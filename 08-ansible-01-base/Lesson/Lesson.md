@@ -6,8 +6,60 @@
 
 ## Подготовка к выполнению
 1. Установите ansible версии 2.10 или выше.
-2. Создайте свой собственный публичный репозиторий на github с произвольным именем.
-3. Скачайте [playbook](./playbook/) из репозитория с домашним заданием и перенесите его в свой репозиторий.
+```ps
+root@server1:~# ansible --version
+-bash: ansible: command not found
+```
+```ps
+root@server1:~# pip3 install ansible
+Collecting ansible
+  Downloading ansible-5.3.0.tar.gz (38.0 MB)
+     |████████████████████████████████| 38.0 MB 65 kB/s 
+Collecting ansible-core~=2.12.2
+  Downloading ansible-core-2.12.2.tar.gz (7.8 MB)
+     |████████████████████████████████| 7.8 MB 726 kB/s 
+Requirement already satisfied: PyYAML in /usr/lib/python3/dist-packages (from ansible-core~=2.12.2->ansible) (5.3.1)
+Requirement already satisfied: cryptography in /usr/lib/python3/dist-packages (from ansible-core~=2.12.2->ansible) (2.8)
+Collecting jinja2
+  Downloading Jinja2-3.0.3-py3-none-any.whl (133 kB)
+     |████████████████████████████████| 133 kB 8.6 MB/s 
+Collecting packaging
+  Downloading packaging-21.3-py3-none-any.whl (40 kB)
+     |████████████████████████████████| 40 kB 5.4 MB/s 
+Collecting resolvelib<0.6.0,>=0.5.3
+  Downloading resolvelib-0.5.4-py2.py3-none-any.whl (12 kB)
+Collecting MarkupSafe>=2.0
+  Downloading MarkupSafe-2.0.1-cp38-cp38-manylinux2010_x86_64.whl (30 kB)
+Collecting pyparsing!=3.0.5,>=2.0.2
+  Downloading pyparsing-3.0.7-py3-none-any.whl (98 kB)
+     |████████████████████████████████| 98 kB 4.7 MB/s 
+Building wheels for collected packages: ansible, ansible-core
+  Building wheel for ansible (setup.py) ... done
+  Created wheel for ansible: filename=ansible-5.3.0-py3-none-any.whl size=63194604 sha256=bb4a4949104df11efe536aa3cf3f30c8a0285bdd58e0addc4272de93da457492
+  Stored in directory: /root/.cache/pip/wheels/e4/99/b9/ef48a86add5258b2ad29f037ec9892f09ba27df769f15ec250
+  Building wheel for ansible-core (setup.py) ... done
+  Created wheel for ansible-core: filename=ansible_core-2.12.2-py3-none-any.whl size=2073804 sha256=eed5288334026d58c4d4533b10647591d29cb2660fe4c3f4b7fe78376b3272aa
+  Stored in directory: /root/.cache/pip/wheels/99/88/72/24c0d37fb2e030bce4186f7bfae8694d2d862d344f9470155d
+Successfully built ansible ansible-core
+Installing collected packages: MarkupSafe, jinja2, pyparsing, packaging, resolvelib, ansible-core, ansible
+Successfully installed MarkupSafe-2.0.1 ansible-5.3.0 ansible-core-2.12.2 jinja2-3.0.3 packaging-21.3 pyparsing-3.0.7 resolvelib-0.5.4
+```
+```ps
+root@server1:~# ansible --version
+ansible [core 2.12.2]
+  config file = None
+  configured module search path = ['/root/.ansible/plugins/modules', '/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/local/lib/python3.8/dist-packages/ansible
+  ansible collection location = /root/.ansible/collections:/usr/share/ansible/collections
+  executable location = /usr/local/bin/ansible
+  python version = 3.8.10 (default, Nov 26 2021, 20:14:08) [GCC 9.3.0]
+  jinja version = 3.0.3
+  libyaml = True
+root@server1:~# 
+
+```
+3. Создайте свой собственный публичный репозиторий на github с произвольным именем.
+4. Скачайте [playbook](./playbook/) из репозитория с домашним заданием и перенесите его в свой репозиторий.
 
 ## Основная часть
 1. Попробуйте запустить playbook на окружении из `test.yml`, зафиксируйте какое значение имеет факт `some_fact` для указанного хоста при выполнении playbook'a.
