@@ -130,12 +130,110 @@ localhost                  : ok=3    changed=0    unreachable=0    failed=0    s
 
 3. Воспользуйтесь подготовленным (используется `docker`) или создайте собственное окружение для проведения дальнейших испытаний.
 ```yml
+root@server1:~# docker image ls
+REPOSITORY                    TAG        IMAGE ID       CREATED         SIZE
+postgres                      13         e01c76bb1351   10 days ago     371MB
+postgres                      12         58bff7631346   4 weeks ago     371MB
+dockerlesson                  1.0        24ef0db48b2f   5 weeks ago     85.3MB
+zakharovnpa/debian            009        888b869de873   7 weeks ago     124MB
+zakharovnpa/centos7           001        62ad6751e301   7 weeks ago     261MB
+zakharovnpa/nginx             13.12.21   4b8b755d634a   7 weeks ago     141MB
+zakharovnpa/ansible           8.12.21    06b6ca73286e   2 months ago    227MB
+python                        3-alpine   eb5bc7d10d52   2 months ago    45.4MB
+nginx                         latest     f652ca386ed1   2 months ago    141MB
+debian                        latest     05d2318291e3   2 months ago    124MB
+alpine                        3.14       0a97eee8041e   2 months ago    5.61MB
+ubuntu                        latest     ba6acccedd29   3 months ago    72.8MB
+hello-world                   latest     feb5d9fea6a5   4 months ago    13.3kB
+centos                        7          eeb6ee3f44bd   4 months ago    204MB
+centos                        latest     5d0da3dc9764   4 months ago    231MB
+teikadev/postgres12-partman   latest     63db8bbf0186   24 months ago   155MB
+
+
+```
+```yml
+root@server1:~# docker run -d --name ubuntu ba6acccedd29 sleep 60000000
+c028217942579e6001eae90aa8bd8ce3d35f9c2896da4ccba94fb2c8c3558821
+root@server1:~# 
+root@server1:~# docker ps
+CONTAINER ID   IMAGE          COMMAND            CREATED         STATUS         PORTS     NAMES
+c02821794257   ba6acccedd29   "sleep 60000000"   7 seconds ago   Up 6 seconds             ubuntu
+root@server1:~# 
+root@server1:~# docker run -d --name centos7 eeb6ee3f44bd sleep 60000000
+6a83d9d628c2bb2d008c1cb61932a05067691f7828c14df5bde8cee844728d37
+root@server1:~# 
+root@server1:~# 
+
 
 ```
 
-4. Проведите запуск playbook на окружении из `prod.yml`. Зафиксируйте полученные значения `some_fact` для каждого из `managed host`.
 ```yml
+root@server1:~# docker ps
+CONTAINER ID   IMAGE          COMMAND            CREATED          STATUS          PORTS     NAMES
+6a83d9d628c2   eeb6ee3f44bd   "sleep 60000000"   3 seconds ago    Up 2 seconds              centos7
+c02821794257   ba6acccedd29   "sleep 60000000"   54 seconds ago   Up 53 seconds             ubuntu
 
+```
+
+
+4. Проведите запуск playbook на окружении из `prod.yml`. Зафиксируйте полученные значения `some_fact` для каждого из `managed host`.
+File site.yml
+```yml
+---
+  - name: Print os facts
+    hosts: all
+    tasks:
+      - name: Print OS
+        debug:
+          msg: "{{ ansible_distribution }}"
+      - name: Print fact
+        debug:
+          msg: "{{ some_fact }}"
+
+
+```
+File prod.yml
+```yml
+---
+  el:
+    hosts:
+      centos7:
+        ansible_connection: docker
+  deb:
+    hosts:
+      ubuntu:
+        ansible_connection: docker
+
+```
+Вывод ` PLAY [Print os facts] ` 
+```yml
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/hosts.yml site.yml 
+
+PLAY [Print os facts] ****************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [localhost]
+ok: [centos7]
+
+TASK [Print OS] **********************************************************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "Ubuntu"
+}
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+
+TASK [Print fact] ********************************************************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "deb"
+}
+ok: [centos7] => {
+    "msg": "el"
+}
+
+PLAY RECAP ***************************************************************************************************************************************************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
 ```
 
 5. Добавьте факты в `group_vars` каждой из групп хостов так, чтобы для `some_fact` получились следующие значения: для `deb` - 'deb default fact', для `el` - 'el default fact'.
