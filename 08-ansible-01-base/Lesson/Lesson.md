@@ -284,12 +284,57 @@ localhost                  : ok=3    changed=0    unreachable=0    failed=0    s
 
 7. При помощи `ansible-vault` зашифруйте факты в `group_vars/deb` и `group_vars/el` с паролем `netology`.
 ```yml
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-vault encrypt group_vars/deb/examp.yml
+New Vault password: 
+Confirm New Vault password: 
+Encryption successful
+```
+```yml
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-vault encrypt group_vars/el/examp.yml
+New Vault password: 
+Confirm New Vault password: 
+Encryption successful
 
 ```
 
-
 8. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь в работоспособности.
 ```yml
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/hosts.yml site.yml 
+
+PLAY [Print os facts] ****************************************************************************************************************************************************************************************
+ERROR! Attempting to decrypt but no vault secrets found
+
+```
+
+```yml
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/hosts.yml site.yml --ask-vault-pass
+Vault password: 
+
+PLAY [Print os facts] ****************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [localhost]
+ok: [centos7]
+
+TASK [Print OS] **********************************************************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "Ubuntu"
+}
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+
+TASK [Print fact] ********************************************************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "deb default fact"
+}
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+
+PLAY RECAP ***************************************************************************************************************************************************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
 
 ```
 
