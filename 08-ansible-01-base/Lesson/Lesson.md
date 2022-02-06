@@ -237,13 +237,49 @@ localhost                  : ok=3    changed=0    unreachable=0    failed=0    s
 ```
 
 5. Добавьте факты в `group_vars` каждой из групп хостов так, чтобы для `some_fact` получились следующие значения: для `deb` - 'deb default fact', для `el` - 'el default fact'.
+
+File group_vars/deb/example.yml
 ```yml
+---
+  some_fact: "deb default fact"
+
+```
+File group_vars/el/example.yml
+```yml
+---
+  some_fact: "el default fact"
 
 ```
 
 6.  Повторите запуск playbook на окружении `prod.yml`. Убедитесь, что выдаются корректные значения для всех хостов.
 ```yml
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/hosts.yml site.yml 
 
+PLAY [Print os facts] ****************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [localhost]
+ok: [centos7]
+
+TASK [Print OS] **********************************************************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "Ubuntu"
+}
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+
+TASK [Print fact] ********************************************************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "deb default fact"
+}
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+
+PLAY RECAP ***************************************************************************************************************************************************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
 ```
 
 7. При помощи `ansible-vault` зашифруйте факты в `group_vars/deb` и `group_vars/el` с паролем `netology`.
