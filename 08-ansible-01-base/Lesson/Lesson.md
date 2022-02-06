@@ -153,6 +153,7 @@ localhost                  : ok=3    changed=0    unreachable=0    failed=0    s
 
 ```
 
+
 8. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь в работоспособности.
 ```yml
 
