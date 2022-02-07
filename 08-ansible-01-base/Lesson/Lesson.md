@@ -253,33 +253,33 @@ File group_vars/el/example.yml
 
 6.  Повторите запуск playbook на окружении `prod.yml`. Убедитесь, что выдаются корректные значения для всех хостов.
 ```yml
-root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/hosts.yml site.yml 
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/prod.yml site.yml
 
 PLAY [Print os facts] ****************************************************************************************************************************************************************************************
 
 TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
-ok: [localhost]
+ok: [ubuntu]
 ok: [centos7]
 
 TASK [Print OS] **********************************************************************************************************************************************************************************************
-ok: [localhost] => {
-    "msg": "Ubuntu"
-}
 ok: [centos7] => {
     "msg": "CentOS"
 }
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
 
 TASK [Print fact] ********************************************************************************************************************************************************************************************
-ok: [localhost] => {
-    "msg": "deb default fact"
-}
 ok: [centos7] => {
     "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
 }
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************
 centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 ```
 
 7. При помощи `ansible-vault` зашифруйте факты в `group_vars/deb` и `group_vars/el` с паролем `netology`.
@@ -307,35 +307,34 @@ ERROR! Attempting to decrypt but no vault secrets found
 ```
 
 ```yml
-root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/hosts.yml site.yml --ask-vault-pass
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/prod.yml site.yml --ask-vault-pass
 Vault password: 
 
 PLAY [Print os facts] ****************************************************************************************************************************************************************************************
 
 TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
-ok: [localhost]
+ok: [ubuntu]
 ok: [centos7]
 
 TASK [Print OS] **********************************************************************************************************************************************************************************************
-ok: [localhost] => {
-    "msg": "Ubuntu"
-}
 ok: [centos7] => {
     "msg": "CentOS"
 }
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
 
 TASK [Print fact] ********************************************************************************************************************************************************************************************
-ok: [localhost] => {
-    "msg": "deb default fact"
-}
 ok: [centos7] => {
     "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
 }
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************
 centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
-
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 ```
 
 9. Посмотрите при помощи `ansible-doc` список плагинов для подключения. Выберите подходящий для работы на `control node`.
