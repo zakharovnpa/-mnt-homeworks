@@ -653,8 +653,86 @@ ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    s
 ```
 
 7. Напишите скрипт на bash: автоматизируйте поднятие необходимых контейнеров, запуск ansible-playbook и остановку контейнеров.
-```ps
 
+Что должен выполнять скрипт:
+- выполнить команду запуска контейнера ` centos7 `
+- независимо от результата выполнения выполнить команду запуска контейнера ` ubuntu `
+- независимо от результата выполнения выполнить команду запуска контейнера ` fedore `
+- независимо от результата выполнения выполнить команду запуска ` ansible-playbook `
+- выполнить проверку условия, что все контейнеры запущены. Использовать регулярки.
+- дождаться окончания выполнения команды запуска ` ansible-playbook `
+- вывести в терминал вывод ` PLAY RECAP `. Использовать регулярки
+- выполнить команду остановки контейнера ` centos7 `
+- независимо от результата выполнения выполнить команду остановки контейнера ` ubuntu `
+- независимо от результата выполнения выполнить команду остановки контейнера ` fedore `
+- вывести все результаты выполненных команд в файл логов
+
+```bash
+#!/usr/bin/env bash
+#
+# Скрипт для запуска контейнеров docker и ansible-playbook
+
+docker run -d --rm --name centos7 eeb6ee3f44bd sleep 60000000 && 
+
+docker run -d --rm --name fedore c31790496329 sleep 60000000 &&
+
+docker run -d --rm --name ubuntu 42a4e3b21923 sleep 60000000 &&
+
+	docker ps | grep 'Up' && 
+	sleep 10 &&
+
+ansible-playbook -i inventory/prod.yml site.yml --ask-vault-pass >> ansible.log && 
+
+docker stop centos7 &&
+docker stop fedore &&
+docker stop ubuntu &&
+
+docker ps
+
+```
+Листинг файла ` ansible.log `
+```ps
+PLAY [Print os facts] **********************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+ok: [fedore]
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Print OS] ****************************************************************
+ok: [localhost] => {
+    "msg": "Ubuntu"
+}
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
+ok: [fedore] => {
+    "msg": "Fedora"
+}
+
+TASK [Print fact] **************************************************************
+ok: [localhost] => {
+    "msg": "PaSSw0rd"
+}
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
+}
+ok: [fedore] => {
+    "msg": "fed default fact"
+}
+
+PLAY RECAP *********************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+fedore                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
 ```
 
 8. Все изменения должны быть зафиксированы и отправлены в вашей личный репозиторий.
