@@ -593,14 +593,14 @@ d81342e16c99   42a4e3b21923   "sleep 60000000"   21 hours ago    Up 21 hours    
 ```
 
 Добавлено в ` inventory/prod.yml `
-```ps
+```yml
   fed:
     hosts:
       fedore:
         ansible_connection: docker
 ```
 Добавлено в ` group_vars/fed/examp.yml `
-```ps
+```yml
 ---
   some_fact: "fed default fact"
 ```
