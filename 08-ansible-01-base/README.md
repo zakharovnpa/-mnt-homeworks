@@ -202,20 +202,160 @@ Encryption successful
 8. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь в работоспособности.
 
 **Ответ:**
+```ps
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/hosts.yml site.yml 
+
+PLAY [Print os facts] ****************************************************************************************************************************************************************************************
+ERROR! Attempting to decrypt but no vault secrets found
+
+```
+Запускаем плейбук с запросом пароля
+```ps
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/prod.yml site.yml --ask-vault-pass
+Vault password: 
+
+PLAY [Print os facts] ****************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Print OS] **********************************************************************************************************************************************************************************************
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
+
+TASK [Print fact] ********************************************************************************************************************************************************************************************
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
+}
+
+PLAY RECAP ***************************************************************************************************************************************************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+```
 
 9. Посмотрите при помощи `ansible-doc` список плагинов для подключения. Выберите подходящий для работы на `control node`.
 
 **Ответ:**
+control node – хост с предустановленным ansible. 
+Найдем список плагинов для подключений.
+```ps
+root@server1:/usr/local/lib/python3.8/dist-packages/ansible/plugins/connection# ansible-doc -t connection -l
+[WARNING]: Collection frr.frr does not support Ansible version 2.12.2
+[WARNING]: Collection ibm.qradar does not support Ansible version 2.12.2
+[WARNING]: Collection splunk.es does not support Ansible version 2.12.2
+ansible.netcommon.httpapi      Use httpapi to run command on network appliances  
+ansible.netcommon.libssh       (Tech preview) Run tasks using libssh for ssh connection 
+ansible.netcommon.napalm       Provides persistent connection using NAPALM    
+ansible.netcommon.netconf      Provides a persistent connection using the netconf protocol 
+ansible.netcommon.network_cli  Use network_cli to run command on network appliances     
+ansible.netcommon.persistent   Use a persistent unix socket for connection   
+community.aws.aws_ssm          execute via AWS Systems Manager          
+community.docker.docker        Run tasks in docker containers    
+community.docker.docker_api    Run tasks in docker containers    
+community.docker.nsenter       execute on host running controller container  
+community.general.chroot       Interact with local chroot      
+community.general.funcd        Use funcd to connect to target    
+community.general.iocage       Run tasks in iocage jails        
+community.general.jail         Run tasks in jails     
+community.general.lxc          Run tasks in lxc containers via lxc python library  
+community.general.lxd          Run tasks in lxc containers via lxc CLI         
+community.general.qubes        Interact with an existing QubesOS AppVM      
+community.general.saltstack    Allow ansible to piggyback on salt minions   
+community.general.zone         Run tasks in a zone instance  
+community.libvirt.libvirt_lxc  Run tasks in lxc containers via libvirt   
+community.libvirt.libvirt_qemu Run tasks on libvirt/qemu virtual machines   
+community.okd.oc               Execute tasks in pods running on OpenShift   
+community.vmware.vmware_tools  Execute tasks inside a VM via VMware Tools   
+containers.podman.buildah      Interact with an existing buildah container   
+containers.podman.podman       Interact with an existing podman container    
+kubernetes.core.kubectl        Execute tasks in pods running on Kubernetes   
+local                          execute on controller                       
+paramiko_ssh                   Run tasks via python ssh (paramiko)      
+psrp                           Run tasks over Microsoft PowerShell Remoting Protocol   
+ssh                            connect via SSH client binary    
+winrm                          Run tasks over Microsoft's WinRM 
+```
+Наиболее подходящий плагин
+```ps
+local                          execute on controller    
+
+```
+Посмотреть описание плагина
+```ps
+ansible-doc -t connection local
+```
 
 10. В `prod.yml` добавьте новую группу хостов с именем  `local`, в ней разместите localhost с необходимым типом подключения.
 
 **Ответ:**
+Для добавления новой группы хостов в файле ` inventory/prod.yml ` добавлено:
+```yml
+  local:
+    hosts:
+      localhost:
+        ansible_connection: local
+
+```
+Создана новая директория ` group_vars/local `
+А в файле ` group_vars/local/examp.yml ` добавлено:
+```yml
+---
+  some_fact: "local default fact"
+
+```
 
 11. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь что факты `some_fact` для каждого из хостов определены из верных `group_vars`.
 
 **Ответ:**
+```ps
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/prod.yml site.yml
+
+PLAY [Print os facts] ****************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [localhost]
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Print OS] **********************************************************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "Ubuntu"
+}
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
+
+TASK [Print fact] ********************************************************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "local default fact"
+}
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
+}
+
+PLAY RECAP ***************************************************************************************************************************************************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+```
 
 12. Заполните `README.md` ответами на вопросы. Сделайте `git push` в ветку `master`. В ответе отправьте ссылку на ваш открытый репозиторий с изменённым `playbook` и заполненным `README.md`.
+
+Файл `README.md` заполнен. Ссылка на репозиторий с измененным `playbook`: [https://github.com/zakharovnpa/Ansible-netology](https://github.com/zakharovnpa/Ansible-netology)
 
 ## Необязательная часть
 
