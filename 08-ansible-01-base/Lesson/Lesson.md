@@ -252,7 +252,7 @@ File group_vars/el/example.yml
 ```
 
 6.  Повторите запуск playbook на окружении `prod.yml`. Убедитесь, что выдаются корректные значения для всех хостов.
-```yml
+```ps
 root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/prod.yml site.yml
 
 PLAY [Print os facts] ****************************************************************************************************************************************************************************************
@@ -283,13 +283,13 @@ ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    s
 ```
 
 7. При помощи `ansible-vault` зашифруйте факты в `group_vars/deb` и `group_vars/el` с паролем `netology`.
-```yml
+```ps
 root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-vault encrypt group_vars/deb/examp.yml
 New Vault password: 
 Confirm New Vault password: 
 Encryption successful
 ```
-```yml
+```ps
 root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-vault encrypt group_vars/el/examp.yml
 New Vault password: 
 Confirm New Vault password: 
@@ -298,15 +298,15 @@ Encryption successful
 ```
 
 8. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь в работоспособности.
-```yml
+```ps
 root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/hosts.yml site.yml 
 
 PLAY [Print os facts] ****************************************************************************************************************************************************************************************
 ERROR! Attempting to decrypt but no vault secrets found
 
 ```
-
-```yml
+Запускаем плейбук с запросом пароля
+```ps
 root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/prod.yml site.yml --ask-vault-pass
 Vault password: 
 
@@ -444,7 +444,7 @@ ansible-doc -t connection local
 ```
 
 11. Запустите playbook на окружении `prod.yml`. При запуске `ansible` должен запросить у вас пароль. Убедитесь что факты `some_fact` для каждого из хостов определены из верных `group_vars`.
-```yml
+```ps
 root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/prod.yml site.yml
 
 PLAY [Print os facts] ****************************************************************************************************************************************************************************************
@@ -493,7 +493,7 @@ ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    s
 ## Необязательная часть
 
 1. При помощи `ansible-vault` расшифруйте все зашифрованные файлы с переменными.
-```yml
+```ps
 root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-vault decrypt group_vars/deb/examp.yml
 Vault password: 
 Decryption successful
@@ -537,7 +537,7 @@ root@server1:~/learning-ansible/Lesson-ansible-01/playbook# cat group_vars/all/e
 
 
 4. Запустите `playbook`, убедитесь, что для нужных хостов применился новый `fact`.
-```yml
+```ps
 root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/prod.yml site.yml --ask-vault-pass
 Vault password: 
 
@@ -592,14 +592,14 @@ d81342e16c99   42a4e3b21923   "sleep 60000000"   21 hours ago    Up 21 hours    
 6a83d9d628c2   eeb6ee3f44bd   "sleep 60000000"   34 hours ago    Up 34 hours              centos7
 ```
 
-Добавлено в ` inventory/prod.yml `
+Добавлена новая группа ` fed ` в ` inventory/prod.yml `
 ```yml
   fed:
     hosts:
       fedore:
         ansible_connection: docker
 ```
-Добавлено в ` group_vars/fed/examp.yml `
+Добавлена новая переменная ` fed default fact ` в ` group_vars/fed/examp.yml `
 ```yml
 ---
   some_fact: "fed default fact"
@@ -654,44 +654,48 @@ ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    s
 
 7. Напишите скрипт на bash: автоматизируйте поднятие необходимых контейнеров, запуск ansible-playbook и остановку контейнеров.
 
-Что должен выполнять скрипт:
+Составлен план действий скрипта:
 - выполнить команду запуска контейнера ` centos7 `
 - независимо от результата выполнения выполнить команду запуска контейнера ` ubuntu `
 - независимо от результата выполнения выполнить команду запуска контейнера ` fedore `
-- независимо от результата выполнения выполнить команду запуска ` ansible-playbook `
-- выполнить проверку условия, что все контейнеры запущены. Использовать регулярки.
+- выдержать паузу 10 секунд
+- выполнить команду запуска ` ansible-playbook `
+- вывести в терминал список запущеных контейнеров.
 - дождаться окончания выполнения команды запуска ` ansible-playbook `
-- вывести в терминал вывод ` PLAY RECAP `. Использовать регулярки
+- вывести в файл логов вывод команды ` ansible-playbook `
 - выполнить команду остановки контейнера ` centos7 `
 - независимо от результата выполнения выполнить команду остановки контейнера ` ubuntu `
 - независимо от результата выполнения выполнить команду остановки контейнера ` fedore `
-- вывести все результаты выполненных команд в файл логов
+- вывести в терминал список запущеных контейнеров.
 
 ```bash
 #!/usr/bin/env bash
 #
-# Скрипт для запуска контейнеров docker и ansible-playbook
+# Скрипт для запуска контейнеров docker и запуска ansible-playbook
 
-docker run -d --rm --name centos7 eeb6ee3f44bd sleep 60000000 && 
+date >> ansible.log &&		# Запись даты выполнения скрипта
+docker run -d --rm --name centos7 eeb6ee3f44bd sleep 60000000 && 	# Старт нового контейнера с именем centos7 на основе образа eeb6ee3f44bd
+docker run -d --rm --name fedore c31790496329 sleep 60000000 &&		# Аналогично для fedore
+docker run -d --rm --name ubuntu 42a4e3b21923 sleep 60000000 &&		# Аналогично для ubuntu
 
-docker run -d --rm --name fedore c31790496329 sleep 60000000 &&
+	sleep 3 &&				# Выполнить остановку скрипта на 3 секунды
+	docker ps | grep 'Up' && 		# Вывод на терминал контейнеров, которые запустились
+	sleep 10 &&				# Выполнить остановку скрипта на 10 секунд
 
-docker run -d --rm --name ubuntu 42a4e3b21923 sleep 60000000 &&
+ansible-playbook -i inventory/prod.yml site.yml --ask-vault-pass >> ansible.log && 	# Запуск playbook с запросом пароля на расшифровку файлов 
+											# и запись результатов в файл ansible.log
 
-	docker ps | grep 'Up' && 
-	sleep 10 &&
+docker stop centos7 &&		# Остановка и удаление уонтейнера с именем centos7
+docker stop fedore &&		# Аналогично для fedore
+docker stop ubuntu &&		# Аналогично для ubuntu
 
-ansible-playbook -i inventory/prod.yml site.yml --ask-vault-pass >> ansible.log && 
-
-docker stop centos7 &&
-docker stop fedore &&
-docker stop ubuntu &&
-
-docker ps
+docker ps		# Вывод на терминал контейнеров, которые запустились
 
 ```
 Листинг файла ` ansible.log `
 ```ps
+Tue 08 Feb 2022 12:41:34 PM UTC
+
 PLAY [Print os facts] **********************************************************
 
 TASK [Gathering Facts] *********************************************************
@@ -732,7 +736,9 @@ PLAY RECAP *********************************************************************
 centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 fedore                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+
 ```
 
 8. Все изменения должны быть зафиксированы и отправлены в вашей личный репозиторий.
