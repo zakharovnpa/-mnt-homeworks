@@ -355,33 +355,270 @@ ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    s
 
 12. Заполните `README.md` ответами на вопросы. Сделайте `git push` в ветку `master`. В ответе отправьте ссылку на ваш открытый репозиторий с изменённым `playbook` и заполненным `README.md`.
 
-Файл `README.md` заполнен. Ссылка на репозиторий с измененным `playbook`: [https://github.com/zakharovnpa/Ansible-netology](https://github.com/zakharovnpa/Ansible-netology)
+Файл `README.md` заполнен. Ссылка на репозиторий с измененным `playbook`: [Ansible-netology](https://github.com/zakharovnpa/Ansible-netology)
 
 ## Необязательная часть
 
 1. При помощи `ansible-vault` расшифруйте все зашифрованные файлы с переменными.
 
 **Ответ:**
+```ps
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-vault decrypt group_vars/deb/examp.yml
+Vault password: 
+Decryption successful
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# 
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-vault decrypt group_vars/el/examp.yml
+Vault password: 
+Decryption successful
+
+```
 
 2. Зашифруйте отдельное значение `PaSSw0rd` для переменной `some_fact` паролем `netology`. Добавьте полученное значение в `group_vars/all/exmp.yml`.
 
 **Ответ:**
+```ps
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-vault encrypt_string
+New Vault password: 
+Confirm New Vault password: 
+Reading plaintext input from stdin. (ctrl-d to end input, twice if your content does not already have a newline)
+PaSSw0rd
+!vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          64643330363533656635636332643634323932653539303466326233386536383666396338306665
+          3465623835666661663433303439346635303662326130300a333239663231666339646464653638
+          63616565303434376664383737323731626538363530343866636432623838333338613139346464
+          6635316338306263350a623864653266653630636532663961336134646261643662393465383537
+          3238
+Encryption successful
+```
+Добавляем полученное значение в `group_vars/all/exmp.yml`
+```ps
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# cat group_vars/all/examp.yml 
+---
+  some_fact: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          64643330363533656635636332643634323932653539303466326233386536383666396338306665
+          3465623835666661663433303439346635303662326130300a333239663231666339646464653638
+          63616565303434376664383737323731626538363530343866636432623838333338613139346464
+          6635316338306263350a623864653266653630636532663961336134646261643662393465383537
+          3238
+
+```
 
 3. Запустите `playbook`, убедитесь, что для нужных хостов применился новый `fact`.
 
 **Ответ:**
+```ps
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/prod.yml site.yml --ask-vault-pass
+Vault password: 
+
+PLAY [Print os facts] ****************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [localhost]
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Print OS] **********************************************************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "Ubuntu"
+}
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
+
+TASK [Print fact] ********************************************************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "PaSSw0rd"
+}
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
+}
+
+PLAY RECAP ***************************************************************************************************************************************************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+```
 
 4. Добавьте новую группу хостов `fedora`, самостоятельно придумайте для неё переменную. В качестве образа можно использовать [этот](https://hub.docker.com/r/pycontribs/fedora).
 
 **Ответ:**
+Запускаем новый контейнер fedore
+```ps
+root@server1:~# docker run -d --name fedore c31790496329 sleep 60000000
+f44a0ef7cfe40e0933865ad73fc0007e9c5bdefc2525096cb46acddfaab98ee6
+root@server1:~# 
+root@server1:~# 
+root@server1:~# docker ps
+CONTAINER ID   IMAGE          COMMAND            CREATED         STATUS         PORTS     NAMES
+f44a0ef7cfe4   c31790496329   "sleep 60000000"   3 seconds ago   Up 3 seconds             fedore
+d81342e16c99   42a4e3b21923   "sleep 60000000"   21 hours ago    Up 21 hours              ubuntu
+6a83d9d628c2   eeb6ee3f44bd   "sleep 60000000"   34 hours ago    Up 34 hours              centos7
+```
+
+Добавлена новая группа ` fed ` в ` inventory/prod.yml `
+```yml
+  fed:
+    hosts:
+      fedore:
+        ansible_connection: docker
+```
+Добавлена новая переменная ` fed default fact ` в ` group_vars/fed/examp.yml `
+```yml
+---
+  some_fact: "fed default fact"
+```
+Запускаем playbook
+```ps
+root@server1:~/learning-ansible/Lesson-ansible-01/playbook# ansible-playbook -i inventory/prod.yml site.yml --ask-vault-pass
+Vault password: 
+
+PLAY [Print os facts] ****************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [localhost]
+ok: [fedore]
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Print OS] **********************************************************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "Ubuntu"
+}
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
+ok: [fedore] => {
+    "msg": "Fedora"
+}
+
+TASK [Print fact] ********************************************************************************************************************************************************************************************
+ok: [localhost] => {
+    "msg": "PaSSw0rd"
+}
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
+}
+ok: [fedore] => {
+    "msg": "fed default fact"
+}
+
+PLAY RECAP ***************************************************************************************************************************************************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+fedore                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
+```
 
 5. Напишите скрипт на bash: автоматизируйте поднятие необходимых контейнеров, запуск ansible-playbook и остановку контейнеров.
 
 **Ответ:**
+Составлен план действий скрипта:
+- выполнить команду запуска контейнера ` centos7 `
+- независимо от результата выполнения выполнить команду запуска контейнера ` ubuntu `
+- независимо от результата выполнения выполнить команду запуска контейнера ` fedore `
+- выдержать паузу 10 секунд
+- выполнить команду запуска ` ansible-playbook `
+- вывести в терминал список запущеных контейнеров.
+- дождаться окончания выполнения команды запуска ` ansible-playbook `
+- вывести в файл логов вывод команды ` ansible-playbook `
+- выполнить команду остановки контейнера ` centos7 `
+- независимо от результата выполнения выполнить команду остановки контейнера ` ubuntu `
+- независимо от результата выполнения выполнить команду остановки контейнера ` fedore `
+- вывести в терминал список запущеных контейнеров.
+
+```bash
+#!/usr/bin/env bash
+#
+# Скрипт для запуска контейнеров docker и запуска ansible-playbook
+
+date >> ansible.log &&		# Запись даты выполнения скрипта
+docker run -d --rm --name centos7 eeb6ee3f44bd sleep 60000000 && 	# Старт нового контейнера с именем centos7 на основе образа eeb6ee3f44bd
+docker run -d --rm --name fedore c31790496329 sleep 60000000 &&		# Аналогично для fedore
+docker run -d --rm --name ubuntu 42a4e3b21923 sleep 60000000 &&		# Аналогично для ubuntu
+
+	sleep 3 &&				# Выполнить остановку скрипта на 3 секунды
+	docker ps | grep 'Up' && 		# Вывод на терминал контейнеров, которые запустились
+	sleep 10 &&				# Выполнить остановку скрипта на 10 секунд
+
+ansible-playbook -i inventory/prod.yml site.yml --ask-vault-pass >> ansible.log && 	# Запуск playbook с запросом пароля на расшифровку файлов 
+											# и запись результатов в файл ansible.log
+
+docker stop centos7 &&		# Остановка и удаление уонтейнера с именем centos7
+docker stop fedore &&		# Аналогично для fedore
+docker stop ubuntu &&		# Аналогично для ubuntu
+
+docker ps		# Вывод на терминал контейнеров, которые запустились
+
+```
+
+Листинг файла ` ansible.log `
+```ps
+Tue 08 Feb 2022 12:41:34 PM UTC
+
+PLAY [Print os facts] **********************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [localhost]
+ok: [fedore]
+ok: [ubuntu]
+ok: [centos7]
+
+TASK [Print OS] ****************************************************************
+ok: [localhost] => {
+    "msg": "Ubuntu"
+}
+ok: [centos7] => {
+    "msg": "CentOS"
+}
+ok: [ubuntu] => {
+    "msg": "Ubuntu"
+}
+ok: [fedore] => {
+    "msg": "Fedora"
+}
+
+TASK [Print fact] **************************************************************
+ok: [localhost] => {
+    "msg": "PaSSw0rd"
+}
+ok: [centos7] => {
+    "msg": "el default fact"
+}
+ok: [ubuntu] => {
+    "msg": "deb default fact"
+}
+ok: [fedore] => {
+    "msg": "fed default fact"
+}
+
+PLAY RECAP *********************************************************************
+centos7                    : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+fedore                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+ubuntu                     : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+
+```
 
 6. Все изменения должны быть зафиксированы и отправлены в вашей личный репозиторий.
 
 **Ответ:**
+Измененный ` playbook ` отправлен в репозиторий [Ansible-netology](https://github.com/zakharovnpa/Ansible-netology)
 
 ---
 
