@@ -19,6 +19,19 @@
 * Затем архив перенесен в Яндекс облако.
 * Ссылка на скачивание была взята из панели разработчика браузера из кода ссылки на кнопке скачать
 * Взятая ссылка была добавлена в ansible-playbook
+```yml
+---
+- name: Check version Java
+  hosts: localhost
+  tasks:
+    - name: Get Java
+      ansible.builtin.get_url: 
+        url: "https://s804sas.storage.yandex.net/rdisk/1.........Jr3yw5--6yZCSqDDextBgY"
+        dest: "/tmp"
+        mode: 0755
+
+```
+
 * Также архив был скачан по взятой с облака ссылке командой 
 ```ps
 curl -O https://s804sas.storage.yandex.net/rdisk/139082549d55ac46f6a77591ecb08eb0a6906d0cbdcb3835c5e53c9eb23bc425/6204f0f5/duT1q6E6kpFTxT3aaITPD9fzKCHXRnJahRxxCO9rinnARF4SWV8lcZbveeI0IzUwOHHrDSYYB7as2-XzzorW-A==?uid=34414669&filename=jdk-11.0.14_linux-x64_bin.tar.gz&disposition=attachment&hash=&limit=0&content_type=application%2Fx-gzip&owner_uid=34414669&fsize=168679847&hid=0fef40a053897309e30543619d23226c&media_type=compressed&tknv=v2&etag=c2037b5f2e2a6ddcfbdfe1489bccfd63&rtoken=e7eIqFuC5HZY&force_default=yes&ycrid=na-3c5259ce3e65a7b6dbd193a5b311927b-downloader9h&ts=5d7a7e5b66740&s=0de7ebb3429f68eb20383eac62727d17cf25e161c2a0002a6999baa8a823e503&pb=U2FsdGVkX19pztWLYUf_22d2O81EXLpp5UmZMzfEl5RRL1Fqgz16R1Gmfxbb7NxvH4SRfEK7S94DqcstbEIB5Jr3yw5--6yZCSqDDextBgY
