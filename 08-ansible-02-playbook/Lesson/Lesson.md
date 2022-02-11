@@ -527,6 +527,55 @@ drwxr-xr-x  3 root  root  4.0K Feb 10 07:39 man
 ```
 Затем архив перенесен в директорию /files
 
+Доустановка ` ansible-lint `
+```ps
+root@server1:/tmp# pip3 install ansible-lint
+Collecting ansible-lint
+  Downloading ansible_lint-5.3.2-py3-none-any.whl (115 kB)
+     |████████████████████████████████| 115 kB 1.4 MB/s 
+Collecting tenacity
+  Downloading tenacity-8.0.1-py3-none-any.whl (24 kB)
+Requirement already satisfied: packaging in /usr/local/lib/python3.8/dist-packages (from ansible-lint) (21.3)
+Collecting ruamel.yaml<1,>=0.15.37; python_version >= "3.7"
+  Downloading ruamel.yaml-0.17.20-py3-none-any.whl (109 kB)
+     |████████████████████████████████| 109 kB 12.5 MB/s 
+Requirement already satisfied: pyyaml in /usr/lib/python3/dist-packages (from ansible-lint) (5.3.1)
+Collecting enrich>=1.2.6
+  Downloading enrich-1.2.7-py3-none-any.whl (8.7 kB)
+Collecting wcmatch>=7.0
+  Downloading wcmatch-8.3-py3-none-any.whl (42 kB)
+     |████████████████████████████████| 42 kB 1.3 MB/s 
+Collecting rich>=9.5.1
+  Downloading rich-11.2.0-py3-none-any.whl (217 kB)
+     |████████████████████████████████| 217 kB 7.1 MB/s 
+Requirement already satisfied: pyparsing!=3.0.5,>=2.0.2 in /usr/local/lib/python3.8/dist-packages (from packaging->ansible-lint) (3.0.7)
+Collecting ruamel.yaml.clib>=0.2.6; platform_python_implementation == "CPython" and python_version < "3.11"
+  Downloading ruamel.yaml.clib-0.2.6-cp38-cp38-manylinux1_x86_64.whl (570 kB)
+     |████████████████████████████████| 570 kB 9.0 MB/s 
+Collecting bracex>=2.1.1
+  Downloading bracex-2.2.1-py3-none-any.whl (12 kB)
+Collecting commonmark<0.10.0,>=0.9.0
+  Downloading commonmark-0.9.1-py2.py3-none-any.whl (51 kB)
+     |████████████████████████████████| 51 kB 5.2 MB/s 
+Collecting pygments<3.0.0,>=2.6.0
+  Downloading Pygments-2.11.2-py3-none-any.whl (1.1 MB)
+     |████████████████████████████████| 1.1 MB 8.6 MB/s 
+Requirement already satisfied: colorama<0.5.0,>=0.4.0 in /usr/lib/python3/dist-packages (from rich>=9.5.1->ansible-lint) (0.4.3)
+Installing collected packages: tenacity, ruamel.yaml.clib, ruamel.yaml, commonmark, pygments, rich, enrich, bracex, wcmatch, ansible-lint
+Successfully installed ansible-lint-5.3.2 bracex-2.2.1 commonmark-0.9.1 enrich-1.2.7 pygments-2.11.2 rich-11.2.0 ruamel.yaml-0.17.20 ruamel.yaml.clib-0.2.6 tenacity-8.0.1 wcmatch-8.3
+
+```
+
+```ps
+root@server1:/tmp# type ansible-lint
+ansible-lint is /usr/local/bin/ansible-lint
+root@server1:/tmp# 
+root@server1:/tmp# which ansible-lint
+/usr/local/bin/ansible-lint
+
+
+```
+
 ## Основная часть
 1. Приготовьте свой собственный inventory файл `prod.yml`.
 
