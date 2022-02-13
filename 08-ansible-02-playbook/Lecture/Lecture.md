@@ -306,14 +306,38 @@ tags:
 - 02:13:10 - -vvv
 
 
-- 02:15:05 - разбор и листинг домашнего playbook
-      - описание работы плейбука
-- 02:18:30 - про циклы и until. Будет выполнять таску, пока не произойдет условие цикла
-- 02:20:30 - объяснение retries - кол-во попыток цикла (это можно вместо until) также можно tiemeout
-- 02:22:30 - модуль file для создания директорий. Директорию можно создать не только при помощи фактов, но и при помощи переменнх group_vars
-- 02:22:48 - модуль unarchive
-- 02:23:40 - моодуль creates проверяет, что по каком-то пути созданы файлы. Если файл не найдется, то таска зафейлится
-- 02:24:20 - про extra_opts
+- 02:15:03 - разбор и листинг домашнего playbook
+- 02:17:00 - описание работы плейбука.  Play `Iinstall Java`
+- 02:17:05 - Task ` Set facts install java 11 vars `. Создаем новую динамическую переменную чере содуль ` set_fact `, котора имеет ключ ` java_home `, а в значении хардкор `/opt/jdk/`  и пеерменная `java_jdk_version` из варсов. Также поставлен тег таски `tags: java`.
+```yml
+      set_fact:
+        java_home: "/opt/jdk/{{ java_jdk_version }}"
+      tags: java
+```
+- 02:17:40 - вторая таска `Upload .tar.gz file containing binaries from local storage` закачивает на `manage_node` файл с архивом, который находится на `control_node` по пути на `localhost`, указанному в переменной `java_oracle_jdk_package ` в файле `group_vars/all/vars.yml`
+`java_oracle_jdk_package: "jdk-{{ java_jdk_version }}_linux-x64_bin.tar.gz"`
+Модуль `copy` ищет файл на локалхосте и отправляет его на `manage_node` по пути в `dest: "/tmp/jdk-{{ java_jdk_version }}.tar.gz"`
+
+```yml
+    - name: Upload .tar.gz file containing binaries from local storage
+      copy:
+        src: "{{ java_oracle_jdk_package }}"
+        dest: "/tmp/jdk-{{ java_jdk_version }}.tar.gz"
+      register: download_java_binaries
+      until: download_java_binaries is succeeded
+      tags: java
+```
+- 02:18:15 - это все также записывается `register` в переменную `download_java_binaries` . А для чего оно записывается: для организации цикла на основе ` until `
+
+- 02:18:30 - про циклы и ` until `. Будет выполнять таску, пока не произойдет условие цикла `download_java_binaries is succeeded` . Т.е. эта таска будет ыполняться до тех пор, пока условие `download_java_binaries` не произойдет успешно `s succeeded`.
+- 02:20:30 - объяснение ` retries ` - кол-во попыток цикла (это можно вместо until) также можно tiemeout
+- 02:21:50 - про таску ` Ensure installation dir exist `
+- 02:22:30 - модуль ` file ` для создания директорий. Директорию можно создать не только при помощи фактов, но и при помощи переменнх group_vars
+Будут созданы все поддиректории, которые в этом пути указаны.
+- 02:22:48 - модуль ` unarchive `
+- 02:23:40 - модуль ` creates ` проверяет, что по каком-то пути созданы файлы. Если файл не найдется, то таска зафейлится
+- 02:24:20 - про ` extra_opts `
+- 02:24:23 - пояснение по Таске "Export environment variables"
 - 02:24:45 - про template модуль для проброса файла шаблона .j2 на manage-node в файлик jdk.sh который создается с наполнением, котороее сть в teamplate
          Есть папка template. Здесь лежать файлы .j2. И они вызываются по пути имя папки - имя файла. Директорию назначеня модуль создавать не может,
          надо чтобы директория уже была создана.
@@ -323,6 +347,7 @@ tags:
          src: .jd2
          dst: /../.sh
          ```
+-02:27:03 - окончание описания playbook для Java
 - 02:27:10 - описание playbook Elasticsearch
          - задача - upload tar.gz модулем url_get. Для скачивания нужной версии нужно параметризовать URL, т.е. 
          добавить {{  elastic_version }} в ссылку на скачивание. Это значит что каждого экземпляра дистрибутив 
