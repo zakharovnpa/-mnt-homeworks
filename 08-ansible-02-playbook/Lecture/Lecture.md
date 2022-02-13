@@ -369,7 +369,7 @@ extra_opts:
 ```
 или так
 ```yml
-xtra_opts: [--strip-components=1], [--strip-components=2], [--strip-components=3]
+extra_opts: [--strip-components=1], [--strip-components=2], [--strip-components=3]
 ```
 
 - 02:24:23 - пояснение по Таске "Export environment variables"
@@ -411,10 +411,12 @@ xtra_opts: [--strip-components=1], [--strip-components=2], [--strip-components=3
             
         
             
-02:35 - запуск playbook --check 
-02:42:00 - уоманда на просмотр ansible-doc ` ansible-doc -t connection ssh `
-02:46:20 - модуль unarchivec
-                     reate - создание директорий
+- 02:35 - запуск playbook --check 
+- 02:42:00 - команда на просмотр ansible-doc ` ansible-doc -t connection ssh `
+- 02:46:20 - модуль unarchivec
+- 02:46:20 - create - создание директорий
+- 02:47:20 - вывод переменной $JAVA_HOME
+                     
 
 
 ### 26Домашнее задание
