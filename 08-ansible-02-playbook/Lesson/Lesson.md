@@ -188,42 +188,28 @@ root@server1:/tmp# which ansible-lint
 
 **Ответ:**
 
-В лекции "8.3. Использование Yandex Cloud" описано 
-
-использование фактов хостов: 01:12:30
-создание инвентори: 01:13:50
-Создание в Яндекс.Облаке ВМ: 01:18:00
-и запуск playbook:01:21:00
-
-
-
-В соответствии с тем, что у нас есть
+- inventory файл `prod.yml`
 ``` yml
-el:
-   hosts:
-     centos7:
+---
+  deb:
+    hosts:
+      ubuntu:
         ansible_connection: docker
 
-```
+  elasticsearch:
+    hosts:
+      fedore:
+        ansible_connection: docker
 
+  kibana:
+    hosts:
+      fedore-core:
+        ansible_connection: docker
 
-```yml
----
-centos7:
-  hosts:
-    localhost:
-      ansible_connection: ssh
-      ansible_user: root
 
 ```
 
 2. Допишите playbook: нужно сделать ещё один play, который устанавливает и настраивает kibana.
-Точно также как настривать эластик. Все рубль- в рубль.
-скачать тар-гз
-сделать тимплейт с-ашника
-разархивировать тар-гз
-создать директорию
-
 
 **Ответ:**
 ```
@@ -248,137 +234,120 @@ Kibana – тиражируемая свободная программная п
 Дописываем playbook 
 ```yml
 ---
-name: Install Kibana
-  hosts: ubuntu
-  ansible_connext: docker
-    tasks: Download kibana
-      - name:Get Kibana
-        get_url: "https://artifacts.elastic.co/downloads/kibana/kibana-8.0.0-linux-x86_64.tar.gz"
-
-```
-```yml
-- name: Install Java
-  hosts: all
+- name: Install Kibana
+  hosts: kibana
   tasks:
-    - name: Set facts for Java 11 vars
-      set_fact:
-        java_home: "/opt/jdk/{{ java_jdk_version }}"
-      tags: java
-    - name: Upload .tar.gz file containing binaries from local storage
-      copy:
-        src: "{{ java_oracle_jdk_package }}"
-        dest: "/tmp/jdk-{{ java_jdk_version }}.tar.gz"
-      register: download_java_binaries
-      until: download_java_binaries is succeeded
-      tags: java
-    - name: Ensure installation dir exists
+    - name: Upload tar.gz Kibana from remote URL
+      get_url:
+        url: "https://artifacts.elastic.co/downloads/kibana/kibana-{{ kibana_version }}-linux-x86_64.tar.gz"
+        dest: "/tmp/kibana-{{ kibana_version }}-linux-x86_64.tar.gz"
+        mode: 0755
+        timeout: 60
+        force: true
+        validate_certs: false
+      register: get_kibana
+      until: get_kibana is succeeded
+      tags: kibana
+    - name: Create directrory for Kibana
       become: true
       file:
         state: directory
-        path: "{{ java_home }}"
-      tags: java
-    - name: Extract java in the installation directory
+        path: "{{ kibana_home }}"
+      tags: kibana
+    - name: Extract Kibana in the installation directory
       become: true
       unarchive:
         copy: false
-        src: "/tmp/jdk-{{ java_jdk_version }}.tar.gz"
-        dest: "{{ java_home }}"
+        src: "/tmp/kibana-{{ kibana_version }}-linux-x86_64.tar.gz"
+        dest: "{{ kibana_home }}"
         extra_opts: [--strip-components=1]
-        creates: "{{ java_home }}/bin/java"
-      tags:
-        - java
-    - name: Export environment variables
+        creates: "{{ kibana_home }}/bin/kibana"
+      tags: kibana
+    - name: Set environment Kibana
       become: true
       template:
-        src: jdk.sh.j2
-        dest: /etc/profile.d/jdk.sh
-      tags: java
+        src: templates/kib.sh.j2
+        dest: /etc/profile.d/kib.sh
+      tags: kibana
+
 
 ```
+
 
 3. При создании tasks рекомендую использовать модули: `get_url`, `template`, `unarchive`, `file`.
 
 **Ответ:**
-
-```yml
-- name: Install Kibana
-  hosts: all
-  tasks:
-    - name: Set facts for Kibana 11 vars
-      set_fact:
-        java_home: "/opt/jdk/{{ java_jdk_version }}"
-      tags: kibana
-    - name: Upload .tar.gz file containing binaries from local storage
-      copy:
-        src: "{{ java_oracle_jdk_package }}"
-        dest: "/tmp/jdk-{{ java_jdk_version }}.tar.gz"
-      register: download_java_binaries
-      until: download_java_binaries is succeeded
-      tags: java
-    - name: Ensure installation dir exists
-      become: true
-      file:
-        state: directory
-        path: "{{ java_home }}"
-      tags: java
-    - name: Extract java in the installation directory
-      become: true
-      unarchive:
-        copy: false
-        src: "/tmp/jdk-{{ java_jdk_version }}.tar.gz"
-        dest: "{{ java_home }}"
-        extra_opts: [--strip-components=1]
-        creates: "{{ java_home }}/bin/java"
-      tags:
-        - java
-    - name: Export environment variables
-      become: true
-      template:
-        src: jdk.sh.j2
-        dest: /etc/profile.d/jdk.sh
-      tags: java
-
-
-```
+Данные модули использованы.
 
 4. Tasks должны: скачать нужной версии дистрибутив, выполнить распаковку в выбранную директорию, сгенерировать конфигурацию с параметрами.
 
 **Ответ:**
 
-```yml
+- Версия Кибаны скачивается в соответствии с версией Elasrticsearch
+```sh
+---
+elastic_version: "7.10.1"
+elastic_home: "/opt/elastic/{{ elastic_version }}"
+```
+
+```sh
+---
+kibana_version: "7.10.1"
+kibana_home: "/opt/kibana/{{ kibana_version }}"
 
 ```
+
+- Распаковка выпоняется модулем `unarchive` в сгенеррированную параметрами директорию `/opt/kibana/7.10.1`
+```ps
+      unarchive:
+        copy: false
+        src: "/tmp/kibana-{{ kibana_version }}-linux-x86_64.tar.gz"
+        dest: "{{ kibana_home }}"
+        extra_opts: [--strip-components=1]
+        creates: "{{ kibana_home }}/bin/kibana"
+```
+
 
 5. Запустите `ansible-lint site.yml` и исправьте ошибки, если они есть.
 
 **Ответ:**
-Проверка идет на таком окружении: локалхост и три различных докер-контейнера.
-Линтер собщает о том, что не установлены права доступа к файлам в следующих тасках:
-  - Upload .tar.gz file containing binaries from local storage
-  - Ensure installation dir exists
-  - Extract java in the installation directory
 
-Данные директории еще не созданы
+Проверка идет на таком окружении: три различных докер-контейнера.
+Линтер собщает о том, что не установлены права доступа к файлам.
+Данные директории и файлы еще не созданы.
 
 ```yml
-root@server1:~/learning-ansible/Lesson-ansible-02/ansible-02-playbook# ansible-lint 2-site.yml 
-WARNING  Overriding detected file kind 'yaml' with 'playbook' for given positional argument: 2-site.yml
-WARNING  Listing 3 violation(s) that are fatal
+root@server1:~/learning-ansible/Lesson-ansible-02/ansible-02-playbook# ansible-lint 7-site.yml 
+WARNING  Overriding detected file kind 'yaml' with 'playbook' for given positional argument: 7-site.yml
+WARNING  Listing 7 violation(s) that are fatal
 risky-file-permissions: File permissions unset or incorrect
-2-site.yml:10 Task/Handler: Upload .tar.gz file containing binaries from local storage
+7-site.yml:10 Task/Handler: Upload .tar.gz file containing binaries from local storage
 
 risky-file-permissions: File permissions unset or incorrect
-2-site.yml:17 Task/Handler: Ensure installation dir exists
+7-site.yml:18 Task/Handler: Ensure installation dir exists
 
 risky-file-permissions: File permissions unset or incorrect
-2-site.yml:33 Task/Handler: Export environment variables
+7-site.yml:35 Task/Handler: Export environment variables
+
+risky-file-permissions: File permissions unset or incorrect
+7-site.yml:56 Task/Handler: Create directrory for Elasticsearch
+
+risky-file-permissions: File permissions unset or incorrect
+7-site.yml:72 Task/Handler: Set environment Elastic
+
+risky-file-permissions: File permissions unset or incorrect
+7-site.yml:93 Task/Handler: Create directrory for Kibana
+
+risky-file-permissions: File permissions unset or incorrect
+7-site.yml:108 Task/Handler: Set environment Kibana
 
 You can skip specific rules or tags by adding them to your configuration file:
 # .ansible-lint
 warn_list:  # or 'skip_list' to silence them completely
   - experimental  # all rules tagged as experimental
 
-Finished with 0 failure(s), 3 warning(s) on 1 files.
+Finished with 0 failure(s), 7 warning(s) on 1 files.
+
 ```
 
 6. Попробуйте запустить playbook на этом окружении с флагом `--check`.
@@ -398,34 +367,67 @@ fatal: [centos7]: FAILED! => {
 - Вывод: на разном окружении могут быть различные результаты выполнения плейбука.
 
 - Вывод команды  с включенным режимом debug [ansible-playbook -i inventory/4-prod.yml 4-site.yml --check](/08-ansible-02-playbook/Lesson/Files/ansible-playbook-check-4.md) на окружении 4-prod.yml
-- Успешная отработка плейбука:
+
+
+- Успешная отработка плейбука с флагом --check:
 ```ps
-root@server1:~/learning-ansible/Lesson-ansible-02/ansible-02-playbook# ansible-playbook -i inventory/4-prod.yml 4-site.yml
+root@server1:~/learning-ansible/Lesson-ansible-02/ansible-02-playbook# ansible-playbook 7-site.yml -i inventory/7-prod.yml --check
 
 PLAY [Install Java] ******************************************************************************************************************************************************************************************
 
 TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [fedore]
 ok: [ubuntu]
+ok: [fedore-core]
 
 TASK [Set facts for Java 11 vars] ****************************************************************************************************************************************************************************
 ok: [ubuntu]
+ok: [fedore]
+ok: [fedore-core]
 
 TASK [Upload .tar.gz file containing binaries from local storage] ********************************************************************************************************************************************
-changed: [ubuntu]
+changed: [fedore-core]
+ok: [fedore]
+ok: [ubuntu]
 
 TASK [Ensure installation dir exists] ************************************************************************************************************************************************************************
-changed: [ubuntu]
+ok: [fedore]
+ok: [ubuntu]
+changed: [fedore-core]
 
 TASK [Extract java in the installation directory] ************************************************************************************************************************************************************
-changed: [ubuntu]
+skipping: [ubuntu]
+skipping: [fedore]
+An exception occurred during task execution. To see the full traceback, use -vvv. The error was: NoneType: None
+fatal: [fedore-core]: FAILED! => {"changed": false, "msg": "dest '/opt/jdk/11.0.14' must be an existing dir"}
 
 TASK [Export environment variables] **************************************************************************************************************************************************************************
-changed: [ubuntu]
+ok: [ubuntu]
+ok: [fedore]
+
+PLAY [Install Elasticsearch] *********************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [fedore]
+
+TASK [Upload tar.gz Elasticsearch from remote URL] ***********************************************************************************************************************************************************
+changed: [fedore]
+
+TASK [Create directrory for Elasticsearch] *******************************************************************************************************************************************************************
+ok: [fedore]
+
+TASK [Extract Elasticsearch in the installation directory] ***************************************************************************************************************************************************
+skipping: [fedore]
+
+TASK [Set environment Elastic] *******************************************************************************************************************************************************************************
+ok: [fedore]
+
+PLAY [Install Kibana] ****************************************************************************************************************************************************************************************
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************
-ubuntu                     : ok=6    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-
-
+fedore                     : ok=9    changed=1    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0   
+fedore-core                : ok=4    changed=2    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0   
+ubuntu                     : ok=5    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0  
 ```
 
 
@@ -434,7 +436,79 @@ ubuntu                     : ok=6    changed=4    unreachable=0    failed=0    s
 Также можно зайти на систему и там посмотреть
 **Ответ:**
 
-```yml
+```sh
+root@server1:~/learning-ansible/Lesson-ansible-02/ansible-02-playbook# ansible-playbook 7-site.yml -i inventory/7-prod.yml --diff
+
+PLAY [Install Java] ******************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [fedore-core]
+ok: [fedore]
+ok: [ubuntu]
+
+TASK [Set facts for Java 11 vars] ****************************************************************************************************************************************************************************
+ok: [ubuntu]
+ok: [fedore]
+ok: [fedore-core]
+
+TASK [Upload .tar.gz file containing binaries from local storage] ********************************************************************************************************************************************
+ok: [fedore]
+ok: [ubuntu]
+ok: [fedore-core]
+
+TASK [Ensure installation dir exists] ************************************************************************************************************************************************************************
+ok: [ubuntu]
+ok: [fedore]
+ok: [fedore-core]
+
+TASK [Extract java in the installation directory] ************************************************************************************************************************************************************
+skipping: [ubuntu]
+skipping: [fedore]
+skipping: [fedore-core]
+
+TASK [Export environment variables] **************************************************************************************************************************************************************************
+ok: [ubuntu]
+ok: [fedore]
+ok: [fedore-core]
+
+PLAY [Install Elasticsearch] *********************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [fedore]
+
+TASK [Upload tar.gz Elasticsearch from remote URL] ***********************************************************************************************************************************************************
+ok: [fedore]
+
+TASK [Create directrory for Elasticsearch] *******************************************************************************************************************************************************************
+ok: [fedore]
+
+TASK [Extract Elasticsearch in the installation directory] ***************************************************************************************************************************************************
+skipping: [fedore]
+
+TASK [Set environment Elastic] *******************************************************************************************************************************************************************************
+ok: [fedore]
+
+PLAY [Install Kibana] ****************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [fedore-core]
+
+TASK [Upload tar.gz Kibana from remote URL] ******************************************************************************************************************************************************************
+ok: [fedore-core]
+
+TASK [Create directrory for Kibana] **************************************************************************************************************************************************************************
+ok: [fedore-core]
+
+TASK [Extract Kibana in the installation directory] **********************************************************************************************************************************************************
+skipping: [fedore-core]
+
+TASK [Set environment Kibana] ********************************************************************************************************************************************************************************
+ok: [fedore-core]
+
+PLAY RECAP ***************************************************************************************************************************************************************************************************
+fedore                     : ok=9    changed=0    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0   
+fedore-core                : ok=9    changed=0    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0   
+ubuntu                     : ok=5    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0 
 
 ```
 
@@ -443,38 +517,305 @@ ubuntu                     : ok=6    changed=4    unreachable=0    failed=0    s
 **Ответ:**
 
 ```ps
-root@server1:~/learning-ansible/Lesson-ansible-02/ansible-02-playbook# ansible-playbook -i inventory/4-prod.yml 4-site.yml --diff
+root@server1:~/learning-ansible/Lesson-ansible-02/ansible-02-playbook# ansible-playbook 7-site.yml -i inventory/7-prod.yml --diff
 
 PLAY [Install Java] ******************************************************************************************************************************************************************************************
 
 TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [fedore-core]
+ok: [fedore]
 ok: [ubuntu]
 
 TASK [Set facts for Java 11 vars] ****************************************************************************************************************************************************************************
 ok: [ubuntu]
+ok: [fedore]
+ok: [fedore-core]
 
 TASK [Upload .tar.gz file containing binaries from local storage] ********************************************************************************************************************************************
+ok: [fedore]
 ok: [ubuntu]
+ok: [fedore-core]
 
 TASK [Ensure installation dir exists] ************************************************************************************************************************************************************************
 ok: [ubuntu]
+ok: [fedore]
+ok: [fedore-core]
 
 TASK [Extract java in the installation directory] ************************************************************************************************************************************************************
 skipping: [ubuntu]
+skipping: [fedore]
+skipping: [fedore-core]
 
 TASK [Export environment variables] **************************************************************************************************************************************************************************
 ok: [ubuntu]
+ok: [fedore]
+ok: [fedore-core]
+
+PLAY [Install Elasticsearch] *********************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [fedore]
+
+TASK [Upload tar.gz Elasticsearch from remote URL] ***********************************************************************************************************************************************************
+ok: [fedore]
+
+TASK [Create directrory for Elasticsearch] *******************************************************************************************************************************************************************
+ok: [fedore]
+
+TASK [Extract Elasticsearch in the installation directory] ***************************************************************************************************************************************************
+skipping: [fedore]
+
+TASK [Set environment Elastic] *******************************************************************************************************************************************************************************
+ok: [fedore]
+
+PLAY [Install Kibana] ****************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [fedore-core]
+
+TASK [Upload tar.gz Kibana from remote URL] ******************************************************************************************************************************************************************
+ok: [fedore-core]
+
+TASK [Create directrory for Kibana] **************************************************************************************************************************************************************************
+ok: [fedore-core]
+
+TASK [Extract Kibana in the installation directory] **********************************************************************************************************************************************************
+skipping: [fedore-core]
+
+TASK [Set environment Kibana] ********************************************************************************************************************************************************************************
+ok: [fedore-core]
 
 PLAY RECAP ***************************************************************************************************************************************************************************************************
+fedore                     : ok=9    changed=0    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0   
+fedore-core                : ok=9    changed=0    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0   
 ubuntu                     : ok=5    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
 
+root@server1:~/learning-ansible/Lesson-ansible-02/ansible-02-playbook# 
+root@server1:~/learning-ansible/Lesson-ansible-02/ansible-02-playbook# 
+root@server1:~/learning-ansible/Lesson-ansible-02/ansible-02-playbook# 
+root@server1:~/learning-ansible/Lesson-ansible-02/ansible-02-playbook# ansible-playbook 7-site.yml -i inventory/7-prod.yml --diff
 
+PLAY [Install Java] ******************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [fedore]
+ok: [fedore-core]
+ok: [ubuntu]
+
+TASK [Set facts for Java 11 vars] ****************************************************************************************************************************************************************************
+ok: [ubuntu]
+ok: [fedore]
+ok: [fedore-core]
+
+TASK [Upload .tar.gz file containing binaries from local storage] ********************************************************************************************************************************************
+ok: [ubuntu]
+ok: [fedore-core]
+ok: [fedore]
+
+TASK [Ensure installation dir exists] ************************************************************************************************************************************************************************
+ok: [ubuntu]
+ok: [fedore-core]
+ok: [fedore]
+
+TASK [Extract java in the installation directory] ************************************************************************************************************************************************************
+skipping: [ubuntu]
+skipping: [fedore]
+skipping: [fedore-core]
+
+TASK [Export environment variables] **************************************************************************************************************************************************************************
+ok: [ubuntu]
+ok: [fedore]
+ok: [fedore-core]
+
+PLAY [Install Elasticsearch] *********************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [fedore]
+
+TASK [Upload tar.gz Elasticsearch from remote URL] ***********************************************************************************************************************************************************
+ok: [fedore]
+
+TASK [Create directrory for Elasticsearch] *******************************************************************************************************************************************************************
+ok: [fedore]
+
+TASK [Extract Elasticsearch in the installation directory] ***************************************************************************************************************************************************
+skipping: [fedore]
+
+TASK [Set environment Elastic] *******************************************************************************************************************************************************************************
+ok: [fedore]
+
+PLAY [Install Kibana] ****************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [fedore-core]
+
+TASK [Upload tar.gz Kibana from remote URL] ******************************************************************************************************************************************************************
+ok: [fedore-core]
+
+TASK [Create directrory for Kibana] **************************************************************************************************************************************************************************
+ok: [fedore-core]
+
+TASK [Extract Kibana in the installation directory] **********************************************************************************************************************************************************
+skipping: [fedore-core]
+
+TASK [Set environment Kibana] ********************************************************************************************************************************************************************************
+ok: [fedore-core]
+
+PLAY RECAP ***************************************************************************************************************************************************************************************************
+fedore                     : ok=9    changed=0    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0   
+fedore-core                : ok=9    changed=0    unreachable=0    failed=0    skipped=2    rescued=0    ignored=0   
+ubuntu                     : ok=5    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0 
 ```
 
 9. Подготовьте README.md файл по своему playbook. В нём должно быть описано: что делает playbook, какие у него есть параметры и теги.
 
 **Ответ:**
 
+Содержимое README.md
+
+```yml
+---
+# Данный ansible-playbook демонстрационный и показывает структуру с описанием задач, модулей, методов, переменных и их значений.
+# 
+
+#  Первый Play по установке Java
+- name: Install Java    # Название Play
+  hosts: all            # Play будет запускатсья на всех хостах нашего инвентори
+  tasks:                # Список задач в составе Play
+  
+  #  Задача первая
+  # Цель задачи - создать динамическую переменую, определяющую зависимое от версии дистрибутива имя домашнего каталога для распакованных фалов Java 
+    - name: Set facts for Java 11 vars    #  Название задачи. 
+      set_fact:         # Создаем новую динамическую переменную чере модуль `set_fact`
+        java_home: "/opt/jdk/{{ java_jdk_version }}"    # Ключ перменной, значение которого содержит хардкор /opt/jdk/`  и пеерменная `java_jdk_version` из варсов
+      tags: java        # Тег, позволяющий запускать таску по условию запуска по тегам
+      
+      #  Задача вторая. 
+      # Цель задачи - перенос файла с архивом из control_node  на  manage_node
+    - name: Upload .tar.gz file containing binaries from local storage     #  Название задачи. 
+    
+    # Цель задачи: Закачивает на manage_node файл с архивом который находится на 
+                 # control_node по пути, указанному в переменной `java_oracle_jdk_package ` 
+                 # в файле `group_vars/all/vars.yml`
+     
+      copy:         # Модуль copy ищет файл на локалхосте и отправляет его на manage_node по пути в dest: "/tmp/jdk-{{ java_jdk_version }}.tar.gz"
+        src: "{{ java_oracle_jdk_package }}"    #  Ищет в локальной директории /files
+        dest: "/tmp/jdk-{{ java_jdk_version }}.tar.gz"    #  Отправляет на manage_node
+      register: download_java_binaries          #  register записывает результат в переменную download_java_binaries
+      until: download_java_binaries is succeeded    #  Цикл будет выполнять таску, пока не произойдет условие цикла `download_java_binaries is succeeded`
+      tags: java     # Тег, позволяющий запускать таску по условию запуска по тегам
+      
+      #  Задача третья.
+      # Цель задачи - создать поддиректории для переноса в них распакованных файлов из архива
+    - name: Ensure installation dir exists    #  Название задачи
+      become: true        # Модуль повышения привелегий пользователя для выполнения действия. По умолчению это root. Может запускаться с ключем become-user=root. 
+                          # При этом на manage_node должен быть установлен sudo
+      file:           # Модуль file для создания state-ом директорий. 
+        state: directory    #  Метод state. При помощи переменнх group_vars будут созданы все поддиректории, 
+                            # которые в этом пути указаны.
+        path: "{{ java_home }}"      #  Путь до домашнего каталога Java на manage_node
+      tags: java      # Тег, позволяющий запускать таску по условию запуска по тегам
+      
+      #  Задача четвертая.
+      # Цель задачи - разархивировать файлы и скопировать их в домашнюю директорию.
+    - name: Extract java in the installation directory     #  Название задачи
+      become: true      # Модуль повышения привелегий пользователя для выполнения действия.
+      unarchive:    # с помощью модуля ` unarchive ` мы из `src: "/tmp/jdk-{{ java_jdk_version }}.tar.gz"`  распаковываем архив, 
+                    # который распакуется и будет находится на `manage_node` по пути в `dest: "{{ java_home }}"`
+
+        copy: false
+        src: "/tmp/jdk-{{ java_jdk_version }}.tar.gz"     # путь до местонахождения архива 
+        dest: "{{ java_home }}"                           # путь до директории, куда будет распакован архив
+        mode: 0755                                        # установление системных прав доступа к директории
+        extra_opts: [--strip-components=1]                # опция для длинных путей
+        creates: "{{ java_home }}/bin/java"     # модуль `creates` после того, как распакует архив, проверяет, что по `{{ java_home }}/bin/java` пути
+                                                # созданы файлы. Если файлы не найдутся, то таска зафейлится
+        
+      tags:
+        - java          # Тег, позволяющий запускать таску по условию запуска по тегам
+        
+      #  Задача пятая.  
+      # Цель задачи - выполнить перенос переменных окружения из шаблонов .j2 в каталог сценариев приложений etc/profile.d/
+    - name: Export environment variables        #  Название задачи
+      become: true                              # Модуль повышения привелегий пользователя для выполнения действия.
+      template:         # template - модуль для проброса файла шаблона .j2 на manage-node в файл jdk.sh который создается с наполнением, котороее сть в teamplate
+                        # Есть папка template. Здесь лежать файлы .j2. И они вызываются по пути имя папки/имя файла. 
+                        # Директорию назначеня модуль создавать не может, надо чтобы директория уже была создана.
+                        # Системня директория /etc/profile.d/ уже существует.
+        src: jdk.sh.j2    # файл шаблона из папки t/emplate
+        dest: /etc/profile.d/jdk.sh   # путь на  manage_node, куда надо перенести шаблон и сделать его сценарием .sh
+      tags: java    # Тег, позволяющий запускать таску по условию запуска по тегам
+      
+      
+ #  Второй Play по установке Elasticsearch
+- name: Install Elasticsearch     # Название Play
+  hosts: elasticsearch            # Play будет запускатсья на хостах из группы elasticsearch нашего инвентори
+  tasks:                          # Список задач в составе Play
+  
+  # Задача первая. 
+  # Цель задачи - скачать с официального сайта файла с архивом Elasticsearch на manage_node
+    - name: Upload tar.gz Elasticsearch from remote URL     #  Название задачи
+      get_url:        # Модуль для скачивания файла и переноса его в указанноую директорию
+        url: "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{{ elastic_version }}-linux-x86_64.tar.gz"   # Адрес расположения архива 
+                          # параметризирован при помощи group_vars {{ elastic_version }} на то, какую именно версию искать
+                          #  Здесь нет модуля delegate_to, поэтому скачивание будет происходить сразу на manage_node
+        
+        dest: "/tmp/elasticsearch-{{ elastic_version }}-linux-x86_64.tar.gz"    # Папка, куда будет сохраняться архив
+        mode: 0755      # Установление прав доступа к файлу-архиву
+        timeout: 60     # Ожидание 60 секунд для get_url
+        force: true     # Если архив Elasticsearch уже ранее был скачан и существует, то будет принудительно перезакачивание архива
+        validate_certs: false    # get_url не будет реагировать ошибки свзанные с отсутствием сертификата SSL сайта
+      register: get_elastic      # результат записываем в переменную get_elastic
+      until: get_elastic is succeeded      # цикл until будет запускать задачу скачивания архива до тех пор, пока не будет удачное скачивание
+      
+      #  Пример работы цикла
+      
+      # TASK [Upload tar.gz Elasticsearch from remote URL] 
+      # *******************************************************************************************************************************************************
+      # FAILED - RETRYING: [fedore]: Upload tar.gz Elasticsearch from remote URL (3 retries left).
+      # ok: [fedore]
+      
+      tags: elastic     # Тег, позволяющий запускать таску по условию запуска по тегам
+      
+      
+  # Задача вторая. 
+  # Цель задачи - создать директорию для Elasticsearch
+    - name: Create directrory for Elasticsearch     #  Название задачи
+      become: true        # Модуль повышения привелегий пользователя для выполнения действия.
+      file:               # Модуль file для создания state-ом директорий. 
+        state: directory    #  Создание модулем state директории без помощи фактов
+        path: "{{ elastic_home }}"    #  Путь к домашней директории взят из group_vars
+      tags: elastic       # Тег, позволяющий запускать таску по условию запуска по тегам
+      
+  # Задача третья. 
+  # Цель задачи - разархивировать файлы и скопировать их в домашнюю директорию.
+  # Действия и модули аналогичные из Play для Java
+    - name: Extract Elasticsearch in the installation directory     #  Название задачи
+      become: true      
+      unarchive:
+        copy: false
+        src: "/tmp/elasticsearch-{{ elastic_version }}-linux-x86_64.tar.gz"
+        dest: "{{ elastic_home }}"
+        extra_opts: [--strip-components=1]
+        creates: "{{ elastic_home }}/bin/elasticsearch"
+      tags:
+        - elastic
+        
+        
+   # Задача четвертая. 
+  # Цель задачи -  выполнить перенос переменных окружения из шаблонов .j2 в каталог сценариев приложений etc/profile.d/ 
+  # Действия и модули аналогичные из Play для Java
+    - name: Set environment Elastic
+      become: true
+      template:
+        src: templates/elk.sh.j2
+        dest: /etc/profile.d/elk.sh
+      tags: elastic
+      
+```
+
+
 10. Готовый playbook выложите в свой репозиторий, в ответ предоставьте ссылку на него.
 
 **Ответ:**
+https://github.com/zakharovnpa/ansible-02-playbook/blob/main/README.md
