@@ -1,5 +1,7 @@
 ## Лекция по теме "08-Ansible-Playbook"
 
+https://docs.ansible.com/ansible/latest/reference_appendices/special_variables.html
+
 ### Работа с Playbook
 Алексей
 Метляков
@@ -390,6 +392,8 @@ extra_opts: [--strip-components=1], [--strip-components=2], [--strip-components=
          - в url_get переметр validate_certs: false не будет принимать ошибки свзанные с отсутствием сертификата SSL сайта
          - regiser - запись в переменную результата скачивания
          - until - цикл, позволяющий заново начинать скачивание при неудаче
+- 02:30:00 - пояснение по таске второй
+- 02:30:13 - пояснение по таске третьей
          
 - 02:31:10 - Inventory. File prod.yml
 
