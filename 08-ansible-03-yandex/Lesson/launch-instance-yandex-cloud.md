@@ -4,7 +4,7 @@
 
 Действия выполняются по уроку ["5.4. Оркестрация группой Docker контейнеров на примере Docker Compose"](https://github.com/zakharovnpa/02-virt-admin-homeworks/blob/main/05-virt-04-docker-compose/Lesson/Log-lesson-docker-compose.md)
 
-1. В ДЗ по Docker-Compose есть файлы Терраформ. Воспльзуемся ими.
+##### В ДЗ по Docker-Compose есть файлы Терраформ. Воспользуемся ими.
 Проверяем доступные ресурсы на Я.Облаке
 ```ps
 root@PC-Ubuntu:~/netology-project/Docker-Compose/src/terraform# yc resource-manager folder list
@@ -18,7 +18,7 @@ root@PC-Ubuntu:~/netology-project/Docker-Compose/src/terraform# yc resource-mana
 ```
 
 
-Проверка валидности Терраформ
+#### Проверка валидности Терраформ
 ```ps
 root@PC-Ubuntu:~/netology-project/Docker-Compose/src/terraform# terraform validate
 Success! The configuration is valid.
@@ -135,7 +135,9 @@ Note: You didn't use the -out option to save this plan, so Terraform can't guara
 ```
 
 
-2. Запуск тераформ на создание ВМ. ВМ создавалась долго - 3 минуты, но создалась.
+#### Запуск тераформ на создание ВМ. 
+
+ВМ создавалась долго - 3 минуты, но создалась.
 
 ```ps
 root@PC-Ubuntu:~/netology-project/Docker-Compose/src/terraform# terraform apply -auto-approve
@@ -279,7 +281,7 @@ external_ip_address_node01_yandex_cloud = "62.84.114.151"
 internal_ip_address_node01_yandex_cloud = "192.168.101.18"
 
 ```
-Подключился к новой ВМ:
+#### Подключился к новой ВМ:
 ```ps
 root@PC-Ubuntu:~# ssh centos@62.84.114.151
 The authenticity of host '62.84.114.151 (62.84.114.151)' can't be established.
@@ -309,7 +311,7 @@ tmpfs              3,9G            0  3,9G            0% /sys/fs/cgroup
 tmpfs              783M            0  783M            0% /run/user/1000
 
 ```
-Остановка и удаление ВМ
+#### Остановка и удаление ВМ
 ```ps
 root@PC-Ubuntu:~/netology-project/Docker-Compose/src/terraform# terraform destroy -auto-approve
 yandex_vpc_network.default: Refreshing state... [id=enp4qt9sn4s4hc0mfkrl]
@@ -425,3 +427,51 @@ yandex_vpc_network.default: Destruction complete after 1s
 Destroy complete! Resources: 3 destroyed.
 
 ```
+#### Подготовка к созданию конфигурации Terraform для установки на Я.Облако трех ВМ для выполнения ДЗ.
+
+* Создана учебная директория
+```ps
+root@PC-Ubuntu:~/ansible-learning/yandex-cloud/Alfa# ls -l
+итого 16
+-rw------- 1 root root 2402 дек 10 18:10 key.json
+-rw-r--r-- 1 root root 1859 дек 21 21:42 main.tf
+-rw-r--r-- 1 root root  225 дек 21 21:45 outputs.tf
+-rw-r--r-- 1 root root  125 дек 21 21:17 versions.tf
+
+```
+* Неоходимо создать инстансы с именами:
+  * el-instance, 4Gb RAM, 2CPU - for install Elastisearch
+  * k-instance, 4Gb RAM, 2CPU - for install Kibana
+  * application-instance
+
+После запуска ВМ, в файле `hosts.yml` добавить IP интсанса в `ansible_host: <paste_IP>`  и имя пользователя в `ansible_user: <paste_user>`
+```yml
+---
+all:
+  hosts:
+    el-instance:
+      ansible_host: <paste_IP>
+    k-instance:
+      ansible_host: <paste_IP>
+    application-instance:
+      ansible_host: <paste_IP>
+  vars:
+    ansible_connection: ssh
+    ansible_user: <paste_user>
+elasticsearch:
+  hosts:
+    el-instance:
+kibana:
+  hosts:
+    k-instance:
+filebeat:
+  hosts:
+    application-instance:
+```
+В файл `site.yml` добавляем новый Play для установки Kibana. На 01:33:35
+```yml
+
+```
+##### Запускаем установку на инстансе Elasticsearch
+* Создаем директорию `/ansible` и переносим в нее файлы для плейбука.
+* 
