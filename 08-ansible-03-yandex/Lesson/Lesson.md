@@ -85,7 +85,7 @@ el-instance                : ok=5    changed=4    unreachable=0    failed=0    s
 }
 
 ```
-![Страница сервера с Elasticsearch]()
+![Страница сервера с Elasticsearch](/08-ansible-03-yandex/files/Elasticsearch-server-pages.png)
 
 ##### Добавление в плейбук плей для установки Kibana
 
