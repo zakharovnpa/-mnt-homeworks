@@ -514,7 +514,7 @@ k-instance                 : ok=4    changed=0    unreachable=0    failed=0    s
 
 ```
 #### Заходим на страницу Кибаны `http://http://62.84.127.237:5601`
-![Страница_кибаны](/)
+![Страница_кибаны](/08-ansible-03-yandex/files/Kibana-server-pages-start.png)
 
 ### Как оформить ДЗ?
 
