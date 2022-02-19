@@ -270,6 +270,7 @@ kibana.index: ".kibana"
 
 - 01:52:20 - установка системного инстанс
 - 01:53:35 - подготовка ` ansible-playbook ` для установки ` filebeat `
+- 01:55:15 - пояснение по таске `Set filebeat systemwork`
 - 01:55:35 - пояснение по настройкам ` filebeat `
 - 02:00:45 - перенос ` teamplate ` для ` filebeat `
 - 02:02:24 - создание инстанс ВМ ` application-instance ` в Яндекс-Облаке
