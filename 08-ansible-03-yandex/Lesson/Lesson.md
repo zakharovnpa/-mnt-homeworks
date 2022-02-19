@@ -304,7 +304,59 @@ PLAY RECAP *********************************************************************
 el-instance                : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 k-instance                 : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0  
 ```
+#### Не стартовала Кибана
+```ps
+[root@k-instance ~]# systemctl status kibana
+● kibana.service - Kibana
+   Loaded: loaded (/etc/systemd/system/kibana.service; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: https://www.elastic.co
 
+```
+* Перезапуск Кибаны вручную
+```ps
+[root@k-instance ~]# systemctl status kibana
+● kibana.service - Kibana
+   Loaded: loaded (/etc/systemd/system/kibana.service; disabled; vendor preset: disabled)
+   Active: active (running) since Сб 2022-02-19 09:41:45 UTC; 4s ago
+     Docs: https://www.elastic.co
+ Main PID: 11530 (node)
+   CGroup: /system.slice/kibana.service
+           ├─11530 /usr/share/kibana/bin/../node/bin/node /usr/share/kibana/bin/../src/cli/dist --logging.dest="/var/log/kibana/kibana.log" --pid.file="/run/kibana/kibana.pid"
+           └─11542 /usr/share/kibana/node/bin/node --preserve-symlinks-main --preserve-symlinks /usr/share/kibana/src/cli/dist --logging.dest="/var/log/kibana/kibana.log" --pid.file="/run/kibana/kibana.p...
+
+фев 19 09:41:45 k-instance.netology.yc systemd[1]: Started Kibana.
+
+```
+* Тест подключения к веб-интерфейсу Кибаны
+```ps
+[root@k-instance ~]# curl http://127.0.0.1:5601
+[root@k-instance ~]# 
+[root@k-instance ~]# curl http://127.0.0.1:5601 -v
+* About to connect() to 127.0.0.1 port 5601 (#0)
+*   Trying 127.0.0.1...
+* Connected to 127.0.0.1 (127.0.0.1) port 5601 (#0)
+> GET / HTTP/1.1
+> User-Agent: curl/7.29.0
+> Host: 127.0.0.1:5601
+> Accept: */*
+> 
+< HTTP/1.1 302 Found
+< location: /spaces/enter
+< x-content-type-options: nosniff
+< referrer-policy: no-referrer-when-downgrade
+< kbn-name: k-instance.netology.yc
+< kbn-license-sig: c9f1110f9b5f57a9651dd72fdc931863461eabcb4978ce3f5f4e53c8cfb2f506
+< cache-control: private, no-cache, no-store, must-revalidate
+< content-length: 0
+< Date: Sat, 19 Feb 2022 10:46:33 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=120
+< 
+* Connection #0 to host 127.0.0.1 left intact
+
+```
+![Плдключение к странице сервера Кибана](/)
 ### Как оформить ДЗ?
 
 Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
