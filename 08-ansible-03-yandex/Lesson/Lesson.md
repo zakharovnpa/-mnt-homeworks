@@ -356,7 +356,166 @@ k-instance                 : ok=4    changed=0    unreachable=0    failed=0    s
 * Connection #0 to host 127.0.0.1 left intact
 
 ```
-![Плдключение к странице сервера Кибана](/)
+![Плдключение к странице сервера Кибана](/08-ansible-03-yandex/files/Kibana-server-pages.png)
+
+#### Не стартовал Filebeat
+```ps
+[root@application-instance filebeat]# systemctl status filebeat
+● filebeat.service - Filebeat sends log files to Logstash or directly to Elasticsearch.
+   Loaded: loaded (/usr/lib/systemd/system/filebeat.service; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+     Docs: https://www.elastic.co/beats/filebeat
+
+```
+```ps
+[root@application-instance filebeat]# systemctl restart filebeat
+[root@application-instance filebeat]# 
+```
+#### Filebeat после рестарта
+```ps
+[root@application-instance filebeat]# systemctl status filebeat
+● filebeat.service - Filebeat sends log files to Logstash or directly to Elasticsearch.
+   Loaded: loaded (/usr/lib/systemd/system/filebeat.service; disabled; vendor preset: disabled)
+   Active: active (running) since Сб 2022-02-19 17:15:28 UTC; 2s ago
+     Docs: https://www.elastic.co/beats/filebeat
+ Main PID: 11867 (filebeat)
+   CGroup: /system.slice/filebeat.service
+           └─11867 /usr/share/filebeat/bin/filebeat --environment systemd -c /etc/filebeat/filebeat.yml --path.home /usr/share/filebeat --path.config /etc/filebeat --path.data /var/lib/filebeat --path.lo...
+
+фев 19 17:15:28 application-instance.netology.yc filebeat[11867]: 2022-02-19T17:15:28.166Z        INFO        [publisher]        pipeline/module.go:113        Beat name: application-instance.netology.yc
+фев 19 17:15:28 application-instance.netology.yc filebeat[11867]: 2022-02-19T17:15:28.167Z        INFO        [monitoring]        log/log.go:118        Starting metrics logging every 30s
+фев 19 17:15:28 application-instance.netology.yc filebeat[11867]: 2022-02-19T17:15:28.167Z        INFO        instance/beat.go:473        filebeat start running.
+фев 19 17:15:28 application-instance.netology.yc filebeat[11867]: 2022-02-19T17:15:28.174Z        INFO        memlog/store.go:119        Loading data file of '/var/lib/filebeat/registry/fil...action id=0
+фев 19 17:15:28 application-instance.netology.yc filebeat[11867]: 2022-02-19T17:15:28.174Z        INFO        memlog/store.go:124        Finished loading transaction log file for '/var/lib/...action id=0
+фев 19 17:15:28 application-instance.netology.yc filebeat[11867]: 2022-02-19T17:15:28.174Z        INFO        [registrar]        registrar/registrar.go:109        States Loaded from registrar: 0
+фев 19 17:15:28 application-instance.netology.yc filebeat[11867]: 2022-02-19T17:15:28.174Z        INFO        [crawler]        beater/crawler.go:71        Loading Inputs: 0
+фев 19 17:15:28 application-instance.netology.yc filebeat[11867]: 2022-02-19T17:15:28.174Z        INFO        [crawler]        beater/crawler.go:108        Loading and starting Inputs compl...d inputs: 0
+фев 19 17:15:28 application-instance.netology.yc filebeat[11867]: 2022-02-19T17:15:28.174Z        INFO        cfgfile/reload.go:164        Config reloader started
+фев 19 17:15:28 application-instance.netology.yc filebeat[11867]: 2022-02-19T17:15:28.174Z        INFO        cfgfile/reload.go:224        Loading of config files completed.
+Hint: Some lines were ellipsized, use -l to show in full.
+
+```
+#### Найдена ошибка в файле `/templates/filebeat.yml.j2` не позволяющая Filebeat видеть где расположены его модули.
+```ps
+root@PC-Ubuntu:~/ansible-learning/yandex-cloud/Epsilon/ansible# ansible-playbook site.yml -i inventory/prod/hosts.yml 
+
+PLAY [Install Elasticsearch] *********************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [el-instance]
+
+TASK [Download Elasticsearch's rpm] **************************************************************************************************************************************************************************
+ok: [el-instance]
+
+TASK [Install Elasticsearch] *********************************************************************************************************************************************************************************
+ok: [el-instance]
+
+TASK [Configure Elasticsearch] *******************************************************************************************************************************************************************************
+ok: [el-instance]
+
+PLAY [Install Kibana] ****************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [k-instance]
+
+TASK [Download Kibana's rpm] *********************************************************************************************************************************************************************************
+ok: [k-instance]
+
+TASK [Install Kibana] ****************************************************************************************************************************************************************************************
+ok: [k-instance]
+
+TASK [Configure Kibana] **************************************************************************************************************************************************************************************
+ok: [k-instance]
+
+PLAY [Install Filebeat] **************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [application-instance]
+
+TASK [Download Filebeat's rpm] *******************************************************************************************************************************************************************************
+ok: [application-instance]
+
+TASK [Install Filebeat] **************************************************************************************************************************************************************************************
+ok: [application-instance]
+
+TASK [Configure Filebeat] ************************************************************************************************************************************************************************************
+ok: [application-instance]
+
+TASK [Set filebeat systemwork] *******************************************************************************************************************************************************************************
+fatal: [application-instance]: FAILED! => {"changed": true, "cmd": ["filebeat", "modules", "enable", "system"], "delta": "0:00:00.150115", "end": "2022-02-19 17:21:35.701093", "msg": "non-zero return code", "rc": 1, "start": "2022-02-19 17:21:35.550978", "stderr": "", "stderr_lines": [], "stdout": "Module system doesn't exist!", "stdout_lines": ["Module system doesn't exist!"]}
+
+PLAY RECAP ***************************************************************************************************************************************************************************************************
+application-instance       : ok=4    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0   
+el-instance                : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+k-instance                 : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+
+```
+#### После исправления ошибки все заработало корректно.
+```ps
+root@PC-Ubuntu:~/ansible-learning/yandex-cloud/Epsilon/ansible# ansible-playbook site.yml -i inventory/prod/hosts.yml 
+
+PLAY [Install Elasticsearch] *********************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [el-instance]
+
+TASK [Download Elasticsearch's rpm] **************************************************************************************************************************************************************************
+ok: [el-instance]
+
+TASK [Install Elasticsearch] *********************************************************************************************************************************************************************************
+ok: [el-instance]
+
+TASK [Configure Elasticsearch] *******************************************************************************************************************************************************************************
+ok: [el-instance]
+
+PLAY [Install Kibana] ****************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [k-instance]
+
+TASK [Download Kibana's rpm] *********************************************************************************************************************************************************************************
+ok: [k-instance]
+
+TASK [Install Kibana] ****************************************************************************************************************************************************************************************
+ok: [k-instance]
+
+TASK [Configure Kibana] **************************************************************************************************************************************************************************************
+ok: [k-instance]
+
+PLAY [Install Filebeat] **************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [application-instance]
+
+TASK [Download Filebeat's rpm] *******************************************************************************************************************************************************************************
+ok: [application-instance]
+
+TASK [Install Filebeat] **************************************************************************************************************************************************************************************
+ok: [application-instance]
+
+TASK [Configure Filebeat] ************************************************************************************************************************************************************************************
+changed: [application-instance]
+
+TASK [Set filebeat systemwork] *******************************************************************************************************************************************************************************
+changed: [application-instance]
+
+TASK [Load Kibana dashboard] *********************************************************************************************************************************************************************************
+ok: [application-instance]
+
+RUNNING HANDLER [restart filebeat] ***************************************************************************************************************************************************************************
+changed: [application-instance]
+
+PLAY RECAP ***************************************************************************************************************************************************************************************************
+application-instance       : ok=7    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+el-instance                : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+k-instance                 : ok=4    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+
+```
+#### Заходим на страницу Кибаны `http://http://62.84.127.237:5601`
+![Страница_кибаны](/)
+
 ### Как оформить ДЗ?
 
 Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
