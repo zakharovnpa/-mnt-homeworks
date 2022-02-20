@@ -194,7 +194,240 @@ DEFAULT_ROLE_PATH
     remove_vector_dnf.yml
 ```
 - 01:09:40 - пояснение про `main.yml`. На все инклуды навешены теги.
+```yml
+  - include_tasks: "download {{ ansible_facts.pkg_mgr }}.yml" 
+    tags: [always]
+                                                               
+  - include_tasks: "remove_vector {{ ansible_facts.pkg_mgr }}.yml"
+    when:
+      - force_reinstall
+    tags: [install]
+  - include_tasks: "install_vector {{ ansible_facts.pkg_mgr }}.yml"
+    when:
+      - skip_instal is undefinde
+      - ansible_distributon in support_system
+    tags: [install]
+    
+    tags: [config]
+    
+    
+    tags: [service]
+  
+```
+- 01:09:55 - инклуды и импорты могу быть привязаны к какому-то событию.
+Например этот инклуд будет выполняться всегда.
+```yml
+---
+- include: precheck_vector.yml
+  tags: [always]
+```
+- 01:10:25 - разбор файла `precheck_vector.yml`
+```yml
+---
+- name: Check Vector | Check Vector already installed
+  command: vactor --version
+  register: current_vector_version
+  ignore_errors: true
+  changed_when: false
+  tags: ["precheck_vector"]
+  
+```
+- 01:12:05 - показано как динамически создавать разные штуки с помощью `set facts`. Заодно можно проверить против какой системы 
+- 01:12:20 - как вместо модуля `debug:` использовать модуль `fail:`
+```yml
+---
+- name: Check environments | Skip OS support reason
+  fail:
+    msg: "Susyem {{ ansible_distribution }} is not support to install Vector by this version of role"  # `ansible_distribution` - это из фактов
+  when:
+  - ansible_distribution is not supported_systems     #Этот параметр `supported systems` лежит в vars/main.yml
+  tags: ["precheck_vector"]
+```
+- 01:12:50 - про параметр `supported_systems` , который лежит в `vars/main.yml`
+```yml
+---
+support_systems: ['CentOS', 'Red Hat Enterprise Linux', 'Ubuntu']
 
+```
+Этот переметр `supported_systems` пользователь определить как дефолт не сможет. И если пользователь запустит эту роль против Windows, например, то эта роль  в этом моменте сразу выйдет в `fail`, потому что тип ОС не соответствует и дальше задача не пойдет.
+
+- 01:13:50 - продолжение описания файла `tasks/main.yml`
+- 01:15:12 - описание таски по безусловному запуску `hendlers` модулем `meta`. `hendlers` запустится здесь и сейчас даже при условии, что роль до конца не дошла.
+```yml
+- name: Create service | Flush handlers
+  meta: flush_handlers 
+```
+
+```yml
+---
+-include: manage_vector.yml
+ when:
+  - ansible_didstribution in support _systems
+  - ansible_service_mgr == "systemd"
+  - vector_service_state is definde
+  - vector_service_state | lenght > 0
+ tags: [service]
+
+```
+- 01:16:10 - про модуль метатаски. Поиск в Google meta ansible. [Ansible.builtin.meta](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/meta_module.html) параметр `free_form`
+- 01:16:58 - пояснение про то, что в некоторых ролях ворсы подключаются с помощью инклуд ворсов в рамках тасок и подключаются они в зависимости от типа систем
+Прмер можно посмотреть [тут](https://github.com/AlexeySetevoi/ansible-clickhouse/tree/master/vars)
+- 01:17:30 - пояснение работы этого примера подключения ворсов:
+```yml
+ ---
+ - name: 'Include OS Family Specific Variables'
+  include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_os_family | lower }}.yml"
+        - 'empty.yml'
+      paths:
+        - 'vars'
+  tags: [always]
+```
+- 01:18:10 - с помошью плагина `lookup` находится первый подходящий по `params` `ansible_os_family.yml`  или `lower.yml`. Если из этого ничего не нашлось, то тогда будет использоваться `empty.yml`. Т.е. здесь мы видим, что переменные в имени файла участвуют в условии поиска нужного файла для запуска.
+
+```yml
+---
+# tasks file for clickhouse
+- name: 'Include OS Family Specific Variables'
+  include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_os_family | lower }}.yml"
+        - 'empty.yml'
+      paths:
+        - 'vars'
+  tags: [always]
+
+- include_tasks: precheck.yml
+  tags: [always]
+
+- include_tasks: params.yml
+  tags: [always]
+
+- include_tasks:
+    file: "{{ lookup('first_found', params) }}"
+    apply:
+      tags: [install]
+  vars:
+    params:
+      files:
+        - "install/{{ ansible_pkg_mgr }}.yml"
+        - 'empty.yml'
+  tags: [install]
+  when: not clickhouse_remove|bool
+
+- include_tasks: 
+    file: configure/sys.yml
+    apply:
+      tags: [config, config_sys]
+  tags: [config, config_sys]
+  when: not clickhouse_remove|bool
+
+- name: "Notify Handlers Now"
+  meta: flush_handlers
+
+- include_tasks: service.yml
+  tags: [always]
+
+- name: "Wait for Clickhouse Server to Become Ready"
+  wait_for:
+    port: "{{ clickhouse_tcp_port }}"
+    delay: "{{ clickhouse_ready_delay }}"
+  when: not clickhouse_remove|bool
+
+- include_tasks:
+    file: configure/db.yml
+    apply:
+      tags: [config, config_db]
+  tags: [config, config_db]
+  when: not clickhouse_remove|bool
+
+- include_tasks:
+    file: configure/dict.yml
+    apply:
+      tags: [config, config_dict]
+  tags: [config, config_dict]
+  when: not clickhouse_remove|bool
+
+- include_tasks:
+    file: remove.yml
+    apply:
+      tags: [remove]
+  tags: [remove]
+  when: clickhouse_remove|bool
+
+```
+- 01:21:05 - создание плейбука для нашей роли
+```ps
+mkdir playbook
+cd playbook
+touch site.yml
+touch requirement.yml
+
+```
+
+```ps
+mkdir inventory
+cd inventory
+touch hosts.yml
+```
+- Создание интвентори файла на основе ВМ Я.Облака
+```yml
+- el:
+  hosts:
+    centos:
+      ansible_host: <ip_adress>
+    debian:
+      ansible_host: <ip_adress>
+  vars:
+    ansible_user: centos
+
+```
+- 01:27:05 - описываем файл `requirement.yml`. Ссылку ssh [берем эту](git@github.com:netology-code/mnt-homeworks-ansible.git)
+- 01:28:00 - В качестве версии, кроме тегов, можно указать еще и имя ветки ` main` и тогда скачается последняя ревизия мейна. 
+- 01:28:17 - Можно указать хэш коммита и тогда  ansible-galaxy на этот коммит и зачекаутит эту роль. По факту он скачивает репозиторий, делает чекаут на нужную версию, а потом удаляет гит директорию и говорит точ все сделал. 
+      
+
+```yml
+---
+- src: git@github.com:netology-code/mnt-homeworks-ansible.git
+  scm: git
+  name:
+  version: main
+```
+
+- 01:28:42 - в качестве версии можно указать все что угодно, но мы выберем тег 2.0.3, потому что мы говорили про семантическое версионирование.
+```yml
+---
+- src: git@github.com:netology-code/mnt-homeworks-ansible.git
+  scm: git
+  version: 2.0.3
+  name: elasticsearch_role
+```
+- 01:29:00 - файл `site.yml`
+```yml
+---
+- name: Assert elasticrole
+  hosts: all
+  roles:
+    - elasticsearch_role
+```
+- 01:30:15 - Плейбук готов.
+- 01:30:30 - перед тем, как запустить плейбук выполняем команду
+```
+ansible-galaxy install -r requirement.yml -p roles
+```
+- Появится директория `roles` в нашей директории с плейбуком.
+- 01:31:25 - Потом запускаем плейбук:
+```
+ansible-playbook -i inventory/hosts.yml site.yml
+```
+- 01:33:10 - создать в директории плейбука поддиректорию `/files`
+- 
 
 
 
@@ -213,7 +446,7 @@ Slack.
 Алексей Метляков
 
 ### Разбор ДЗ 02:01:20
-
+- 01:55;00 - пояснение как сделать репозиторий с первой ролью.
 - 02:01:20 - начало разбора ДЗ
 - 02:02:30 - подготовить три разных репозитория
 - 02:02:37 - пояснение по Задача №1
