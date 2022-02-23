@@ -25,4 +25,6 @@
 
 Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
 
+Ответ на ДЗ размещен в репозитории [nsible-03-yandex-cloud](https://github.com/zakharovnpa/ansible-03-yandex-cloud/blob/main/README.md)
+
 ---
