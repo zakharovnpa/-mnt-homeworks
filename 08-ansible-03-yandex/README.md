@@ -2,7 +2,7 @@
 
 Ответ на ДЗ размещен в репозитории [ansible-03-yandex-cloud](https://github.com/zakharovnpa/ansible-03-yandex-cloud/blob/main/README.md)
 
-Ход выполнения ДЗ размещен на странице [Lesson]()
+Ход выполнения ДЗ размещен на странице [Lesson](/08-ansible-03-yandex/Lesson/Lesson.md)
 
 ## Подготовка к выполнению
 1. Создайте свой собственный (или используйте старый) публичный репозиторий на github с произвольным именем.
