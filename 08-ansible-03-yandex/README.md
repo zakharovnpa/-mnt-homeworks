@@ -1,5 +1,9 @@
 # Домашнее задание к занятию "08.03 Использование Yandex Cloud" - Захаров Сергей Николаевич
 
+Ответ на ДЗ размещен в репозитории [ansible-03-yandex-cloud](https://github.com/zakharovnpa/ansible-03-yandex-cloud/blob/main/README.md)
+
+Ход выполнения ДЗ размещен на странице [Lesson]()
+
 ## Подготовка к выполнению
 1. Создайте свой собственный (или используйте старый) публичный репозиторий на github с произвольным именем.
 2. Скачайте [playbook](./playbook/) из репозитория с домашним заданием и перенесите его в свой репозиторий.
@@ -25,6 +29,6 @@
 
 Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
 
-Ответ на ДЗ размещен в репозитории [nsible-03-yandex-cloud](https://github.com/zakharovnpa/ansible-03-yandex-cloud/blob/main/README.md)
+Ответ на ДЗ размещен в репозитории [ansible-03-yandex-cloud](https://github.com/zakharovnpa/ansible-03-yandex-cloud/blob/main/README.md)
 
 ---
