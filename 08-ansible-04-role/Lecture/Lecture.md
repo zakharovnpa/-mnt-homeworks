@@ -474,7 +474,7 @@ Slack.
 
 
 ---
-### Play №2.
+### Play №1.
 ```yml
 - name: Install Elasticsearch
   hosts: elasticsearch
