@@ -519,5 +519,6 @@ k-instance                 : ok=4    changed=0    unreachable=0    failed=0    s
 ### Как оформить ДЗ?
 
 Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
+Ответ размещен в репозитории [ansible-03-yandex-cloud](https://github.com/zakharovnpa/ansible-03-yandex-cloud)
 
 ---
