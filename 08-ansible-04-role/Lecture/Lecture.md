@@ -479,6 +479,7 @@ Slack.
 - name: Install Elasticsearch
   hosts: elasticsearch
 ```
+* `/roles/elastic/handlers/main.yml `
 ```yml
   handlers:
     - name: restart Elasticsearch
@@ -489,7 +490,8 @@ Slack.
 ```
 
 ###  tasks:
-
+* `/roles/elastic/tasks/download_elasticsearch_rpm.yml
+`
 ```yml
     - name: "Download Elasticsearch's rpm"
       get_url:
@@ -498,6 +500,7 @@ Slack.
       register: download_elastic
       until: download_elastic is succeeded
 ```
+* `/roles/elastic/tasks/install_elasticsearch.yml`
 ```yml
     - name: Install Elasticsearch
       become: true
@@ -505,6 +508,7 @@ Slack.
         name: "/tmp/elasticsearch-{{ elk_stack_version }}-x86_64.rpm"
         state: present
 ```
+* `/roles/elastic/tasks/configure_elasticsearch.yml`
 ```yml
     - name: Configure Elasticsearch
       become: true
@@ -520,6 +524,7 @@ Slack.
 - name: Install Kibana
   hosts: kibana
 ```
+* `/roles/kibana/handlers/main.yml`
 ```yml
   handlers:
     - name: restart kibana
@@ -530,7 +535,7 @@ Slack.
  ```
 
 ###  tasks:
-
+* `/roles/kibana/tasks/download_kibana_rpm.yml`
 ```yml
     - name: "Download Kibana's rpm"
       get_url:
@@ -539,6 +544,7 @@ Slack.
       register: download_kibana
       until: download_kibana is succeeded
 ```
+* `/roles/kibana/tasks/install_kibana.yml`
 ```yml
     - name: Install Kibana
       become: true
@@ -547,6 +553,7 @@ Slack.
         state: present
       notify: restart kibana
 ```
+* `/roles/kibana/tasks/configure_kibana.yml`
 ```yml
     - name: Configure Kibana
       become: true
