@@ -236,7 +236,7 @@ root@PC-Ubuntu:~/ansible-learning/yandex-cloud/Dzeta/ansible/roles# tree
 4. На основе tasks из старого playbook заполните новую role. Разнесите переменные между `vars` и `default`. 
 
 
-Разбираем плейбук на отдельные файлы
+Разбираем файл `site.yml` плейбука на отдельные файлы
 
 * `/roles/kibana/handler/main.yml`
 
@@ -254,7 +254,12 @@ root@PC-Ubuntu:~/ansible-learning/yandex-cloud/Dzeta/ansible/roles# tree
 * `/roles/kibana/tasks/main.yml`
 
 ```yml
-
+  - import_tasks: "configure.yml"
+    tags: [config]                                       
+  - include_tasks: "download_kibana_rpm.yml" 
+    tags: [install]
+  - include_tasks: "install_kibana.yml" 
+    tags: [install]
 ```
 * `/roles/kibana/tasks/configure.yml`
 ```yml
@@ -292,6 +297,27 @@ root@PC-Ubuntu:~/ansible-learning/yandex-cloud/Dzeta/ansible/roles# tree
         state: present
       notify: restart kibana
 
+```
+* `/roles/kibana/tasks/main.yml` - пока это пример
+```yml
+  - import_tasks: "configure.yml"
+  - include_tasks: "download {{ ansible_facts.pkg_mgr }}.yml"     # пока это пример
+    tags: [always]
+                                                               
+  - include_tasks: "download_kibana_rpm.yml"    # пока это пример
+    # when:
+    #  - force_reinstall
+    # tags: [install]
+  - include_tasks: "install_kibana.yml"   # пока это пример
+    # when:
+    #  - skip_instal is undefinde
+    #  - ansible_distributon in support_system
+    tags: [install]
+    
+    tags: [config]
+    
+    
+    tags: [service]
 ```
 
 * Разнесим переменные между `vars` и `default`.
