@@ -349,6 +349,31 @@ root@PC-Ubuntu:~/ansible-learning/yandex-cloud/Galaxy/roles# ansible-galaxy role
 - Role filebeat_role was created successfully
 
 ```
+* `/roles/filebeat/tasks/main.yml`
+```yml
+  - import_tasks: "configure_filebeat.yml"
+    tags: [config]                                       
+  - include_tasks: "download_filebeat_rpm.yml" 
+    tags: [install]
+  - include_tasks: "install_filebeat.yml" 
+    tags: [install]
+  - include_tasks: "set_filebeat_systemwork.yml" 
+    tags: [install]
+  - include_tasks: "load_kibana_dashboard.yml" 
+    tags: [install]
+```
+
+```yml
+configure_filebeat.yml  
+download_filebeat_rpm.yml  
+install_filebeat.yml  
+load_kibana_dashboard.yml  
+main.yml  
+set_filebeat_systemwork.yml
+```
+
+
+
 7. На основе tasks из старого playbook заполните новую role. Разнесите переменные между `vars` и `default`. 
 
 ```ps
@@ -388,15 +413,54 @@ root@PC-Ubuntu:~/ansible-learning/yandex-cloud/Galaxy/roles# ansible-galaxy role
 
 ```
 12. Переработайте playbook на использование roles.
+В данном случае под playbook понимается файл `site.yml` в директории `/ansible/playbook/site.yml`
 
+* Команда запуска плейбука в данной конфигурации: `ansible-playbook -i inventory.host.yml site.yml`
 ```yml
-
+- name: Assert elasticrole
+  hosts: all
+  roles:
+    - elastic
+    - kibana
+    - filebeat
+tags: [0.1.0]
 ```
 13. Выложите playbook в репозиторий.
 
+* Quick setup — if you’ve done this kind of thing before
 ```ps
+https://github.com/zakharovnpa/kibana_roles.git
+```
+
+```ps
+git@github.com:zakharovnpa/kibana_roles.git
+```
+
+* …or create a new repository on the command line
+```ps
+echo "# kibana_roles" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/zakharovnpa/kibana_roles.git
+git push -u origin main
 
 ```
+* …or push an existing repository from the command line
+```ps
+git remote add origin https://github.com/zakharovnpa/kibana_roles.git
+git branch -M main
+git push -u origin main
+```
+* Добавление тэгов коммитам
+```ps
+git tag -a v0.0.01 -m "init version"
+```
+```ps
+git push origin --tags
+```
+
 14. В ответ приведите ссылки на оба репозитория с roles и одну ссылку на репозиторий с playbook.
 
 ## Необязательная часть
