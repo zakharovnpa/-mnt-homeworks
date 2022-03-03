@@ -2,7 +2,7 @@
 
 ## Подготовка к выполнению
 1. Установите molecule: `pip3 install "molecule==3.4.0"`
-2. Соберите локальный образ на основе [Dockerfile](./Dockerfile)
+2. Соберите локальный образ на основе [Dockerfile](./08-ansible-05-testing/Lecture/Dockerfile)
 
 ## Основная часть
 
