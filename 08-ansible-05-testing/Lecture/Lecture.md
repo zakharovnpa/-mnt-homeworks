@@ -49,9 +49,9 @@ OpenWay
 - стандартный набор директорий и файлов для role;
 - molecule – набор scenarios для тестирования.
 Внутри любого scenario находятся следующие файлы:
-- molecule.yml – основной файл для molecule;
-- converge.yml – playbook, который molecule будет использовать для запуска тестов;
-- verify.yml – дополнительные тесты после исполнения role.
+- `molecule.yml` – основной файл для molecule;
+- `converge.yml` – playbook, который molecule будет использовать для запуска тестов;
+- `verify.yml` – дополнительные тесты после исполнения role.
 
 
 - Команда запуска по созданию новой роли молекулой `molecule init role new_role`. Появится новая директория `new_role`
