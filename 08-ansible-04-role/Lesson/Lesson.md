@@ -463,6 +463,96 @@ git push origin --tags
 
 14. В ответ приведите ссылки на оба репозитория с roles и одну ссылку на репозиторий с playbook.
 
+* Запуск `ansible-playbook -i inventory/hosts.yml site.yml` и листинг работоспособного плейбука, запускающего 
+```ps
+root@PC-Ubuntu:~/ansible-learning/yandex-cloud/Eta/ansible/playbook# ansible-playbook -i inventory/hosts.yml site.yml 
+[DEPRECATION WARNING]: "include" is deprecated, use include_tasks/import_tasks instead. This feature will be removed in version 2.16. Deprecation warnings can be disabled by setting 
+deprecation_warnings=False in ansible.cfg.
+
+PLAY [el-instance] *******************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [el-instance]
+
+TASK [elasticsearch_roles : Download Elasticsearch's rpm] ****************************************************************************************************************************************************
+changed: [el-instance]
+
+TASK [elasticsearch_roles : Install Elasticsearch] ***********************************************************************************************************************************************************
+changed: [el-instance]
+
+TASK [elasticsearch_roles : Configure Elasticsearch] *********************************************************************************************************************************************************
+changed: [el-instance]
+
+RUNNING HANDLER [elasticsearch_roles : restart Elasticsearch] ************************************************************************************************************************************************
+changed: [el-instance]
+
+PLAY [k-instance] ********************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [k-instance]
+
+TASK [kibana_roles : include_tasks] **************************************************************************************************************************************************************************
+included: /root/ansible-learning/yandex-cloud/Eta/ansible/playbook/roles/kibana_roles/tasks/download_kibana_rpm.yml for k-instance
+
+TASK [kibana_roles : Download Kibana's rpm] ******************************************************************************************************************************************************************
+changed: [k-instance]
+
+TASK [kibana_roles : include_tasks] **************************************************************************************************************************************************************************
+included: /root/ansible-learning/yandex-cloud/Eta/ansible/playbook/roles/kibana_roles/tasks/install_kibana.yml for k-instance
+
+TASK [kibana_roles : Install Kibana] *************************************************************************************************************************************************************************
+changed: [k-instance]
+
+TASK [kibana_roles : include_tasks] **************************************************************************************************************************************************************************
+included: /root/ansible-learning/yandex-cloud/Eta/ansible/playbook/roles/kibana_roles/tasks/configure_kibana.yml for k-instance
+
+TASK [kibana_roles : Configure Kibana] ***********************************************************************************************************************************************************************
+changed: [k-instance]
+
+RUNNING HANDLER [kibana_roles : restart kibana] **************************************************************************************************************************************************************
+changed: [k-instance]
+
+PLAY [application-instance] **********************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+ok: [application-instance]
+
+TASK [filebeat_roles : include_tasks] ************************************************************************************************************************************************************************
+included: /root/ansible-learning/yandex-cloud/Eta/ansible/playbook/roles/filebeat_roles/tasks/download_filebeat_rpm.yml for application-instance
+
+TASK [filebeat_roles : Download Filebeat's rpm] **************************************************************************************************************************************************************
+changed: [application-instance]
+
+TASK [filebeat_roles : include_tasks] ************************************************************************************************************************************************************************
+included: /root/ansible-learning/yandex-cloud/Eta/ansible/playbook/roles/filebeat_roles/tasks/install_filebeat.yml for application-instance
+
+TASK [filebeat_roles : Install Filebeat] *********************************************************************************************************************************************************************
+changed: [application-instance]
+
+TASK [filebeat_roles : Configure Filebeat] *******************************************************************************************************************************************************************
+changed: [application-instance]
+
+TASK [filebeat_roles : include_tasks] ************************************************************************************************************************************************************************
+included: /root/ansible-learning/yandex-cloud/Eta/ansible/playbook/roles/filebeat_roles/tasks/set_filebeat_systemwork.yml for application-instance
+
+TASK [filebeat_roles : Set filebeat systemwork] **************************************************************************************************************************************************************
+changed: [application-instance]
+
+TASK [filebeat_roles : include_tasks] ************************************************************************************************************************************************************************
+included: /root/ansible-learning/yandex-cloud/Eta/ansible/playbook/roles/filebeat_roles/tasks/load_kibana_dashboard.yml for application-instance
+
+TASK [filebeat_roles : Load Kibana dashboard] ****************************************************************************************************************************************************************
+ok: [application-instance]
+
+RUNNING HANDLER [filebeat_roles : restart filebeat] **********************************************************************************************************************************************************
+changed: [application-instance]
+
+PLAY RECAP ***************************************************************************************************************************************************************************************************
+application-instance       : ok=11   changed=5    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+el-instance                : ok=5    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+k-instance                 : ok=8    changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+```
+
 ## Необязательная часть
 
 1. Проделайте схожие манипуляции для создания роли logstash.
