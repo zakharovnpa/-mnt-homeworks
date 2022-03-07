@@ -429,23 +429,26 @@ platforms:
   hosts: vector_inner
   gather_facts: false
   tasks:
-  - name: Install nc
+  - name: Install nc    № Устанавливаем Netcast (или NetCad?) для отправки первоначальному вектору по его порту 6767 какие-то данные
     become: true
     yum:
       name: nc
       state: present
-   - name: Run debug message
+   - name: Run debug message    # отправление тестового сообщения "debug_mesage" 
      shell: set -o pipefail && echo "debug_mesage" | nc 127.0.0.1:6767 # здесь задаем передачу данных от одного Вектора к другому, и чтобы тот тоже смог их 
                                                                        # перебросить.
      register: qwe
      changed_when: false
-   - name: Check local vector work correctly
+   - name: Check local vector work correctly   # Проверяем, что тестовое сообщение записалось в лог
      slurp:
-       src: "{{ vector_config_dir}}/local.log"
+       src: "{{ vector_config_dir }}/local.log"
        register: mounts
-   - name: Set correct facts
+   - name: Set correct facts        # проверка 
        set_fact:
          debug_msg: "{{ monts['content'] | b64decode }}"
+   - name: Ensure message in sent
+     assert:
+       that: "debug message" in "debug_msg.message"
            
        
        
