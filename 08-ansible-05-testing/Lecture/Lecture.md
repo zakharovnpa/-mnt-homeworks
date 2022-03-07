@@ -425,6 +425,8 @@ platforms:
 - 00:52:56 - Описание файла `destroy.yml`
 - 00:53:29 - Описание файла `verify.yml`
 ```yml
+# verify.yml`
+#Первый Play для локального вектора
 - name: Check local vector
   hosts: vector_inner
   gather_facts: false
@@ -435,35 +437,93 @@ platforms:
       name: nc
       state: present
    - name: Run debug message    # отправление тестового сообщения "debug_mesage" 
-     shell: set -o pipefail && echo "debug_mesage" | nc 127.0.0.1:6767 # здесь задаем передачу данных от одного Вектора к другому, и чтобы тот тоже смог их 
+     shell: set -o pipefail && echo "debug_mesage" | nc 127.0.0.1:6767 # здесь задаем передачу данных к локалхостному Вектору, и чтобы тот тоже смог их 
                                                                        # перебросить.
      register: qwe
      changed_when: false
-   - name: Check local vector work correctly   # Проверяем, что тестовое сообщение записалось в лог
+   - name: Check local vector work correctly   # Проверяем, что тестовое сообщение записалось в local.log припомощи slurp
      slurp:
        src: "{{ vector_config_dir }}/local.log"
        register: mounts
-   - name: Set correct facts        # проверка 
+   - name: Set correct facts        # декодирование и создание из mounts в файл "debug_msg.message"
        set_fact:
-         debug_msg: "{{ monts['content'] | b64decode }}"
-   - name: Ensure message in sent
+         debug_msg: "{{ mounts['content'] | b64decode }}"
+   - name: Ensure message in sent  # проверяется, что слова "debug message" появились в файле "debug_msg.message"
      assert:
        that: "debug message" in "debug_msg.message"
-           
        
-       
-       
-  
+# - 00:54:44
+#Второй Play для удаленного вектора
+- name: Check outer vector   
+  hosts: vector_outer
+  gather_facts: false
+  tasks:
+  - name: Check    # Проверяем, что тестовое сообщение записалось в local.log припомощи slurp
+    slurp:
+      src: "{{ vector_config_dir }}/local.log"
+      register: mounts
+  - name: Set correct facts        # декодирование и создание из mounts в файл "debug_msg.message"
+      set_fact:
+        debug_msg: "{{ mounts['content'] | b64decode }}"
+  - name: Ensure message in sent  # проверяется, что слова "debug message" появились в файле "debug_msg.message"
+    assert:
+      that: "debug message" in "debug_msg.message"
+```
+- 00:55:00 - о том, что успешное выполнение прверок по вышеизложенному файлу `verify.yml` подтверждает, что собранные по этой роли сервера работоспособны. Очень незатейливый сценарий.
+
+
+- 00:55:27 - Важно! Запуск команды `molecule test` и пояснение что происходит
+  -  создание инстансов
+  -  запуск и прохождение тестиования
+  -  удаление инстансов
+- Мы один раз все настроили в `default/molecule.yml` 
+
+- 00:59:50 - теперь мы можем в файлах директории `role/tasks` все что угодно понаписать и пытаться все это дело прогнать.
+```ps
+/role/tasks/
+            config_vector.yml
+            install_vector_apt.yml
+            install_vector_dnf.yml
+            install_vector_yum.yml
+            main.yml
+            manage.yml
+            remove_vector_apt.yml
+            remove_vector_dnf.yml
+            remove_vector_yum.yml
+            service_vector.yml
+            
+```
+- 01:00:10 - `install_vector_yum.yml`
+```yml
+# install_vector_yum.yml
+
+
+
+
 ```
 
-- 00:55:27- запуск команды `molecule test` и пояснение что происходит
-- 01:00:00 - тест запуска при сломанном чем-то. Пояснение про то, как можно в Докер-контейнере прикрутить systemd с помощью Сигруп.
-- 01:02:56 - как прогнать тест, но не уничтожить ВМ. Команда `molecule converge`
+
+
+
+- 01:00:25 - тест запуска при сломанном чем-то. Пояснение про то, как можно в Докер-контейнере прикрутить systemd с помощью Сигруп. Как альтернатива - использовать Podman.
+- 01:02:56 - Команда `molecule converge`. Как прогнать тест, но не уничтожить ВМ. 
 - 01:05:20 - итог прогонки `molecule converge`
 - 01:05:30 - посмотреть что там на ВМ делается. Команда `molecule login --host <hostname> `. И дальше можно тестировать.
 - 01:08:35 - как сделать коммит.
-- 01:09:00 - об использовании `hint` в виде файла `pre-commt-config.yml`. Реклмендация сайта ]pre-commit.com](https://pre-commit.com). Выполняется прекомит чек
-и есть уверенность на 90%, что мы линты пройдем.
+- 01:09:00 - об использовании `hint` в виде файла `pre-commt-config.yml`. Рекомендация сайта [pre-commit.com](https://pre-commit.com). Выполняется прекомит чек
+и есть уверенность на 90%, что мы линты пройдем. Останавливается коммит при наличии ошибок. А также ошибки могут автоматически исправляться.
+```yml
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: 3.2.0
+  hooks:
+  -   id: trailing-whitespace
+  -   id: end-of-file-fixer
+  -   id: check_yaml
+  -   id: check-added-lirge-files
+```
+
+* Про TOX
 - 01:11:45 - о том, что на ` control_node` бвыает разные версии Ансибл, а этот разный Ансибл может управляться разными Пайтонами. Чтобы этот зоопарк оттестировать можно испоьзовать Tox. Этот фреймворк связан не с Ансибл, а с Пайтон. tox – менеджер виртуальных окружений. Он создает ENV, в них накидывает пакеты, которые нам нужны. Причем разные версии пакетов. Он умеет их завпускать против разных Пайтонов, которые мы ему  скажем. Но они все должны быть установлены в моей системе. А в конце он запустит ту команду, которую мы укажем ему в аргументе. Например, запустить Пайтон.
 - 01:13:10 - Тох нужен для подготовки разных окружений и запуска молекулы, которая запускает сценарии тестирования внутри разных Ансибл на `control_node`
 
