@@ -210,7 +210,9 @@ OpenWay
    verifier:
      ansible
      
-   lint:                # сюда можно добавить линтер. Статический анализ
+   lint: |             # сюда можно добавить линтер. Статический анализ. Здесь прописан bash-script, который построчно вызывает ansible-lint и потом yamllint
+     ansible-lint .
+     yamllint .
    
    scenario:            # сюда можно добавить какие scenario будут запускаться. Определение последовательности выполнения шагов внутри сценария
      - default
@@ -307,26 +309,26 @@ test_sequence:
 ```
 
 ### 14Список основных команд molecule     00:47:25
-```ps
-- molecule init role --driver-name <driver> <rolename>
 ```
-```ps
-- molecule init scenario --driver-name <driver> <scenarioname>
+molecule init role --driver-name <driver> <rolename>
 ```
-```ps
-- molecule test
-```ps
 ```
-- molecule test --destroy=never
+molecule init scenario --driver-name <driver> <scenarioname>
 ```
-```ps
-- molecule matrix <taskname>
 ```
-```ps
-- molecule matrix -s <scenarioname> <taskname>
+molecule test
 ```
-```ps
-- molecule <taskname>
+```
+molecule test --destroy=never
+```
+```
+molecule matrix <taskname>
+```
+```
+molecule matrix -s <scenarioname> <taskname>
+```
+```
+molecule <taskname>
 ```
 - 00:48:00 - показ эксклюзива. Работа молекулы с облаками. Описание файла сценария `default/molecule.yml` для того, чтобы два сервера Вектор могли друг другу передавать данные
 
