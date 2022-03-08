@@ -105,7 +105,60 @@ OpenWay
   
   ```
 - 00:23:20 - `verify.yml` отрабатывается в самом конце отработки `molecule.yml`. Молекуле все равно что запускать. Хоть здесь еще одну роль запиши и она ее запустит. Но это наша возможность прверить, что все хорошо прошло.
-- 00:24:10 -`create.yml` - для создания ВМ, `destroy.yml` - для удаления ВМ
+- 00:24:10 - пример файла `create.yml` - для создания ВМ, `destroy.yml` - для удаления ВМ
+* Файл `create.yml`
+```
+---
+- name: Create
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  no_lod: "{{ molecule_no_log }}"
+  tasks:
+    - when: server.changed | default(false) | bool
+    block:
+      - name: Populate instanse config dict
+        set_facts:
+          instanse_config_dict: {
+            'instance': "{{  }}",
+            'address': "{{  }}",
+            'user': "{{  }}",
+            'port': "{{  }}",
+            'identity_file': "{{  }}", }
+        with_items: "{{ server.results }}"
+        register: instance_config_dict
+      - name: Convert instance config dict to a list
+        set_fact:
+          instance_conf: "{{ instance_config_dist.results | map(attribute....) }}"
+      - name: Dump instance config
+        copy:
+          content: | 
+             # Molecule managed
+             {{ instance_conf | to_json | from_json | to_yaml }}
+          dest: "{{ molecule_instance_config }}"
+          mode: 0600 
+```
+- 00:24:23 - Файл `destroy.yml`
+```
+- name: Destroy
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  no_lod: "{{ molecule_no_log }}"
+  tasks:
+  - name: Populate instanse config
+    set_facts:
+          instanse_config_dict: {}
+  - name: Dump instance config
+    copy:
+      content: | 
+        # Molecule managed
+        {{ instance_conf | to_json | from_json | to_yaml }}
+        dest: "{{ molecule_instance_config }}"
+        mode: 0600 
+    when: server.changed | default(false) | bool
+  
+```
 - 00:24:30 - `create.yml` и `destroy.yml` появляются только тогда, когда используется либо OpenStack дрейвер,либо Delegate драйвер
 - 00:24:40 - `create.yml` когда в Docker работает, таб плейбук гонять не надо, а когда ВМ в облаках, то это плейбук - это несколько тасок, которые создают то самое динамическое инвентори.
 - 00:26:00 - про `destroy.yml`
