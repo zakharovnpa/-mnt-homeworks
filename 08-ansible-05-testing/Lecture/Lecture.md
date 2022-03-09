@@ -107,7 +107,7 @@ OpenWay
 - 00:23:20 - `verify.yml` отрабатывается в самом конце отработки `molecule.yml`. Молекуле все равно что запускать. Хоть здесь еще одну роль запиши и она ее запустит. Но это наша возможность прверить, что все хорошо прошло.
 - 00:24:10 - пример файла `create.yml` - для создания ВМ, `destroy.yml` - для удаления ВМ
 * Файл `create.yml`
-```
+```yml
 ---
 - name: Create
   hosts: localhost
@@ -139,7 +139,7 @@ OpenWay
           mode: 0600 
 ```
 - 00:24:23 - Файл `destroy.yml`
-```
+```yml
 - name: Destroy
   hosts: localhost
   connection: local
