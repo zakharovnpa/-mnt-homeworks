@@ -8,6 +8,19 @@ molecule 3.6.1 using python 3.8
     ansible:2.12.2
     delegated:3.6.1 from molecule
 ```
+2. Установите ``molecule_docker
+```ps
+pip3 install "molecule_docker<0.3"
+```
+```ps
+Installing collected packages: websocket-client, docker, molecule-docker
+Successfully installed docker-5.0.3 molecule-docker-0.2.4 websocket-client-1.3.1
+```
+```ps
+docker --version
+Docker version 20.10.12, build e91ed57
+```
+
 3. Соберите локальный образ на основе [Dockerfile](/08-ansible-05-testing/Lecture/Dockerfile). Это нужно для тестиования TOX на роли Elasticsearche
 ```ps
 FROM registry.redhat.io/rhel8/podman:latest
@@ -52,10 +65,206 @@ registry.redhat.io/rhel8/podman   latest     f58db8adf7bb   5 weeks ago     399M
 ### Molecule
 
 1. Запустите  `molecule test` внутри корневой директории `elasticsearch-role`, посмотрите на вывод команды.
-Необходимо, чтобы было установлено: - `molecule`, `docker`, `molecule-docker` пакетик.
+Необходимо, чтобы было установлено: - `molecule`, `docker`, `molecule_docker` пакетик.
+* Заходим в директорию роли и запускаем `molecule init scenario`
+```ps
+root@server1:~/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/elasticsearch_roles# molecule init scenario Alfa --driver-name docker
+CRITICAL The default scenario not found.  Please create a scenario named 'default' first.
+```
+```ps
+root@server1:~/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/elasticsearch_roles# molecule init scenario default --driver-name docker
+INFO     Initializing new scenario default...
+INFO     Initialized scenario in /root/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/elasticsearch_roles/molecule/default successfully.
+
+```
+```ps
+root@server1:~/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/elasticsearch_roles# molecule test
+INFO     default scenario test matrix: dependency, lint, cleanup, destroy, syntax, create, prepare, converge, idempotence, side_effect, verify, cleanup, destroy
+INFO     Performing prerun...
+INFO     Guessed /root/learning-ansible/Lesson-ansible-05/ansible/playbook as project root directory
+WARNING  Computed fully qualified role name of elasticsearch_roles does not follow current galaxy requirements.
+Please edit meta/main.yml and assure we can correctly determine full role name:
+
+galaxy_info:
+role_name: my_name  # if absent directory name hosting role is used instead
+namespace: my_galaxy_namespace  # if absent, author is used instead
+
+Namespace: https://galaxy.ansible.com/docs/contributing/namespaces.html#galaxy-namespace-limitations
+Role: https://galaxy.ansible.com/docs/contributing/creating_role.html#role-names
+
+As an alternative, you can add 'role-name' to either skip_list or warn_list.
+
+INFO     Using /root/.cache/ansible-lint/ef1620/roles/elasticsearch_roles symlink to current repository in order to enable Ansible to find the role using its expected full name.
+INFO     Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:/root/.cache/ansible-lint/ef1620/roles
+INFO     Running default > dependency
+WARNING  Skipping, missing the requirements file.
+WARNING  Skipping, missing the requirements file.
+INFO     Running default > lint
+INFO     Lint is disabled.
+INFO     Running default > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running default > destroy
+INFO     Sanity checks: 'docker'
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item=instance)
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+FAILED - RETRYING: [localhost]: Wait for instance(s) deletion to complete (300 retries left).
+ok: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '491121043162.51591', 'results_file': '/root/.ansible_async/491121043162.51591', 'changed': True, 'item': {'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+TASK [Delete docker network(s)] ************************************************
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+INFO     Running default > syntax
+
+playbook: /root/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/elasticsearch_roles/molecule/default/converge.yml
+INFO     Running default > create
+
+PLAY [Create] ******************************************************************
+
+TASK [Log into a Docker registry] **********************************************
+skipping: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True}) 
+
+TASK [Check presence of custom Dockerfiles] ************************************
+ok: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True})
+
+TASK [Create Dockerfiles from image names] *************************************
+skipping: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True}) 
+
+TASK [Discover local Docker images] ********************************************
+ok: [localhost] => (item={'changed': False, 'skipped': True, 'skip_reason': 'Conditional result was False', 'item': {'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item', 'i': 0, 'ansible_index_var': 'i'})
+
+TASK [Build an Ansible compatible image (new)] *********************************
+skipping: [localhost] => (item=molecule_local/docker.io/pycontribs/centos:8) 
+
+TASK [Create docker network(s)] ************************************************
+
+TASK [Determine the CMD directives] ********************************************
+ok: [localhost] => (item={'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True})
+
+TASK [Create molecule instance(s)] *********************************************
+changed: [localhost] => (item=instance)
+
+TASK [Wait for instance(s) creation to complete] *******************************
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (300 retries left).
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (299 retries left).
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (298 retries left).
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (297 retries left).
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (296 retries left).
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (295 retries left).
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (294 retries left).
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (293 retries left).
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (292 retries left).
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (291 retries left).
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (290 retries left).
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (289 retries left).
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (288 retries left).
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (287 retries left).
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (286 retries left).
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (285 retries left).
+changed: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '685605531567.51781', 'results_file': '/root/.ansible_async/685605531567.51781', 'changed': True, 'item': {'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=5    changed=2    unreachable=0    failed=0    skipped=4    rescued=0    ignored=0
+
+INFO     Running default > prepare
+WARNING  Skipping, prepare playbook not configured.
+INFO     Running default > converge
+
+PLAY [Converge] ****************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [instance]
+
+TASK [Include elasticsearch_roles] *********************************************
+[DEPRECATION WARNING]: "include" is deprecated, use include_tasks/import_tasks 
+instead. This feature will be removed in version 2.16. Deprecation warnings can
+ be disabled by setting deprecation_warnings=False in ansible.cfg.
+
+TASK [elasticsearch_roles : Download Elasticsearch's rpm] **********************
+changed: [instance]
+
+TASK [elasticsearch_roles : Install Elasticsearch] *****************************
+fatal: [instance]: FAILED! => {"changed": false, "msg": "Failed to download metadata for repo 'appstream': Cannot prepare internal mirrorlist: No URLs in mirrorlist", "rc": 1, "results": []}
+
+PLAY RECAP *********************************************************************
+instance                   : ok=2    changed=1    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0
+
+CRITICAL Ansible return code was 2, command was: ['ansible-playbook', '--inventory', '/root/.cache/molecule/elasticsearch_roles/default/inventory', '--skip-tags', 'molecule-notest,notest', '/root/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/elasticsearch_roles/molecule/default/converge.yml']
+WARNING  An error occurred during the test sequence action: 'converge'. Cleaning up.
+INFO     Running default > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running default > destroy
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item=instance)
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+FAILED - RETRYING: [localhost]: Wait for instance(s) deletion to complete (300 retries left).
+changed: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '864738462699.52986', 'results_file': '/root/.ansible_async/864738462699.52986', 'changed': True, 'item': {'image': 'docker.io/pycontribs/centos:8', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+TASK [Delete docker network(s)] ************************************************
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+INFO     Pruning extra files from scenario ephemeral directory
+
+```
 
 2. Перейдите в каталог с ролью `kibana-role` и создайте сценарий тестирования по умолчаню при помощи `molecule init scenario --driver-name docker`.
 Можно использовать любые драверы. (а какме есть?)
+```ps
+root@server1:~/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/kibana_roles# molecule init scenario --driver-name docker
+INFO     Initializing new scenario default...
+INFO     Initialized scenario in /root/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/kibana_roles/molecule/default successfully.
+```
+После выполнения команды созданы директории и файлы:
+```
+root@server1:~/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/kibana_roles# ls -l molecule/default/
+total 12
+-rw-r--r-- 1 root root 127 Mar  8 09:44 converge.yml
+-rw-r--r-- 1 root root 206 Mar  8 09:44 molecule.yml
+-rw-r--r-- 1 root root 177 Mar  8 09:44 verify.yml
+
+```
+```
+root@server1:~/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/kibana_roles# tree
+.
+├── defaults
+│   └── main.yml
+├── handlers
+│   └── main.yml
+├── meta
+│   └── main.yml
+├── molecule        # Новая директория
+│   └── default     # Новая директория. Это же является именем сценария тестирования
+│       ├── converge.yml        # Новый файл
+│       ├── molecule.yml        # Новый файл
+│       └── verify.yml        # Новый файл
+├── README.md
+├── tasks
+│   ├── configure_kibana.yml
+│   ├── download_kibana_rpm.yml
+│   ├── install_kibana.yml
+│   └── main.yml
+├── templates
+│   └── kibana.yml.j2
+├── tests
+│   ├── inventory
+│   └── test.yml
+└── vars
+    └── main.yml
+
+9 directories, 15 files
+```
 
 3. Добавьте несколько разных дистрибутивов (centos:8, ubuntu:latest) для инстансов и протестируйте роль, исправьте найденные ошибки, если они есть.
 
