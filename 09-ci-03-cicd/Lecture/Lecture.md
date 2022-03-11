@@ -9,6 +9,7 @@ DevOps Engineer
 OpenWay
 Алексей Метляков
 
+
 ### 2План занятия
 1. Continuous Integration
 2. Test
