@@ -40,7 +40,7 @@
 
 ### Ответ: Выгружены файлы .XML для Workflow задач `bug`
 
-1. [Файл workflow для задач типа bug](/09-ci-01-intro/Files/For_ZSN-1_onl_bug.xml)
+1. [Файл workflow для задач типа bug](/09-ci-01-intro/Files/For-ZSN-1-only-bug.xml)
 2. [Файл workflow для остальных типов задач](/09-ci-01-intro/Files/For_ZSN-1_only-other_tasks.xml)
 
 
