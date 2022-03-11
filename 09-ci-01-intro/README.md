@@ -40,11 +40,11 @@
 
 ### Ответ: Выгружены файлы .XML для Workflow задач `bug`
 
-[1](/09-ci-01-intro/Files/For_ZSN-1_only_bug.xml)
-[2](/09-ci-01-intro/Files/For_ZSN-1_only-other_tasks.xml)
+[1. Файл workflow для задач типа bug](/09-ci-01-intro/Files/For_ZSN-1_only_bug.xml)
+[2. Файл workflow для остальных типов задач](/09-ci-01-intro/Files/For_ZSN-1_only-other_tasks.xml)
 
-Файл workflow для задач типа bug
-Файл workflow для остальных типов задач
+
+
 ---
 
 ### Как оформить ДЗ?
