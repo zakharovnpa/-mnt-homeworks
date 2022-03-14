@@ -66,6 +66,18 @@ registry.redhat.io/rhel8/podman   latest     f58db8adf7bb   5 weeks ago     399M
 
 1. Запустите  `molecule test` внутри корневой директории `elasticsearch-role`, посмотрите на вывод команды.
 Необходимо, чтобы было установлено: - `molecule`, `docker`, `molecule_docker` пакетик.
+```
+root@server1:~# docker --version
+Docker version 20.10.12, build e91ed57
+root@server1:~# 
+root@server1:~# molecule --version
+molecule 3.4.0 using python 3.8 
+    ansible:2.12.2
+    delegated:3.4.0 from molecule
+    docker:0.2.4 from molecule_docker
+
+```
+
 * Заходим в директорию роли и запускаем `molecule init scenario`
 ```ps
 root@server1:~/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/elasticsearch_roles# molecule init scenario Alfa --driver-name docker
