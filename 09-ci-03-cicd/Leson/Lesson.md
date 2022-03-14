@@ -288,7 +288,7 @@ OpenJDK 64-Bit Server VM (build 14+36-1461, mixed mode, sharing)
 You now have Java 14 / JDK 14 installed on Debian / Ubuntu Linux Desktop or server edition.
 ```
 
-Решение:
+Выполнение:
 ```
 root@PC-Ubuntu:~# sudo mv jdk-14 /opt/
 root@PC-Ubuntu:~# 
