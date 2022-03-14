@@ -10,6 +10,165 @@ root@PC-Ubuntu:~/ansible-learning/yandex-cloud/Yota#
 
 1. Создаём 2 VM в yandex cloud со следующими параметрами: 2CPU 4RAM Centos7(остальное по минимальным требованиям)
 
+```tf
+root@PC-Ubuntu:~/ansible-learning/yandex-cloud/Yota/terraform# terraform show
+# yandex_compute_instance.nexus-01:
+resource "yandex_compute_instance" "nexus-01" {
+    allow_stopping_for_update = true
+    created_at                = "2022-03-13T13:06:49Z"
+    folder_id                 = "b1gd3hm4niaifoa8dahm"
+    fqdn                      = "nexus-01.netology.yc"
+    hostname                  = "nexus-01"
+    id                        = "fhmr2dlap2btrjej21tl"
+    metadata                  = {
+        "ssh-keys" = <<-EOT
+            centos:ssh-rsa AAAAB3NzaC1yc........FMs= root@PC-Ubuntu
+        EOT
+    }
+    name                      = "nexus-01"
+    network_acceleration_type = "standard"
+    platform_id               = "standard-v1"
+    status                    = "running"
+    zone                      = "ru-central1-a"
+
+    boot_disk {
+        auto_delete = true
+        device_name = "fhmpqcb6gsr91k00orgs"
+        disk_id     = "fhmpqcb6gsr91k00orgs"
+        mode        = "READ_WRITE"
+
+        initialize_params {
+            block_size = 4096
+            image_id   = "fd87ftkus6nii1k3epnu"
+            name       = "root-nexus-01"
+            size       = 10
+            type       = "network-ssd"
+        }
+    }
+
+    network_interface {
+        index              = 0
+        ip_address         = "192.168.101.12"
+        ipv4               = true
+        ipv6               = false
+        mac_address        = "d0:0d:1b:13:6a:ac"
+        nat                = true
+        nat_ip_address     = "178.154.241.15"
+        nat_ip_version     = "IPV4"
+        security_group_ids = []
+        subnet_id          = "e9b6gb29790g73bpooru"
+    }
+
+    placement_policy {}
+
+    resources {
+        core_fraction = 100
+        cores         = 4
+        gpus          = 0
+        memory        = 8
+    }
+
+    scheduling_policy {
+        preemptible = false
+    }
+}
+
+# yandex_compute_instance.sonar-01:
+resource "yandex_compute_instance" "sonar-01" {
+    allow_stopping_for_update = true
+    created_at                = "2022-03-13T13:06:48Z"
+    folder_id                 = "b1gd3hm4niaifoa8dahm"
+    fqdn                      = "sonar-01.netology.yc"
+    hostname                  = "sonar-01"
+    id                        = "fhmcda0egfg9c7dagado"
+    metadata                  = {
+        "ssh-keys" = <<-EOT
+            centos:ssh-rsa AAAAB3..........7+FMs= root@PC-Ubuntu
+        EOT
+    }
+    name                      = "sonar-01"
+    network_acceleration_type = "standard"
+    platform_id               = "standard-v1"
+    status                    = "running"
+    zone                      = "ru-central1-a"
+
+    boot_disk {
+        auto_delete = true
+        device_name = "fhma0ea1lm172pm37m5e"
+        disk_id     = "fhma0ea1lm172pm37m5e"
+        mode        = "READ_WRITE"
+
+        initialize_params {
+            block_size = 4096
+            image_id   = "fd87ftkus6nii1k3epnu"
+            name       = "root-sonar-01"
+            size       = 10
+            type       = "network-ssd"
+        }
+    }
+
+    network_interface {
+        index              = 0
+        ip_address         = "192.168.101.11"
+        ipv4               = true
+        ipv6               = false
+        mac_address        = "d0:0d:c6:a8:0e:83"
+        nat                = true
+        nat_ip_address     = "178.154.229.213"
+        nat_ip_version     = "IPV4"
+        security_group_ids = []
+        subnet_id          = "e9b6gb29790g73bpooru"
+    }
+
+    placement_policy {}
+
+    resources {
+        core_fraction = 100
+        cores         = 4
+        gpus          = 0
+        memory        = 8
+    }
+
+    scheduling_policy {
+        preemptible = false
+    }
+}
+
+# yandex_vpc_network.default:
+resource "yandex_vpc_network" "default" {
+    created_at = "2022-03-13T13:06:44Z"
+    folder_id  = "b1gd3hm4niaifoa8dahm"
+    id         = "enp7iaq43sgk6mdnr1kg"
+    labels     = {}
+    name       = "net"
+    subnet_ids = []
+}
+
+# yandex_vpc_subnet.default:
+resource "yandex_vpc_subnet" "default" {
+    created_at     = "2022-03-13T13:06:47Z"
+    folder_id      = "b1gd3hm4niaifoa8dahm"
+    id             = "e9b6gb29790g73bpooru"
+    labels         = {}
+    name           = "subnet"
+    network_id     = "enp7iaq43sgk6mdnr1kg"
+    v4_cidr_blocks = [
+        "192.168.101.0/24",
+    ]
+    v6_cidr_blocks = []
+    zone           = "ru-central1-a"
+}
+
+
+Outputs:
+
+external_ip_address_nexus-01 = "178.154.241.15"
+external_ip_address_sonar-01 = "178.154.229.213"
+internal_ip_address_nexus-01 = "192.168.101.12"
+internal_ip_address_sonar-01 = "192.168.101.11"
+
+```
+
 2. Прописываем в [inventory](./infrastructure/inventory/cicd/hosts.yml) [playbook'a](./infrastructure/site.yml) созданные хосты
 3. Добавляем в [files](./infrastructure/files/) файл со своим публичным ключом (id_rsa.pub). Если ключ называется иначе - найдите таску в плейбуке, которая использует id_rsa.pub имя и исправьте на своё
 4. Запускаем playbook, ожидаем успешного завершения
