@@ -240,7 +240,8 @@ INFO: ------------------------------------------------------------------------
 
 3. Удаляем из `apache-maven-<version>/conf/settings.xml` упоминание о правиле, отвергающем http соединение( раздел mirrors->id: my-repository-http-unblocker)
 4. Проверяем `mvn --version`
-Была проблема: не установлена Java
+Была проблема: не установлена Java. 
+Установка Java по этой [инструкции](https://computingforgeeks.com/how-to-install-java-14-on-ubuntu-debian/)
 ```
 root@PC-Ubuntu:~/Downloads/apache-maven-3.8.5/bin# mvn --version
 The JAVA_HOME environment variable is not defined correctly,
