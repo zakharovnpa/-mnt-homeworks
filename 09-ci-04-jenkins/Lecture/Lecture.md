@@ -264,36 +264,54 @@ molecule test
 
 #### Окончание пояснение по задаче "Freestile Job"     - 02:13:15
 
+- 02:14:15 - об использовании консоли и скриптов Groove
 
+```
+Jenkins.instance.computers.each{
+  println "${it.displayName} === ${it.hostName}"
+}
+```
+```
+Jenkins.instance.computers.each{
+  println "${it.displayName} ${it.hostName}"
+  if(it.displayName==Centos7-agent){
+  it.connect()
+  }
+}
+```
+- 02:22:20 - это все можно делать и через Job,но там много ограничений по методам
+- 02:23:10 - про Global Credentials
+- 02:26:05 - консольные команды Jenkins CLI. Меню Dasboard --> Jenkins CLI
 
-
-
-
-
-
-
+### Pipeline Job    - 02:27:43
+> Это тоже Freestile Job, но написанный на отдельном языке, который называется "Pipeline DSL"
+> Свою сборку мы разделяем на стадии Stage и шаги Steps.
+> Аналогмчно Play, Task в Ansible
+> Может храниться в репозитории как `Jenkinsfile`
 
 ### 11Pipeline Job
 Pipeline Job – описание рутины в отдельных файлах с pipeline на
 собственном синтаксисе. Удобство в большей визуализации
 различных этапов сборки и отдельной обработки каждой стадии
-(stage) при работе с шагами (steps). Хранится в репозитории или в
-самом Jenkins.
-Может быть описано в двух видах:
-- Declarative Pipeline
-- Scripted Pipeline
+(stage) при работе с шагами (steps). 
+Хранится в корне репозитория в виде файла `Jenkinsfile` или в самом Jenkins.
 
-### 12Pipeline Syntax
-Declarative Pipeline – верхнеуровневое описание того, что
-необходимо сделать. Имеет свой собственный синтаксис и
-описывается в файлах с именованием Jenkinsﬁle.
+> Может быть описано в двух видах:
+> - Declarative Pipeline
+> - Scripted Pipeline
+
+
+### 12Pipeline Syntax     - 02:29:22
+> Declarative Pipeline – верхнеуровневое описание того, что
+> необходимо сделать. Имеет свой собственный синтаксис и описывается в файлах с именованием `Jenkinsﬁle`.
+
 Пример Declarative Pipeline:
 ```
-pipeline {
-     agent any
-     stages {
-       stage(‘Build’){
-            steps{
+pipeline {        # начинаем декларативный пайплайн словом pipeline
+     agent any    # объявляем на каких агентах это запускать. any - на любых. Как будто мы не указали лейблы
+     stages {     # стадии. По аналогии с Play в Ansible
+       stage(‘Build’){    # стадия Build
+            steps{        # шаги. Здесь построчно описываем вызов shell, pludin и прочего. Что нам нужно.
             }
        }
        stage(‘Test’){
@@ -303,31 +321,85 @@ pipeline {
     }
 }
 ```
+- 02:30:40 - заполняем все stageи так создаем `Pipeline`
 
-### 13Pipeline Syntax
-Scripted Pipeline – описание стадий конвейера с использованием
-собственного синтаксиса, но с дополнениями в виде groovy-
-скриптов.
+### 13Pipeline Syntax     - 02:31:05
+> Scripted Pipeline – описание стадий конвейера с использованием
+> собственного синтаксиса, но с дополнениями в виде groovy-скриптов.
+> Можно внутрь Stage включать часть кода Groove
+
+
 Пример Scripted Pipeline:
 ```
-node {
+node {                      # начинаем скриптовый пайплайн словом node
+                            # если указать node.Centos7-agent, то будет исполняться на указанном агенте, иначе будет выполняться на любом доступном
+                            # агенте.
+                            # а внутри стейджи
      stage(‘Build’){
      }
      stage(‘Test’){
      }
-     if (currentBuild.currentResult == SUCCESS){
-         stage(‘Test’){
+     if (currentBuild.currentResult == SUCCESS){      # Groove code
+         stage(‘Test’){                               # вставляем стандартный код
          }
      }
 }
 ```
 
-### 14Pipeline Syntax
-- Jenkins был написан в тесной связи с groovy
-- Groovy нужно было изолировать от использования системных вызовов – был создан Scripted Pipeline
-- Чтобы не принуждать всех пользователей изучать groovy, был
-создан Declarative Pipeline с упрощенным интерфейсом.
-Полное описание работы с pipeline можно найти в [документации](https://www.jenkins.io/doc/book/pipeline/).
+### 14Pipeline Syntax     - 02:32:18
+> - Jenkins был написан в тесной связи с groovy
+> - Groovy нужно было изолировать от использования системных вызовов – был создан Scripted Pipeline
+> - Чтобы не принуждать всех пользователей изучать groovy, был создан Declarative Pipeline с упрощенным интерфейсом.
+
+- Полное описание работы с pipeline можно найти в [документации](https://www.jenkins.io/doc/book/pipeline/).
+- 02:34:00 - сайт с документацией
+
+### Создание Pipeline на языке Pipeline DSL, а не на языке Freestyle
+- Создаем: New Item --> Pipiline --> Name `run-ansible-pypline`
+- В пункте `Definition`
+- В меню Pipeline Script:
+  - указываем какой SCM нужно использовать
+  - указать адрес репозитория
+  - указать имя ветки по которой будет чекаутиться, например `*/main`,
+  - путь до файла скрипта `Jenkinsfile` или любого другого скрипта
+Или:
+- В меню Pipeline Script:
+  - выбираем возможность писать скрипт в поле с текстом. Этим можно оперативно проверять правильность скрипта.
+  - пишем текст скрипта
+  - В этом случае нужен гит-плагин для скачивания репозитория
+
+Пример скрипта:
+- 02:41:20 - что писать в Steps. В меню Pipeline Syntax есть генератор кода и там все перечислено.
+```
+pipeline {
+    agent{
+        label ansible
+    }
+    stages{
+        stage('checkout git'){
+            steps{'сюда вставляем то что сделал генератор кода'}
+        }
+        stage('install dependence'){
+            steps{
+            
+           }
+        }
+        }
+        stage ('run molecule')
+
+}
+```
+
+- 02:43:50 - написание shell-script
+- 02:45:20 - Directive code-generator. Он создает чаcть pipeline
+- 02:46:00 - о параллельности работы стедж
+- 02:46:53 - о снипер генераторе
+- 02:48:10 - пример создания Directives
+
+### Запуск сборки     - 02:48:50
+- Как выглядит Stage View сборок Pipeline, который показывает как идут сборки разных стадий
+
+- 02:51:00 - про скриптовый Pipeline. У него нет почти никакой разницы с Declarative Pipeline
 
 ### 15Multibranch Pipeline
 Multibranch Pipeline – вид Pipeline, который умеет запускать сборки
