@@ -381,12 +381,15 @@ pipeline {
         }
         stage('install dependence'){
             steps{
-            
+              sh 'pip3 install -r requirements.txt'
            }
         }
+        stage ('run molecule'){
+          steps{
+            sh 'molecule test'
+          }
         }
-        stage ('run molecule')
-
+    }
 }
 ```
 
@@ -395,17 +398,111 @@ pipeline {
 - 02:46:00 - о параллельности работы стедж
 - 02:46:53 - о снипер генераторе
 - 02:48:10 - пример создания Directives
+- 02:48:40 - переименовали Item на `mnt-homeworks-ansible`
 
-### Запуск сборки     - 02:48:50
+### Запуск сборки     - 02:48:52
 - Как выглядит Stage View сборок Pipeline, который показывает как идут сборки разных стадий
 
 - 02:51:00 - про скриптовый Pipeline. У него нет почти никакой разницы с Declarative Pipeline
+> Выбрать новый Pipeline name `scripted pipeline`
+> В коде скрипта слова `step` нет совсем. Есть просто `stage`
 
-### 15Multibranch Pipeline
-Multibranch Pipeline – вид Pipeline, который умеет запускать сборки
-по действиям в рамках одного репозитория.
+```
+node('ansible') {
+        stage('checkout git'){
+          'сюда вставляем то что сделал генератор кода'
+        }
+        stage('install dependence'){
+              sh 'pip3 install -r requirements.txt'
+        }
+        stage ('run molecule'){
+            sh 'molecule test'
+          }
+}
+```
+- 02:53:20 - проверка синтаксиса
+
+###  Старт сборки  Pipeline `scripted pipeline`  - 02:55:25
+- 02:58:10 - показана директория на Агенте, где лежит склонированный репо
+- 02:59:00 - о вставках в скрипт кода Groovy
+- 03:09:00 - неудачная сборка, причины и как исправить.
+- 03:10:00 - создание новой ветки в Git `bugix/fix_pipeline` ответки `main` т редактируем Jenkinsfile
+```
+Jenkinsfile
+  pipeline{
+      agent{
+        label 'linux'
+      }  
+      stages{
+          stage('Install molecule'){
+              steps{
+                  sh 'cd mnt-homeworks-ansible && pip3 install -r requirements.txt'
+                  sh 'echo ==========='
+              }
+          }
+          stage('Run molecule'){
+              steps{
+                 sh 'cd mnt-homeworks-ansible && molecule test'
+              }
+          }
+      }
+  }
+
+```
+- 03:11:12 - ручной запуск сканирования репозитория. Но ветка оказалась незапаблишенная. Она лежит локально.
+- 03:13:30 - разбор почему неудачная сборка
+- 03:16:00 - найдена причина неудачной сборки. Корректируем файл Jenkinsfile
+```
+Jenkinsfile
+  pipeline{
+      agent{
+        label 'linux'
+      }  
+      stages{
+          stage('Checkout role'){
+              dir('mnt-homeworks-ansible'){
+                 # checkout scm      # меняем на то, что было в декларативном пайплайне  - 03:17:20
+                 git branch: 'main', credentialsId: '876872368723', url: 'http://123.123.123.123'
+              }
+      
+          }
+          stage('Install molecule'){
+              steps{
+                  dir('mnt-home-works-ansible'){
+                  sh 'pip3 install -r requirements.txt'
+                  sh 'echo ==========='
+                  }
+              }
+          }
+          stage('Run molecule'){
+              steps{
+                  dir('mnt-home-works-ansible'){
+                      sh 'molecule test'
+                  }
+              }
+          }
+      }
+  }
+
+```
+- 03:18:35 - коррекция Item `multibranch`
+
+
+### 15Multibranch Pipeline      - 02:59:45
+> Multibranch Pipeline – вид Pipeline, который умеет запускать сборки
+> по действиям в рамках одного репозитория.
+> Сборка запускается даже если в любой ветке произойдет изменение. Jenkins это отловит и запустит сборку.
+> Сборка запускается автомтически по тегам
+
 - Умеет разделять виды действий в репозитории
 - Фильтровать имена branches
+
+- 03:00:52 - для Multibranch Pipeline  файл Jenkinsfile должен лежать в корне репозитория.
+- 03:01:22 - пояснение по Jenkinsfile. Это тот же файл с Pipeline какой и был нами ранее написан.
+- 03:02:10 - создаем новый Item на основе 'Multibranch" с именем `multibranch`
+
+
+
 
 ### 16Дополнения
 
