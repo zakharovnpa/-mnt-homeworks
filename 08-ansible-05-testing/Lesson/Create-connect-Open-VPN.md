@@ -1,7 +1,7 @@
 ### Порядок запуска и подключения сервера OpenVPN.
 
-#### Запуск ВМ на AWS
-#### Установка сервера OpenVPN
+#### 1. Запуск ВМ на AWS
+#### 2. Установка сервера OpenVPN
 
 * Установка сервера OpenVPN по [этой статье](https://openvpn.net/download-open-vpn/)
   * Выбрать вариант походящий по Дистрибутиву `Ubuntu-20.04 Focal`
@@ -290,8 +290,8 @@ root@ip-172-31-94-64:~#
 
 
 
-#### Конфигурирование сервера OpenVPN
-#### Установка клиента OpenVPN на ОС Ubuntu
+#### 3. Конфигурирование сервера OpenVPN
+#### 4. Установка клиента OpenVPN на ОС Ubuntu
 
 Статья по установке и настройке комента [OpenVPN 3 Linux](https://community.openvpn.net/openvpn/wiki/OpenVPN3Linux?_ga=2.137721525.403010542.1648301988-1657003433.1648301987)
 
@@ -761,6 +761,10 @@ root@PC-Ubuntu:~# pwd
 root@PC-Ubuntu:~# 
 root@PC-Ubuntu:~# mc
 ```
+
+
+
+#### 5. Подключение клиента к серверу
 * Запуск сессии на основании файла-конфигураци пользователя 
 ```
 
@@ -855,6 +859,8 @@ openvpn3: Unknown command 'sessions-manage'
 root@PC-Ubuntu:~# 
 ```
 
+
+#### 6. Отключение клиента от сервера
 ```
 root@PC-Ubuntu:~# openvpn3 session-manage
 session-manage: ** ERROR ** One of --pause, --resume, --restart, --disconnect, --cleanup or --log-level must be present
@@ -862,6 +868,3 @@ root@PC-Ubuntu:~#
 root@PC-Ubuntu:~# 
 
 ```
-
-#### Подключение клиента к серверу
-#### Отключение клиента от сервера
