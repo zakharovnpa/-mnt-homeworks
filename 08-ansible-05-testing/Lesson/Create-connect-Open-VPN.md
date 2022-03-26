@@ -868,3 +868,32 @@ root@PC-Ubuntu:~#
 root@PC-Ubuntu:~# 
 
 ```
+```
+root@PC-Ubuntu:~# openvpn3 sessions-list
+-----------------------------------------------------------------------------
+        Path: /net/openvpn/v3/sessions/f4a2e5f6sa286s439cs9fc7sc39ecbdca540
+     Created: Sat Mar 26 21:16:31 2022                  PID: 170527
+       Owner: root                                   Device: tun0
+ Config name: profile-3.ovpn  (Config not available)
+Session name: 3.82.174.127
+      Status: Connection, Client connected
+-----------------------------------------------------------------------------
+root@PC-Ubuntu:~# 
+```
+
+```
+root@PC-Ubuntu:~# openvpn3 session-manage --session-path /net/openvpn/v3/sessions/f4a2e5f6sa286s439cs9fc7sc39ecbdca540 --disconnect
+Initiated session shutdown.
+
+Connection statistics:
+     BYTES_IN...............736744423
+     BYTES_OUT...............23519889
+     PACKETS_IN................592699
+     PACKETS_OUT...............195849
+     TUN_BYTES_IN............18809575
+     TUN_BYTES_OUT..........722510373
+     TUN_PACKETS_IN............195820
+     TUN_PACKETS_OUT...........592672
+
+root@PC-Ubuntu:~# 
+```
