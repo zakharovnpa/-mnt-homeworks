@@ -1,4 +1,7 @@
 ###  Лекция по теме "Средство визуализации Grafana"
+[1](https://grafana.com/grafana/dashboards/)
+[2](https://grafana.com/docs/grafana/latest/auth/)
+[3](https://grafana.com/grafana/plugins/)
 
 Сергей
 БывшевСергей Бывшев
