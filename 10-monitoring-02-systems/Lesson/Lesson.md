@@ -326,12 +326,76 @@ P.S.: если при запуске некоторые контейнеры б�
       - "8094:8094"
       - "8125:8125/udp"
 ```
+#### Получал ошибку. 
+Ошибка связана с тем, что не настроена принадлежность к группе “docker” файла /var/run/docker.socket в контейнере Telegraf.
+
+Это описано [здесь](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/docker#docker-daemon-permissions) и в моем случае ошибка пропала:
 
 * Error:
 ```
 sandbox-telegraf-1  | 2022-04-06T03:32:35Z E! [inputs.docker] Error in plugin: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json?filters=%7B%22status%22%3A%7B%22running%22%3Atrue%7D%7D&limit=0": dial unix /var/run/docker.sock: connect: permission denied
 
 ```
+Для устранения ошибки в контейнере Telegraf необходимо выполнить:
+```
+sudo groupadd docker
+```
+```
+sudo usermod -aG docker telegraf
+```
+* Также можно это сделать через MC.
+
+```
+root@0b64ee62510c:/var/run# ls -lha
+total 12K
+drwxr-xr-x 1 root     root   4.0K Apr  6 11:07 .
+drwxr-xr-x 1 root     root   4.0K Apr  6 11:07 ..
+srw-rw---- 1 telegraf docker    0 Apr  6 05:13 docker.sock
+drwxrwxrwt 2 root     root   4.0K Mar 28 00:00 lock
+-rw-rw-r-- 1 root     utmp      0 Mar 28 00:00 utmp
+
+```
+
+* Ошибка недоступности сокета пропала.
+```
+root@server1:~/learning-monitoring/sandbox# ./sandbox logs telegraf
+Using latest, stable releases
+Following the logs from the telegraf container...
+sandbox-telegraf-1  | 2022-04-06T11:07:14Z I! Using config file: /etc/telegraf/telegraf.conf
+sandbox-telegraf-1  | 2022-04-06T11:07:14Z W! DeprecationWarning: Option "container_names" of plugin "inputs.docker" deprecated since version 1.4.0 and will be removed in 2.0.0: use 'container_name_include' instead
+sandbox-telegraf-1  | 2022-04-06T11:07:14Z W! DeprecationWarning: Option "perdevice" of plugin "inputs.docker" deprecated since version 1.18.0 and will be removed in 2.0.0: use 'perdevice_include' instead
+sandbox-telegraf-1  | 2022-04-06T11:07:14Z I! Starting Telegraf 1.22.0
+sandbox-telegraf-1  | 2022-04-06T11:07:14Z I! Loaded inputs: cpu disk docker influxdb mem syslog system
+sandbox-telegraf-1  | 2022-04-06T11:07:14Z I! Loaded aggregators: 
+sandbox-telegraf-1  | 2022-04-06T11:07:14Z I! Loaded processors: 
+sandbox-telegraf-1  | 2022-04-06T11:07:14Z I! Loaded outputs: influxdb
+sandbox-telegraf-1  | 2022-04-06T11:07:14Z I! Tags enabled: host=telegraf-getting-started
+sandbox-telegraf-1  | 2022-04-06T11:07:14Z W! Deprecated inputs: 0 and 2 options
+sandbox-telegraf-1  | 2022-04-06T11:07:14Z I! [agent] Config: Interval:5s, Quiet:false, Hostname:"telegraf-getting-started", Flush Interval:5s
+sandbox-telegraf-1  | 2022-04-06T11:07:14Z W! [outputs.influxdb] When writing to [http://influxdb:8086]: database "telegraf" creation failed: Post "http://influxdb:8086/query": dial tcp 172.19.0.2:8086: connect: connection refused
+sandbox-telegraf-1  | 2022-04-06T11:07:15Z E! [inputs.influxdb] Error in plugin: Get "http://influxdb:8086/debug/vars": dial tcp 172.19.0.2:8086: connect: connection refused
+sandbox-telegraf-1  | 2022-04-06T11:07:19Z E! [outputs.influxdb] When writing to [http://influxdb:8086]: failed doing req: Post "http://influxdb:8086/write?consistency=any&db=telegraf": dial tcp 172.19.0.2:8086: connect: connection refused
+sandbox-telegraf-1  | 2022-04-06T11:07:19Z E! [agent] Error writing to outputs.influxdb: could not write any address
+sandbox-telegraf-1  | 2022-04-06T11:07:20Z E! [inputs.influxdb] Error in plugin: Get "http://influxdb:8086/debug/vars": dial tcp 172.19.0.2:8086: connect: connection refused
+sandbox-telegraf-1  | 2022-04-06T11:07:24Z E! [outputs.influxdb] When writing to [http://influxdb:8086]: failed doing req: Post "http://influxdb:8086/write?consistency=any&db=telegraf": dial tcp 172.19.0.2:8086: connect: connection refused
+sandbox-telegraf-1  | 2022-04-06T11:07:24Z E! [agent] Error writing to outputs.influxdb: could not write any address
+sandbox-telegraf-1  | 2022-04-06T11:07:25Z E! [inputs.influxdb] Error in plugin: Get "http://influxdb:8086/debug/vars": dial tcp 172.19.0.2:8086: connect: connection refused
+sandbox-telegraf-1  | 2022-04-06T11:07:29Z E! [outputs.influxdb] When writing to [http://influxdb:8086]: failed doing req: Post "http://influxdb:8086/write?consistency=any&db=telegraf": dial tcp 172.19.0.2:8086: connect: connection refused
+sandbox-telegraf-1  | 2022-04-06T11:07:29Z E! [agent] Error writing to outputs.influxdb: could not write any address
+sandbox-telegraf-1  | 2022-04-06T11:07:30Z E! [inputs.influxdb] Error in plugin: Get "http://influxdb:8086/debug/vars": dial tcp 172.19.0.2:8086: connect: connection refused
+sandbox-telegraf-1  | 2022-04-06T11:07:34Z E! [outputs.influxdb] When writing to [http://influxdb:8086]: failed doing req: Post "http://influxdb:8086/write?consistency=any&db=telegraf": dial tcp 172.19.0.2:8086: connect: connection refused
+sandbox-telegraf-1  | 2022-04-06T11:07:34Z E! [agent] Error writing to outputs.influxdb: could not write any address
+sandbox-telegraf-1  | 2022-04-06T11:07:35Z E! [inputs.influxdb] Error in plugin: Get "http://influxdb:8086/debug/vars": dial tcp 172.19.0.2:8086: connect: connection refused
+sandbox-telegraf-1  | 2022-04-06T11:07:39Z E! [outputs.influxdb] When writing to [http://influxdb:8086]: failed doing req: Post "http://influxdb:8086/write?consistency=any&db=telegraf": dial tcp 172.19.0.2:8086: connect: connection refused
+sandbox-telegraf-1  | 2022-04-06T11:07:39Z E! [agent] Error writing to outputs.influxdb: could not write any address
+sandbox-telegraf-1  | 2022-04-06T11:07:40Z E! [inputs.influxdb] Error in plugin: Get "http://influxdb:8086/debug/vars": dial tcp 172.19.0.2:8086: connect: connection refused
+sandbox-telegraf-1  | 2022-04-06T11:07:44Z E! [outputs.influxdb] When writing to [http://influxdb:8086]: failed doing req: Post "http://influxdb:8086/write?consistency=any&db=telegraf": dial tcp 172.19.0.2:8086: connect: connection refused
+sandbox-telegraf-1  | 2022-04-06T11:07:44Z E! [agent] Error writing to outputs.influxdb: could not write any address
+sandbox-telegraf-1  | 2022-04-06T11:07:45Z E! [inputs.influxdb] Error in plugin: Get "http://influxdb:8086/debug/vars": dial tcp 172.19.0.2:8086: connect: connection refused
+
+```
+
+
 После настройке перезапустите telegraf, обновите веб интерфейс и приведите скриншотом список `measurments` в 
 веб-интерфейсе базы telegraf.autogen . Там должны появиться метрики, связанные с docker.
 
