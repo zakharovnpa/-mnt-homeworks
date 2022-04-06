@@ -326,16 +326,24 @@ P.S.: если при запуске некоторые контейнеры б�
       - "8094:8094"
       - "8125:8125/udp"
 ```
-#### Получал ошибку. 
-Ошибка связана с тем, что не настроена принадлежность к группе “docker” файла /var/run/docker.socket в контейнере Telegraf.
+### Проблемы конфигурирования при подключении плагина docker
 
-Это описано [здесь](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/docker#docker-daemon-permissions) и в моем случае ошибка пропала:
+#### После конфигурирования не появлялись метрики docker пока не перезагрузился основной ПК
+
+#### Не появлялись данные в графиках метрик docker. 
+Получал ошибку `dial unix /var/run/docker.sock: connect: permission denied`. 
 
 * Error:
 ```
 sandbox-telegraf-1  | 2022-04-06T03:32:35Z E! [inputs.docker] Error in plugin: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json?filters=%7B%22status%22%3A%7B%22running%22%3Atrue%7D%7D&limit=0": dial unix /var/run/docker.sock: connect: permission denied
 
 ```
+
+Ошибка связана с тем, что не настроена принадлежность к группе “docker” файла /var/run/docker.socket в контейнере Telegraf.
+
+Это описано [здесь](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/docker#docker-daemon-permissions) и в моем случае ошибка пропала:
+
+
 Для устранения ошибки в контейнере Telegraf необходимо выполнить:
 ```
 sudo groupadd docker
