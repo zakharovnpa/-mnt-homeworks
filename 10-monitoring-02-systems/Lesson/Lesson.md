@@ -275,7 +275,7 @@ fb0d798dd2f2   chrono_config           "/entrypoint.sh chro…"   2 minutes ago 
      </html>
     ```
     
-    - curl http://localhost:9092/kapacitor/v1/ping
+ - curl http://localhost:9092/kapacitor/v1/ping
     
     ```
     {
@@ -317,7 +317,7 @@ P.S.: если при запуске некоторые контейнеры б�
     image: telegraf:1.4.0
     privileged: true
     volumes:
-      - ./etc/telegraf.conf:/etc/telegraf/telegraf.conf:Z
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:Z
       - /var/run/docker.sock:/var/run/docker.sock:Z
     links:
       - influxdb
@@ -327,6 +327,11 @@ P.S.: если при запуске некоторые контейнеры б�
       - "8125:8125/udp"
 ```
 
+* Error:
+```
+sandbox-telegraf-1  | 2022-04-06T03:32:35Z E! [inputs.docker] Error in plugin: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get "http://%2Fvar%2Frun%2Fdocker.sock/v1.24/containers/json?filters=%7B%22status%22%3A%7B%22running%22%3Atrue%7D%7D&limit=0": dial unix /var/run/docker.sock: connect: permission denied
+
+```
 После настройке перезапустите telegraf, обновите веб интерфейс и приведите скриншотом список `measurments` в 
 веб-интерфейсе базы telegraf.autogen . Там должны появиться метрики, связанные с docker.
 
