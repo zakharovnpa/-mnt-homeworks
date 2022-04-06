@@ -369,7 +369,7 @@ P.S.: если при запуске некоторые контейнеры б�
     
 **Ответ:**
 
-[screen-dasboard-host](/10-monitoring-02-systems/Files/screen-dasboard-host.png)
+![screen-dasboard-host](/10-monitoring-02-systems/Files/screen-dasboard-host.png)
     ---
 
 ### Как оформить ДЗ?
