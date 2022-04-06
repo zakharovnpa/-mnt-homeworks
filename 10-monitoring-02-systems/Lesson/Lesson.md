@@ -4,6 +4,9 @@
 ```
 root@server1:~/learning-monitoring/sandbox#
 ```
+Источник для запуска стэка TICK [InfluxData 1.x Sandbox](https://github.com/influxdata/sandbox/tree/master)
+Информация по [Docker Input Plugin](https://github.com/influxdata/telegraf/tree/master/plugins/inputs/docker#docker-daemon-permissions)
+
 Читай файл README.md
 ### Running
 
