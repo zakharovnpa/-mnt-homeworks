@@ -31,7 +31,7 @@
 
 **Ответ:**
 
-![screen-grafana-host](/)
+![screen-grafana-host](/10-monitoring-03-grafana/Files/screen-grafana-host.png)
 
 ## Задание 2
 Изучите самостоятельно ресурсы:
