@@ -48,10 +48,46 @@
 
 **Ответ:**
 1. Утилизация CPU для nodeexporter (в процентах, 100-idle)
+
+* Запрос:
 ```
 100 * (1 - avg by(instance)(irate(node_cpu_seconds_total{mode="idle"}[5m])))
 ```
-![screen-CPU-nodeexporter]()
+* Результат:
+![screen-CPU-nodeexporter](/10-monitoring-03-grafana/Files/screen-CPU-nodeexporter.png)
+
+2. CPULA 1/5/15
+* Запрос A:
+```
+node_load1{job="nodeexporter"}
+```
+* Запрос B:
+```
+node_load5{job="nodeexporter"}
+```
+* Запрос C:
+```
+node_load15{job="nodeexporter"}
+```
+
+* Результат:
+![screen-CPULA-nodeexporter](/10-monitoring-03-grafana/Files/screen-CPULA-nodeexporter.png)
+
+3. Количество свободной оперативной памяти
+* Запрос:
+```
+node_memory_Active_bytes / on (instance) node_memory_MemTotal_bytes
+```
+* Результат:
+![screen-Free-mem-nodeexporter](/10-monitoring-03-grafana/Files/screen-Free-mem-nodeexporter.png)
+
+4. Количество места на файловой системе
+* Запрос:
+```
+node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|fuse.lxcfs|squashfs"}
+```
+* Результат:
+![screen-Free-space-nodeexporter](/10-monitoring-03-grafana/Files/screen-Free-space-nodeexporter.png)
 
 ## Задание 3
 Создайте для каждой Dashboard подходящее правило alert (можно обратиться к первой лекции в блоке "Мониторинг").
