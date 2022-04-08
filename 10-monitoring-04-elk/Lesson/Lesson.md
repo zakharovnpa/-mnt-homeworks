@@ -44,7 +44,7 @@ root@server1:~/learning-monitoring/ELK# tree
 
 ## Задание 1
 
-Вам необходимо поднять в докере:
+1. Вам необходимо поднять в докере:
 - elasticsearch(hot и warm ноды)
 - logstash
 - kibana
@@ -52,7 +52,77 @@ root@server1:~/learning-monitoring/ELK# tree
 
 и связать их между собой.
 
-Logstash следует сконфигурировать для приёма по tcp json сообщений.
+**Ответ:**
+
+Запуск `docler-compose up -d` приводит к ошибке:
+```
+
+```
+* Причина ошибки - ограничение доступа по территоиальному признаку.
+* С обходом данной ситуации через приватные частные сети позволяет нормально собрать образы и запустить контейнеры:
+```
+⠿ filebeat Pulled                                                                                                                                                                                     252.5s
+   ⠿ a4f595742a5b Pull complete                                                                                                                                                                        193.9s
+   ⠿ 3581c22b2b4e Pull complete                                                                                                                                                                        221.8s
+   ⠿ 7208c262d709 Pull complete                                                                                                                                                                        223.3s
+   ⠿ 43589b2d6d0e Pull complete                                                                                                                                                                        223.6s
+   ⠿ 123296607618 Pull complete                                                                                                                                                                        223.9s
+   ⠿ 326b60db75d5 Pull complete                                                                                                                                                                        243.4s
+   ⠿ 57dfc02aeffa Pull complete                                                                                                                                                                        244.0s
+   ⠿ 382fd98b4209 Pull complete                                                                                                                                                                        244.4s
+   ⠿ 31247e830430 Pull complete                                                                                                                                                                        245.5s
+   ⠿ 8307b5ba0ded Pull complete                                                                                                                                                                        245.8s
+   ⠿ 10edc5e6eaf2 Pull complete                                                                                                                                                                        246.5s
+ ⠿ some_application Pulled                                                                                                                                                                              79.2s
+   ⠿ df9b9388f04a Pull complete                                                                                                                                                                         57.5s
+   ⠿ a1ef3e6b7a02 Pull complete                                                                                                                                                                         63.0s
+   ⠿ bf5b42ba4ad7 Pull complete                                                                                                                                                                         73.1s
+   ⠿ 149beaa72b5f Pull complete                                                                                                                                                                         73.3s
+   ⠿ 5c7b50b69f68 Pull complete                                                                                                                                                                         77.0s
+ ⠿ es-hot Pulled                                                                                                                                                                                       261.1s
+   ⠿ c0f9908af642 Pull complete                                                                                                                                                                         25.5s
+   ⠿ dc193d8d7c71 Pull complete                                                                                                                                                                        257.8s
+   ⠿ e3deb19b2c38 Pull complete                                                                                                                                                                        258.2s
+[+] Running 10/10
+ ⠿ Network elk_elastic  Created                                                                                                                                                                          0.2s
+ ⠿ Network elk_default  Created                                                                                                                                                                          0.1s
+ ⠿ Volume "elk_data02"  Created                                                                                                                                                                          0.0s
+ ⠿ Volume "elk_data01"  Created                                                                                                                                                                          0.0s
+ ⠿ Container es-warm    Started                                                                                                                                                                          2.5s
+ ⠿ Container some_app   Started                                                                                                                                                                          2.4s
+ ⠿ Container es-hot     Started                                                                                                                                                                          3.9s
+ ⠿ Container logstash   Started                                                                                                                                                                          6.7s
+ ⠿ Container kibana     Started                                                                                                                                                                          6.6s
+ ⠿ Container filebeat   Started                    
+```
+* Состояние контейнеров сразу после их запуска:
+```
+root@server1:~/learning-monitoring/ELK# docker ps
+CONTAINER ID   IMAGE                                     COMMAND                  CREATED          STATUS          PORTS                                                           NAMES
+7ef1b93fa1e8   docker.elastic.co/beats/filebeat:7.16.2   "/usr/bin/tini -- /u…"   22 seconds ago   Up 13 seconds                                                                   filebeat
+59e1770d0d2f   kibana:7.16.2                             "/bin/tini -- /usr/l…"   22 seconds ago   Up 15 seconds   0.0.0.0:5601->5601/tcp, :::5601->5601/tcp                       kibana
+7ac3eedd149e   logstash:7.16.2                           "/usr/local/bin/dock…"   22 seconds ago   Up 15 seconds   5044/tcp, 9600/tcp, 0.0.0.0:5046->5046/tcp, :::5046->5046/tcp   logstash
+f2758a81619c   elasticsearch:7.16.2                      "/bin/tini -- /usr/l…"   22 seconds ago   Up 18 seconds   0.0.0.0:9200->9200/tcp, :::9200->9200/tcp, 9300/tcp             es-hot
+cf5431bf3027   elasticsearch:7.16.2                      "/bin/tini -- /usr/l…"   23 seconds ago   Up 20 seconds   9200/tcp, 9300/tcp                                              es-warm
+d7cd758e2cc7   python:3.9-alpine                         "python3 /opt/run.py"    23 seconds ago   Up 20 seconds                                                                   some_app
+
+```
+
+* Состояние контейнеров через 30 минут:
+```
+root@server1:~/learning-monitoring/ELK# docker ps -a
+CONTAINER ID   IMAGE                                     COMMAND                  CREATED          STATUS                        PORTS                                                           NAMES
+7ef1b93fa1e8   docker.elastic.co/beats/filebeat:7.16.2   "/usr/bin/tini -- /u…"   33 minutes ago   Up 33 minutes                                                                                 filebeat
+59e1770d0d2f   kibana:7.16.2                             "/bin/tini -- /usr/l…"   33 minutes ago   Up 33 minutes                 0.0.0.0:5601->5601/tcp, :::5601->5601/tcp                       kibana
+7ac3eedd149e   logstash:7.16.2                           "/usr/local/bin/dock…"   33 minutes ago   Up 33 minutes                 5044/tcp, 9600/tcp, 0.0.0.0:5046->5046/tcp, :::5046->5046/tcp   logstash
+f2758a81619c   elasticsearch:7.16.2                      "/bin/tini -- /usr/l…"   33 minutes ago   Exited (137) 32 minutes ago                                                                   es-hot
+cf5431bf3027   elasticsearch:7.16.2                      "/bin/tini -- /usr/l…"   33 minutes ago   Exited (137) 32 minutes ago                                                                   es-warm
+
+```
+
+* Связывание между собой:
+
+2. Logstash следует сконфигурировать для приёма по tcp json сообщений.
 
 Filebeat следует сконфигурировать для отправки логов docker вашей системы в logstash.
 
