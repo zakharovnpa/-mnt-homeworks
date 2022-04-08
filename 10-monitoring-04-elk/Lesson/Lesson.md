@@ -5,6 +5,21 @@
 ```
 root@server1:~/learning-monitoring/ELK# 
 ```
+```
+root@server1:~/learning-monitoring/ELK# tree
+.
+├── configs
+│   ├── filebeat.yml
+│   ├── logstash.conf
+│   └── logstash.yml
+├── docker-compose.yml
+├── pinger
+│   └── run.py
+└── README.md
+
+2 directories, 6 files
+
+```
 
 ## Дополнительные ссылки
 
