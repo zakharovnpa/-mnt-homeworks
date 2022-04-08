@@ -74,7 +74,20 @@
  ⠿ Container kibana     Started                                                                                                                                                                          6.6s
  ⠿ Container filebeat   Started                    
 ```
-* Состояние контейнеров:
+* Состояние контейнеров сразу после их запуска:
+```
+root@server1:~/learning-monitoring/ELK# docker ps
+CONTAINER ID   IMAGE                                     COMMAND                  CREATED          STATUS          PORTS                                                           NAMES
+7ef1b93fa1e8   docker.elastic.co/beats/filebeat:7.16.2   "/usr/bin/tini -- /u…"   22 seconds ago   Up 13 seconds                                                                   filebeat
+59e1770d0d2f   kibana:7.16.2                             "/bin/tini -- /usr/l…"   22 seconds ago   Up 15 seconds   0.0.0.0:5601->5601/tcp, :::5601->5601/tcp                       kibana
+7ac3eedd149e   logstash:7.16.2                           "/usr/local/bin/dock…"   22 seconds ago   Up 15 seconds   5044/tcp, 9600/tcp, 0.0.0.0:5046->5046/tcp, :::5046->5046/tcp   logstash
+f2758a81619c   elasticsearch:7.16.2                      "/bin/tini -- /usr/l…"   22 seconds ago   Up 18 seconds   0.0.0.0:9200->9200/tcp, :::9200->9200/tcp, 9300/tcp             es-hot
+cf5431bf3027   elasticsearch:7.16.2                      "/bin/tini -- /usr/l…"   23 seconds ago   Up 20 seconds   9200/tcp, 9300/tcp                                              es-warm
+d7cd758e2cc7   python:3.9-alpine                         "python3 /opt/run.py"    23 seconds ago   Up 20 seconds                                                                   some_app
+
+```
+
+* Состояние контейнеров через 30 минут:
 ```
 root@server1:~/learning-monitoring/ELK# docker ps -a
 CONTAINER ID   IMAGE                                     COMMAND                  CREATED          STATUS                        PORTS                                                           NAMES
