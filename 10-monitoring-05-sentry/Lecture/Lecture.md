@@ -1,5 +1,15 @@
 ### Лекция по теме "Платформа мониторинга Sentry"
 
+### Ссылки на лекции:
+
+[Site Sentry](https://sentry.io/welcome/)
+[Self-Hosted Sentry nightly](https://github.com/getsentry/self-hosted)
+[Official Sentry integration/plugin](https://gist.github.com/denji/b801f19d95b7d7910982c22bb1478f96#file-docker-compose-yml)
+[Sentry 10 helm charts](https://github.com/sentry-kubernetes/charts)
+[Sentry Configuration](https://develop.sentry.dev/config/)
+[sentry.conf.example.py](https://github.com/getsentry/self-hosted/blob/master/sentry/sentry.conf.example.py)
+
+
 Платформа мониторинга Sentry
 Сергей
 БывшевСергей Бывшев
