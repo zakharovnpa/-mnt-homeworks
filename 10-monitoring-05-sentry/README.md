@@ -70,7 +70,7 @@ Free cloud account имеет следующие ограничения:
 пример кода подключения sentry sdk/отсылки событий.
 
 **Ответ:**
-![screen-issue-sentry](/)
+![screen-issue-sentry](/10-monitoring-05-sentry/Files/screen-issue-sentry.png)
 
 * Файл `main.py`
 ```py
