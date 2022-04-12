@@ -59,7 +59,7 @@ Free cloud account имеет следующие ограничения:
 
 **Ответ:**
 
-
+![sentry-alert-message](/10-monitoring-05-sentry/Files/sentry-alert-message.png)
 
 ## Задание повышенной сложности
 
