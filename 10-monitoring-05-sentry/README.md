@@ -19,6 +19,7 @@ Free cloud account имеет следующие ограничения:
 
 **Ответ:**
 
+![screen-sentry-create-new-project](/10-monitoring-05-sentry/Files/screen-sentry-create-new-project.png)
 
 
 ## Задание 2
@@ -34,7 +35,7 @@ Free cloud account имеет следующие ограничения:
 
 **Ответ:**
 
-
+![](/)
 
 ## Задание 3
 
