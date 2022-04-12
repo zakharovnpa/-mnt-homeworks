@@ -35,7 +35,7 @@ Free cloud account имеет следующие ограничения:
 
 **Ответ:**
 
-![](/)
+![sentry-stack-trace](/10-monitoring-05-sentry/Files/sentry-stack-trace.png)
 
 ## Задание 3
 
