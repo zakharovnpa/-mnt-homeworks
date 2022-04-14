@@ -1,5 +1,26 @@
 # Домашнее задание к занятию "10.06. Инцидент-менеджмент"
 
+Ссылка из лекции
+[1](https://health.aws.amazon.com/health/status)
+
+[2](https://sre.google/workbook/incident-response/)
+
+[3](https://www.pingdom.com/)
+
+[4](https://uptimerobot.com/)
+
+[5](https://sre.google/workbook/on-call/)
+
+[6](https://www.atlassian.com/incident-management/postmortem/blameless)
+
+
+```
+Николай Поскребышев ответил Александр Хайкин
+20:35
+через Logstash так и не получилось передать логи, а без него (filebeat->elastic) все гуд
+пиши в слаке, у меня есть продакшн вариант, подскажу
+```
+
 ## Задание 1
 
 Составьте постмотрем, на основе реального сбоя системы Github в 2018 году.
