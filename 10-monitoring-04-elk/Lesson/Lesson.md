@@ -44,7 +44,7 @@ root@server1:~/learning-monitoring/ELK# tree
 
 ## Задание 1
 
-1. Вам необходимо поднять в докере:
+### 1. Вам необходимо поднять в докере:
 - elasticsearch(hot и warm ноды)
 - logstash
 - kibana
@@ -54,7 +54,7 @@ root@server1:~/learning-monitoring/ELK# tree
 
 **Ответ:**
 
-Запуск `docler-compose up -d` приводит к ошибке:
+Запуск `docker-compose up -d` приводит к ошибке:
 ```
 
 ```
@@ -120,16 +120,147 @@ cf5431bf3027   elasticsearch:7.16.2                      "/bin/tini -- /usr/l…
 
 ```
 
-* Связывание между собой:
+* Решение вопроса по `vm.max_map_count`:
+```
+root@PC-Ubuntu:~# cat /proc/sys/vm/max_map_count
+65530
+```
+```
+root@PC-Ubuntu:~# sysctl -w vm.max_map_count=262144
+vm.max_map_count = 262144
+```
+```
+root@PC-Ubuntu:~# cat /proc/sys/vm/max_map_count
+262144
+```
+```
+root@PC-Ubuntu:~# echo "vm.max_map_count=262144" >> /etc/sysctl.conf
+```
+```
+root@PC-Ubuntu:~# sysctl --system
+* Applying /etc/sysctl.d/10-console-messages.conf ...
+kernel.printk = 4 4 1 7
+* Applying /etc/sysctl.d/10-ipv6-privacy.conf ...
+net.ipv6.conf.all.use_tempaddr = 2
+net.ipv6.conf.default.use_tempaddr = 2
+* Applying /etc/sysctl.d/10-kernel-hardening.conf ...
+kernel.kptr_restrict = 1
+* Applying /etc/sysctl.d/10-link-restrictions.conf ...
+fs.protected_hardlinks = 1
+fs.protected_symlinks = 1
+* Applying /etc/sysctl.d/10-magic-sysrq.conf ...
+kernel.sysrq = 176
+* Applying /etc/sysctl.d/10-network-security.conf ...
+net.ipv4.conf.default.rp_filter = 2
+net.ipv4.conf.all.rp_filter = 2
+* Applying /etc/sysctl.d/10-ptrace.conf ...
+kernel.yama.ptrace_scope = 1
+* Applying /etc/sysctl.d/10-zeropage.conf ...
+vm.mmap_min_addr = 65536
+* Applying /usr/lib/sysctl.d/30-tracker.conf ...
+fs.inotify.max_user_watches = 65536
+* Applying /usr/lib/sysctl.d/50-default.conf ...
+net.ipv4.conf.default.promote_secondaries = 1
+sysctl: setting key "net.ipv4.conf.all.promote_secondaries": Недопустимый аргумент
+net.ipv4.ping_group_range = 0 2147483647
+net.core.default_qdisc = fq_codel
+fs.protected_regular = 1
+fs.protected_fifos = 1
+* Applying /usr/lib/sysctl.d/50-pid-max.conf ...
+kernel.pid_max = 4194304
+* Applying /etc/sysctl.d/99-sysctl.conf ...
+vm.max_map_count = 262144
+* Applying /usr/lib/sysctl.d/protect-links.conf ...
+fs.protected_fifos = 1
+fs.protected_hardlinks = 1
+fs.protected_regular = 2
+fs.protected_symlinks = 1
+* Applying /etc/sysctl.conf ...
+vm.max_map_count = 262144
+root@PC-Ubuntu:~# 
+root@PC-Ubuntu:~# 
+root@PC-Ubuntu:~# cat /proc/sys/vm/max_map_count
+262144
+root@PC-Ubuntu:~# 
+root@PC-Ubuntu:~# 
+root@PC-Ubuntu:~# 
+root@PC-Ubuntu:~# cat /proc/sys/vm/max_map_count
+262144
+root@PC-Ubuntu:~# 
 
-2. Logstash следует сконфигурировать для приёма по tcp json сообщений.
+```
 
-Filebeat следует сконфигурировать для отправки логов docker вашей системы в logstash.
+```
+root@PC-Ubuntu:~/learning-monitoring/ELK# docker-compose exec es-hot cat /etc/*release
+DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=20.04
+DISTRIB_CODENAME=focal
+DISTRIB_DESCRIPTION="Ubuntu 20.04.3 LTS"
+NAME="Ubuntu"
+VERSION="20.04.3 LTS (Focal Fossa)"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu 20.04.3 LTS"
+VERSION_ID="20.04"
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+VERSION_CODENAME=focal
+UBUNTU_CODENAME=focal
 
-В директории [help](./help) находится манифест docker-compose и конфигурации filebeat/logstash для быстрого 
+```
+
+```
+root@PC-Ubuntu:~/learning-monitoring/ELK# docker-compose exec es-hot bash
+root@3aeca93dc0a8:/usr/share/elasticsearch# 
+root@3aeca93dc0a8:/usr/share/elasticsearch# ls -lha
+total 688K
+drwxrwxr-x  1 root          root 4.0K Apr 13 19:41 .
+drwxr-xr-x  1 root          root 4.0K Apr 13 19:41 ..
+-rw-r--r--  1 root          root  220 Dec 19 00:19 .bash_logout
+-rw-r--r--  1 root          root 3.7K Dec 19 00:19 .bashrc
+drwxrwxr-x  3 elasticsearch root 4.0K Apr 13 19:41 .cache
+-rw-r--r--  1 root          root  807 Dec 19 00:19 .profile
+-r--r--r--  1 root          root 3.8K Dec 18 19:40 LICENSE.txt
+-r--r--r--  1 root          root 614K Dec 18 19:45 NOTICE.txt
+-r--r--r--  1 root          root 2.7K Dec 18 19:40 README.asciidoc
+drwxrwxr-x  1 elasticsearch root 4.0K Dec 19 00:18 bin
+drwxrwxr-x  1 elasticsearch root 4.0K Apr 13 19:41 config
+drwxrwxr-x  3 elasticsearch root 4.0K Apr 13 17:16 data
+dr-xr-xr-x  1 root          root 4.0K Dec 18 19:48 jdk
+dr-xr-xr-x  3 root          root 4.0K Dec 18 19:48 lib
+drwxrwxr-x  1 elasticsearch root 4.0K Apr 13 19:48 logs
+dr-xr-xr-x 61 root          root 4.0K Dec 18 19:48 modules
+drwxrwxr-x  1 elasticsearch root 4.0K Dec 18 19:45 plugins
+
+```
+
+```
+root@3aeca93dc0a8:/usr/share/elasticsearch/config# cat elasticsearch.yml 
+cluster.name: "docker-cluster"
+network.host: 0.0.0.0
+
+```
+
+### Связывание между собой:
+
+#### 2. Logstash следует сконфигурировать для приёма по tcp json сообщений.
+
+#### 3. Filebeat следует сконфигурировать для отправки логов docker вашей системы в logstash.
+
+#### 4. В директории [help](./help) находится манифест docker-compose и конфигурации filebeat/logstash для быстрого 
 выполнения данного задания.
 
-Результатом выполнения данного задания должны быть:
+* Быстро выполнить не удается. Контейнеры es-hot, es-warm падают через минуту после запуска.
+* Логи es-hot `docker start es-hot -i`:
+```
+{"type": "server", "timestamp": "2022-04-13T18:58:48,339Z", "level": "ERROR", "component": "o.e.b.ElasticsearchUncaughtExceptionHandler", "cluster.name": "es-docker-cluster", "node.name": "es-hot", "message": "uncaught exception in thread [main]", 
+"stacktrace": ["org.elasticsearch.bootstrap.StartupException: ElasticsearchException[Failure running machine learning native code. This could be due to running on an unsupported OS or distribution, missing OS libraries, or a problem with the temp directory. To bypass this problem by running Elasticsearch without machine learning functionality set [xpack.ml.enabled: false].]",
+
+```
+
+#### 5. Результатом выполнения данного задания должны быть:
 - скриншот `docker ps` через 5 минут после старта всех контейнеров (их должно быть 5)
 - скриншот интерфейса kibana
 - docker-compose манифест (если вы не использовали директорию help)
