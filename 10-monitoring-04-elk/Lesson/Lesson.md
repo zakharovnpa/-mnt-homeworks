@@ -280,7 +280,143 @@ root@server1:~/learning-monitoring/ELK# docker-compose exec es-hot curl -v http:
 
 #### 2. Logstash следует сконфигурировать для приёма по tcp json сообщений.
 
+```
+root@server1:~/learning-monitoring/ELK# docker-compose exec es-hot curl http://localhost:9200/_template/logstash
+{"logstash":{"order":0,"version":60001,"index_patterns":["logstash-*"],"settings":{"index":{"number_of_shards":"1","refresh_interval":"5s"}},"mappings":{"dynamic_templates":[{"message_field":{"path_match":"message","mapping":{"norms":false,"type":"text"},"match_mapping_type":"string"}},{"string_fields":{"mapping":{"norms":false,"type":"text","fields":{"keyword":{"ignore_above":256,"type":"keyword"}}},"match_mapping_type":"string","match":"*"}}],"properties":{"@timestamp":{"type":"date"},"geoip":{"dynamic":true,"properties":{"ip":{"type":"ip"},"latitude":{"type":"half_float"},"location":{"type":"geo_point"},"longitude":{"type":"half_float"}}},"@version":{"type":"keyword"}}},"aliases":{}}}root@server1:~/learning-monitoring/ELK# 
+root@server1:~/learning-monitoring/ELK# 
+root@server1:~/learning-monitoring/ELK# 
+root@server1:~/learning-monitoring/ELK# docker-compose exec kibana curl http://es-hot:9200/_template/logstash
+{"logstash":{"order":0,"version":60001,"index_patterns":["logstash-*"],"settings":{"index":{"number_of_shards":"1","refresh_interval":"5s"}},"mappings":{"dynamic_templates":[{"message_field":{"path_match":"message","mapping":{"norms":false,"type":"text"},"match_mapping_type":"string"}},{"string_fields":{"mapping":{"norms":false,"type":"text","fields":{"keyword":{"ignore_above":256,"type":"keyword"}}},"match_mapping_type":"string","match":"*"}}],"properties":{"@timestamp":{"type":"date"},"geoip":{"dynamic":true,"properties":{"ip":{"type":"ip"},"latitude":{"type":"half_float"},"location":{"type":"geo_point"},"longitude":{"type":"half_float"}}},"@version":{"type":"keyword"}}},"aliases":{}}}root@server1:~/learning-monitoring/ELK# 
+```
+
 #### 3. Filebeat следует сконфигурировать для отправки логов docker вашей системы в logstash.
+
+```
+[root@579145f2712b filebeat]# curl http://logstash:5046
+```
+
+```
+[root@579145f2712b filebeat]# 
+[root@579145f2712b filebeat]# curl http://logstash:9600
+{"host":"b24497fb9412","version":"7.16.2","http_address":"0.0.0.0:9600","id":"6c856762-610d-4c66-ad5b-7c138349fe38","name":"b24497fb9412","ephemeral_id":"6d719791-eff5-4df4-8b1f-397dcfe0ea78","status":"green","snapshot":false,"pipeline":{"workers":3,"batch_size":125,"batch_delay":50},"build_date":"2021-12-18T19:42:46Z","build_sha":"f1d497fd30cdb16dccebf2de1a788aad1005be9a","build_snapshot":false}[root@579145f2712b filebeat]# 
+```
+
+```
+[root@579145f2712b filebeat]# curl http://logstash:5044
+curl: (7) Failed connect to logstash:5044; Connection refused
+```
+
+```
+[root@579145f2712b filebeat]# curl -v http://logstash:5046
+* About to connect() to logstash port 5046 (#0)
+*   Trying 172.18.0.4...
+* Connected to logstash (172.18.0.4) port 5046 (#0)
+> GET / HTTP/1.1
+> User-Agent: curl/7.29.0
+> Host: logstash:5046
+> Accept: */*
+> 
+^C
+```
+
+```
+[root@579145f2712b filebeat]# curl -v http://es-hot:9200
+* About to connect() to es-hot port 9200 (#0)
+*   Trying 172.18.0.3...
+* Connected to es-hot (172.18.0.3) port 9200 (#0)
+> GET / HTTP/1.1
+> User-Agent: curl/7.29.0
+> Host: es-hot:9200
+> Accept: */*
+> 
+< HTTP/1.1 200 OK
+< X-elastic-product: Elasticsearch
+< Warning: 299 Elasticsearch-7.16.2-2b937c44140b6559905130a8650c64dbd0879cfb "Elasticsearch built-in security features are not enabled. Without authentication, your cluster could be accessible to anyone. See https://www.elastic.co/guide/en/elasticsearch/reference/7.16/security-minimal-setup.html to enable security."
+< content-type: application/json; charset=UTF-8
+< content-length: 543
+< 
+{
+  "name" : "es-hot",
+  "cluster_name" : "es-docker-cluster",
+  "cluster_uuid" : "V6JcOag3SEizV7t4nYi1Cg",
+  "version" : {
+    "number" : "7.16.2",
+    "build_flavor" : "default",
+    "build_type" : "docker",
+    "build_hash" : "2b937c44140b6559905130a8650c64dbd0879cfb",
+    "build_date" : "2021-12-18T19:42:46.604893745Z",
+    "build_snapshot" : false,
+    "lucene_version" : "8.10.1",
+    "minimum_wire_compatibility_version" : "6.8.0",
+    "minimum_index_compatibility_version" : "6.0.0-beta1"
+  },
+  "tagline" : "You Know, for Search"
+}
+* Connection #0 to host es-hot left intact
+[root@579145f2712b filebeat]# 
+[root@579145f2712b filebeat]# curl -v http://es-warm:9200
+* About to connect() to es-warm port 9200 (#0)
+*   Trying 172.18.0.2...
+* Connected to es-warm (172.18.0.2) port 9200 (#0)
+> GET / HTTP/1.1
+> User-Agent: curl/7.29.0
+> Host: es-warm:9200
+> Accept: */*
+> 
+< HTTP/1.1 200 OK
+< X-elastic-product: Elasticsearch
+< Warning: 299 Elasticsearch-7.16.2-2b937c44140b6559905130a8650c64dbd0879cfb "Elasticsearch built-in security features are not enabled. Without authentication, your cluster could be accessible to anyone. See https://www.elastic.co/guide/en/elasticsearch/reference/7.16/security-minimal-setup.html to enable security."
+< content-type: application/json; charset=UTF-8
+< content-length: 544
+< 
+{
+  "name" : "es-warm",
+  "cluster_name" : "es-docker-cluster",
+  "cluster_uuid" : "V6JcOag3SEizV7t4nYi1Cg",
+  "version" : {
+    "number" : "7.16.2",
+    "build_flavor" : "default",
+    "build_type" : "docker",
+    "build_hash" : "2b937c44140b6559905130a8650c64dbd0879cfb",
+    "build_date" : "2021-12-18T19:42:46.604893745Z",
+    "build_snapshot" : false,
+    "lucene_version" : "8.10.1",
+    "minimum_wire_compatibility_version" : "6.8.0",
+    "minimum_index_compatibility_version" : "6.0.0-beta1"
+  },
+  "tagline" : "You Know, for Search"
+}
+* Connection #0 to host es-warm left intact
+
+```
+
+```
+root@server1:~/learning-monitoring/ELK# docker-compose exec es-hot curl -v http://localhost:9200/_template/logstash
+*   Trying 127.0.0.1:9200...
+* TCP_NODELAY set
+* Connected to localhost (127.0.0.1) port 9200 (#0)
+> GET /_template/logstash HTTP/1.1
+> Host: localhost:9200
+> User-Agent: curl/7.68.0
+> Accept: */*
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< X-elastic-product: Elasticsearch
+< Warning: 299 Elasticsearch-7.16.2-2b937c44140b6559905130a8650c64dbd0879cfb "Elasticsearch built-in security features are not enabled. Without authentication, your cluster could be accessible to anyone. See https://www.elastic.co/guide/en/elasticsearch/reference/7.16/security-minimal-setup.html to enable security."
+< content-type: application/json; charset=UTF-8
+< content-length: 696
+< 
+* Connection #0 to host localhost left intact
+{"logstash":{"order":0,"version":60001,"index_patterns":["logstash-*"],"settings":{"index":{"number_of_shards":"1","refresh_interval":"5s"}},"mappings":{"dynamic_templates":[{"message_field":{"path_match":"message","mapping":{"norms":false,"type":"text"},"match_mapping_type":"string"}},{"string_fields":{"mapping":{"norms":false,"type":"text","fields":{"keyword":{"ignore_above":256,"type":"keyword"}}},"match_mapping_type":"string","match":"*"}}],"properties":{"@timestamp":{"type":"date"},"geoip":{"dynamic":true,"properties":{"ip":{"type":"ip"},"latitude":{"type":"half_float"},"location":{"type":"geo_point"},"longitude":{"type":"half_float"}}},"@version":{"type":"keyword"}}},"aliases":{}}}root@server1:~/learning-monitoring/ELK# 
+```
+
+```
+root@server1:~/learning-monitoring/ELK# docker-compose exec es-hot curl http://localhost:9200/_template/logstash
+{"logstash":{"order":0,"version":60001,"index_patterns":["logstash-*"],"settings":{"index":{"number_of_shards":"1","refresh_interval":"5s"}},"mappings":{"dynamic_templates":[{"message_field":{"path_match":"message","mapping":{"norms":false,"type":"text"},"match_mapping_type":"string"}},{"string_fields":{"mapping":{"norms":false,"type":"text","fields":{"keyword":{"ignore_above":256,"type":"keyword"}}},"match_mapping_type":"string","match":"*"}}],"properties":{"@timestamp":{"type":"date"},"geoip":{"dynamic":true,"properties":{"ip":{"type":"ip"},"latitude":{"type":"half_float"},"location":{"type":"geo_point"},"longitude":{"type":"half_float"}}},"@version":{"type":"keyword"}}},"aliases":{}}}root@server1:~/learning-monitoring/ELK# 
+root@server1:~/learning-monitoring/ELK# 
+
+```
 
 #### 4. В директории [help](./help) находится манифест docker-compose и конфигурации filebeat/logstash для быстрого 
 выполнения данного задания.
