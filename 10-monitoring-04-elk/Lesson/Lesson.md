@@ -245,6 +245,39 @@ network.host: 0.0.0.0
 
 ### Связывание между собой:
 
+#### N. Тестирование подключений
+
+* На `es-hot` выполняем `curl -v http://localhost:9200/_template/logstash`
+
+```
+curl http://localhost:9200/_template/logstash
+
+```
+```
+{"logstash":{"order":0,"version":60001,"index_patterns":["logstash-*"],"settings":{"index":{"number_of_shards":"1","refresh_interval":"5s"}},"mappings":{"dynamic_templates":[{"message_field":{"path_match":"message","mapping":{"norms":false,"type":"text"},"match_mapping_type":"string"}},{"string_fields":{"mapping":{"norms":false,"type":"text","fields":{"keyword":{"ignore_above":256,"type":"keyword"}}},"match_mapping_type":"string","match":"*"}}],"properties":{"@timestamp":{"type":"date"},"geoip":{"dynamic":true,"properties":{"ip":{"type":"ip"},"latitude":{"type":"half_float"},"location":{"type":"geo_point"},"longitude":{"type":"half_float"}}},"@version":{"type":"keyword"}}},"aliases":{}}}
+```
+
+```
+root@server1:~/learning-monitoring/ELK# docker-compose exec es-hot curl -v http://localhost:9200/_template/logstash
+*   Trying 127.0.0.1:9200...
+* TCP_NODELAY set
+* Connected to localhost (127.0.0.1) port 9200 (#0)
+> GET /_template/logstash HTTP/1.1
+> Host: localhost:9200
+> User-Agent: curl/7.68.0
+> Accept: */*
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< X-elastic-product: Elasticsearch
+< Warning: 299 Elasticsearch-7.16.2-2b937c44140b6559905130a8650c64dbd0879cfb "Elasticsearch built-in security features are not enabled. Without authentication, your cluster could be accessible to anyone. See https://www.elastic.co/guide/en/elasticsearch/reference/7.16/security-minimal-setup.html to enable security."
+< content-type: application/json; charset=UTF-8
+< content-length: 696
+< 
+* Connection #0 to host localhost left intact
+{"logstash":{"order":0,"version":60001,"index_patterns":["logstash-*"],"settings":{"index":{"number_of_shards":"1","refresh_interval":"5s"}},"mappings":{"dynamic_templates":[{"message_field":{"path_match":"message","mapping":{"norms":false,"type":"text"},"match_mapping_type":"string"}},{"string_fields":{"mapping":{"norms":false,"type":"text","fields":{"keyword":{"ignore_above":256,"type":"keyword"}}},"match_mapping_type":"string","match":"*"}}],"properties":{"@timestamp":{"type":"date"},"geoip":{"dynamic":true,"properties":{"ip":{"type":"ip"},"latitude":{"type":"half_float"},"location":{"type":"geo_point"},"longitude":{"type":"half_float"}}},"@version":{"type":"keyword"}}},"aliases":{}}}
+```
+
 #### 2. Logstash следует сконфигурировать для приёма по tcp json сообщений.
 
 #### 3. Filebeat следует сконфигурировать для отправки логов docker вашей системы в logstash.
