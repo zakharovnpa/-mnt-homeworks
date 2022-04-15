@@ -50,7 +50,7 @@ Filebeat следует сконфигурировать для отправки
 ![screen-cmd-elk](/10-monitoring-04-elk/Files/screen-cmd-elk.png)
 
 * Скриншот интерфейса kibana:
-![](/)
+![screen-kibana-elk](/10-monitoring-04-elk/Files/screen-kibana-elk.png)
 
 ## Задание 2
 
