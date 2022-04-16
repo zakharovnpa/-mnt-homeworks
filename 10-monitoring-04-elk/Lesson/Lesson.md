@@ -25,6 +25,11 @@ root@server1:~/learning-monitoring/ELK# tree
 
 При выполнении задания пользуйтесь вспомогательными ресурсами:
 
+- [Документация по Filebeat](https://www.elastic.co/guide/en/beats/filebeat/7.16/index.html)
+- [Running the Elastic Stack on Docker-Compose](https://www.elastic.co/guide/en/elastic-stack-get-started/7.16/get-started-docker.html)
+- [Index management](https://www.elastic.co/guide/en/elasticsearch/reference/7.16/index-mgmt.html)
+- 
+
 - [поднимаем elk в докер](https://www.elastic.co/guide/en/elastic-stack-get-started/current/get-started-docker.html)
 - [поднимаем elk в докер с filebeat и докер логами](https://www.sarulabs.com/post/5/2019-08-12/sending-docker-logs-to-elasticsearch-and-kibana-with-filebeat.html)
 - [конфигурируем logstash](https://www.elastic.co/guide/en/logstash/current/configuration.html)
@@ -121,6 +126,12 @@ cf5431bf3027   elasticsearch:7.16.2                      "/bin/tini -- /usr/l…
 ```
 
 * Решение вопроса по `vm.max_map_count`:
+```
+ERROR: [1] bootstrap checks failed. You must address the points described in the following [1] lines before starting Elasticsearch.
+bootstrap check failure [1] of [1]: max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]
+
+```
+
 ```
 root@PC-Ubuntu:~# cat /proc/sys/vm/max_map_count
 65530
