@@ -127,6 +127,43 @@ root@server1:~/learning-monitoring/ELK/pinger# docker-compose exec kibana curl h
 ```
 5. Проверка того, что ФБ генерирует сообщения с логами.
 [Filebeat quick start: installation and configuration](https://www.elastic.co/guide/en/beats/filebeat/7.16/filebeat-installation-configuration.html)
+* Директория с логами указана в файле `docker-compose.yml`
 
+```
+filebeat.inputs:
+  - type: container
+    paths:
+      - '/var/lib/docker/containers/*/*.log'
+```
+* Содержимое директории `/var/lib/docker/containers/`
+```
+
+```
+* `filebeat.yml`
+```
+filebeat.inputs:
+  - type: container
+    paths:
+      - '/var/lib/docker/containers/*/*.log'
+
+processors:
+  - add_docker_metadata:
+      host: "unix:///var/run/docker.sock"
+
+  - decode_json_fields:
+      fields: ["message"]
+      target: "json"
+      overwrite_keys: true
+
+output.logstash:
+  hosts: ["http://logstash:5046"]
+
+#output.console:
+#  enabled: true
+
+logging.json: true
+logging.metrics.enabled: false
+
+```
 
 6. Проверка того, что ФБ передает сообщения с логами.
