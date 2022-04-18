@@ -28,7 +28,7 @@ root@server1:~/learning-monitoring/ELK# tree
 - [Документация по Filebeat](https://www.elastic.co/guide/en/beats/filebeat/7.16/index.html)
 - [Running the Elastic Stack on Docker-Compose](https://www.elastic.co/guide/en/elastic-stack-get-started/7.16/get-started-docker.html)
 - [Index management](https://www.elastic.co/guide/en/elasticsearch/reference/7.16/index-mgmt.html)
-- 
+- [Справочник по Logstash](https://www.elastic.co/guide/en/logstash/7.16/index.html)
 
 - [поднимаем elk в докер](https://www.elastic.co/guide/en/elastic-stack-get-started/current/get-started-docker.html)
 - [поднимаем elk в докер с filebeat и докер логами](https://www.sarulabs.com/post/5/2019-08-12/sending-docker-logs-to-elasticsearch-and-kibana-with-filebeat.html)
