@@ -391,3 +391,7 @@ logging.metrics.enabled: false
 ```
 
 6. Проверка того, что ФБ передает сообщения с логами.
+7. [Справочник по Logstash](https://www.elastic.co/guide/en/logstash/7.16/index.html)
+```
+
+```
