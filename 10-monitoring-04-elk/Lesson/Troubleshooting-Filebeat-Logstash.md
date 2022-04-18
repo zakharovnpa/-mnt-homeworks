@@ -391,6 +391,10 @@ logging.metrics.enabled: false
 ```
 
 6. Проверка того, что ФБ передает сообщения с логами.
+[Set up and run Filebeatedit](https://www.elastic.co/guide/en/beats/filebeat/current/setting-up-and-running.html?baymax=rec&rogue=rec-1&elektra=guide)
+[Filebeat Reference](https://www.elastic.co/guide/en/beats/filebeat/7.16/index.html)
+[Configure the Logstash output](https://www.elastic.co/guide/en/beats/filebeat/current/logstash-output.html)
+
 7. [Справочник по Logstash](https://www.elastic.co/guide/en/logstash/7.16/index.html)
 ```
 
