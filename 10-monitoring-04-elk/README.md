@@ -52,7 +52,7 @@ Filebeat следует сконфигурировать для отправки
 
 **Ответ:**
 
-Для запуска стэка ELK использовались [свои файлы](https://github.com/zakharovnpa/ELK-7.16.2), созданные на основе те, что расположены в директории [help](./help)
+Для запуска стэка ELK использовались [свои файлы](https://github.com/zakharovnpa/ELK-7.16.2), созданные на основе тех, что расположены в директории [help](./help)
 
 * Скриншот `docker ps` через 5 минут после старта всех контейнеров:
 ![screen-cmd-elk](/10-monitoring-04-elk/Files/screen-cmd-elk.png)
@@ -75,7 +75,9 @@ Filebeat следует сконфигурировать для отправки
  
 **Ответ:**
 
-1. Страница с логами контейнера **filebeat**:
+1. Созданы паттерны:
+![screen-kibana-index-pattern](/)
+2. Страница с логами контейнера **filebeat**:
 
 ![screen-kibana-logs-filebeat](/10-monitoring-04-elk/Files/screen-kibana-logs-filebeat.png)
 ---
