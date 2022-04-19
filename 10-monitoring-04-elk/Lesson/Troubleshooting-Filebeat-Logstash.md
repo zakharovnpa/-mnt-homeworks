@@ -23,7 +23,7 @@ logstash  | [2022-04-15T18:01:29,270][INFO ][logstash.inputs.tcp      ][main][2a
 ```
 
 ```
-* Вот такой файл приходит от Filebeat в Logstash"
+* Вот такой файл приходит от Filebeat в Logstash при нормальной передачи логов.
 ```json
 {
   "_index": "logstash-2022.04.19",
