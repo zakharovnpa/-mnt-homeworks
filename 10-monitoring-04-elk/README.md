@@ -76,7 +76,7 @@ Filebeat следует сконфигурировать для отправки
 **Ответ:**
 
 1. Созданы паттерны:
-![screen-kibana-index-pattern](/10-monitoring-04-elk/Files/screen-kibana-index-pattern.png)
+![screen-kibana-index-pattern-2](/10-monitoring-04-elk/Files/screen-kibana-index-pattern-2.png)
 2. Страница с логами контейнера **filebeat**:
 
 ![screen-logs-filebeat-elk](/10-monitoring-04-elk/Files/screen-logs-filebeat-elk.png)
