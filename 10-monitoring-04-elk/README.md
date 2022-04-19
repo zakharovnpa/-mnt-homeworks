@@ -80,6 +80,9 @@ Filebeat следует сконфигурировать для отправки
 2. Страница с логами контейнера **filebeat**:
 
 ![screen-logs-filebeat-elk](/10-monitoring-04-elk/Files/screen-logs-filebeat-elk.png)
+
+3. Логи Filebeat:
+![screen-logs-filebeat-elk-2](/10-monitoring-04-elk/Files/screen-logs-filebeat-elk-2.png)
 ---
 
 ### Как оформить ДЗ?
