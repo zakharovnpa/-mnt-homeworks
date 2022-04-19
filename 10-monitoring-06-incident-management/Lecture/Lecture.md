@@ -7,6 +7,19 @@
 квадратный"
 Сергей Бывшев
 
+Ссылки из лекции
+[1](https://health.aws.amazon.com/health/status)
+
+[2](https://sre.google/workbook/incident-response/)
+
+[3](https://www.pingdom.com/)
+
+[4](https://uptimerobot.com/)
+
+[5](https://sre.google/workbook/on-call/)
+
+[6](https://www.atlassian.com/incident-management/postmortem/blameless)
+
 ### 2План занятия
 1. Введение
 2. Коммуникация
