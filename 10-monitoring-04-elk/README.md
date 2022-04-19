@@ -85,6 +85,52 @@ Filebeat следует сконфигурировать для отправки
 ![screen-logs-filebeat-elk-2](/10-monitoring-04-elk/Files/screen-logs-filebeat-elk-2.png)
 ---
 
+4. Вот такой json файл приходит от Filebeat в Logstash при нормальной передачи логов.
+```json
+{
+  "_index": "logstash-2022.04.19",
+  "_type": "_doc",
+  "_id": "E8cVQIAB4iChi9AGHMV2",
+  "_version": 1,
+  "_score": 1,
+  "_source": {
+    "port": 33088,
+    "message": "\\xDBl\\xE0\\xAC­嚇\\a\\xF0p3\\x8Fo3\\xB8oxj玩\\x9D\\x86'\\x90\\u0018\\x9E@\\xA2#\\x81\\xC4+\\xF3\\u0005\\xD6|\\b\\f?\\x85\\xC9\\xF0S\\x98\\f?\\x85\\xE9`Oa\\\"`z\\xD6\\xED\\u0003\\xD5.Xw\\b\\u0013X\\x87\\x8E\\xEB[\\xE5n\\u0004\\\"\\xE4\\u0019\\x87\\xD30H\\xCA\\u0014Ex\\x949~\\xF5\\xDC \\u0011\\xF2\\xB4V\\x8A|\\x9A\\xE4\\xBBD\\xC9\\xEB\\u000E\\xA6\\xA0V\\xA5@#(\\x9BnYj\\x91\\xEDsѾ\\xB8\\xD4\\xD4<\\xAB7/\\ew\\xF7\\xD1y\\xBE\\xDA\\xF9*\\rd\\u000F\\u0000\\xB85\\u0012\\xA0\\xFF\\u001C\\xE5m\\x8B+M\\xD8{ͽ\\xAFP\\xE1\\xEC\\x83\\v8\\xF3LY\\xCD\\u0005\\xD0p<\\xFD\\x9C\\xC0\\x99[\\xCAj*@\\u0004\\u0013,\\x81K=<\\xC1\\x99R\\xB2\\xAAE6\\xBE\\u000F\\u0004\\xC8\\u001A\\u0004j\\u0000\\xC0\\xB5&\\u0004\\xE8\\u001A\\\"*\\x84H\\xB1\\u0014ti\\xA2\\xC39\\u00040X\\x9D\\b\\xC9",
+    "@version": "1",
+    "@timestamp": "2022-04-19T04:29:26.845Z",
+    "host": "filebeat.elk_elastic",
+    "tags": [
+      "_jsonparsefailure"
+    ]
+  },
+  "fields": {
+    "@timestamp": [
+      "2022-04-19T04:29:26.845Z"
+    ],
+    "port": [
+      33088
+    ],
+    "tags.keyword": [
+      "_jsonparsefailure"
+    ],
+    "@version": [
+      "1"
+    ],
+    "host": [
+      "filebeat.elk_elastic"
+    ],
+    "host.keyword": [
+      "filebeat.elk_elastic"
+    ],
+    "message": [
+      "\\xDBl\\xE0\\xAC­嚇\\a\\xF0p3\\x8Fo3\\xB8oxj玩\\x9D\\x86'\\x90\\u0018\\x9E@\\xA2#\\x81\\xC4+\\xF3\\u0005\\xD6|\\b\\f?\\x85\\xC9\\xF0S\\x98\\f?\\x85\\xE9`Oa\\\"`z\\xD6\\xED\\u0003\\xD5.Xw\\b\\u0013X\\x87\\x8E\\xEB[\\xE5n\\u0004\\\"\\xE4\\u0019\\x87\\xD30H\\xCA\\u0014Ex\\x949~\\xF5\\xDC \\u0011\\xF2\\xB4V\\x8A|\\x9A\\xE4\\xBBD\\xC9\\xEB\\u000E\\xA6\\xA0V\\xA5@#(\\x9BnYj\\x91\\xEDsѾ\\xB8\\xD4\\xD4<\\xAB7/\\ew\\xF7\\xD1y\\xBE\\xDA\\xF9*\\rd\\u000F\\u0000\\xB85\\u0012\\xA0\\xFF\\u001C\\xE5m\\x8B+M\\xD8{ͽ\\xAFP\\xE1\\xEC\\x83\\v8\\xF3LY\\xCD\\u0005\\xD0p<\\xFD\\x9C\\xC0\\x99[\\xCAj*@\\u0004\\u0013,\\x81K=<\\xC1\\x99R\\xB2\\xAAE6\\xBE\\u000F\\u0004\\xC8\\u001A\\u0004j\\u0000\\xC0\\xB5&\\u0004\\xE8\\u001A\\\"*\\x84H\\xB1\\u0014ti\\xA2\\xC39\\u00040X\\x9D\\b\\xC9"
+    ],
+    "tags": [
+      "_jsonparsefailure"
+    ]
+  }
+}
+```
 ### Как оформить ДЗ?
 
 Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
