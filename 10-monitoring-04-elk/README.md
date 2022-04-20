@@ -82,51 +82,233 @@ Filebeat следует сконфигурировать для отправки
 ![screen-logs-filebeat-elk](/10-monitoring-04-elk/Files/screen-logs-filebeat-elk.png)
 
 3. Логи Filebeat:
-![screen-logs-filebeat-elk-2](/10-monitoring-04-elk/Files/screen-logs-filebeat-elk-2.png)
+![screen-logs-filebeat-elk-3](/10-monitoring-04-elk/Files/screen-logs-filebeat-elk-3.png)
 ---
 
 4. Вот такой json файл приходит от Filebeat в Logstash при нормальной передачи логов.
 ```json
 {
-  "_index": "logstash-2022.04.19",
+  "_index": "logstash-2022.04.20",
   "_type": "_doc",
-  "_id": "E8cVQIAB4iChi9AGHMV2",
+  "_id": "rKw9RYABmp83w62qTgaY",
   "_version": 1,
   "_score": 1,
   "_source": {
-    "port": 33088,
-    "message": "\\xDBl\\xE0\\xAC­嚇\\a\\xF0p3\\x8Fo3\\xB8oxj玩\\x9D\\x86'\\x90\\u0018\\x9E@\\xA2#\\x81\\xC4+\\xF3\\u0005\\xD6|\\b\\f?\\x85\\xC9\\xF0S\\x98\\f?\\x85\\xE9`Oa\\\"`z\\xD6\\xED\\u0003\\xD5.Xw\\b\\u0013X\\x87\\x8E\\xEB[\\xE5n\\u0004\\\"\\xE4\\u0019\\x87\\xD30H\\xCA\\u0014Ex\\x949~\\xF5\\xDC \\u0011\\xF2\\xB4V\\x8A|\\x9A\\xE4\\xBBD\\xC9\\xEB\\u000E\\xA6\\xA0V\\xA5@#(\\x9BnYj\\x91\\xEDsѾ\\xB8\\xD4\\xD4<\\xAB7/\\ew\\xF7\\xD1y\\xBE\\xDA\\xF9*\\rd\\u000F\\u0000\\xB85\\u0012\\xA0\\xFF\\u001C\\xE5m\\x8B+M\\xD8{ͽ\\xAFP\\xE1\\xEC\\x83\\v8\\xF3LY\\xCD\\u0005\\xD0p<\\xFD\\x9C\\xC0\\x99[\\xCAj*@\\u0004\\u0013,\\x81K=<\\xC1\\x99R\\xB2\\xAAE6\\xBE\\u000F\\u0004\\xC8\\u001A\\u0004j\\u0000\\xC0\\xB5&\\u0004\\xE8\\u001A\\\"*\\x84H\\xB1\\u0014ti\\xA2\\xC39\\u00040X\\x9D\\b\\xC9",
+    "log": {
+      "offset": 476,
+      "file": {
+        "path": "/var/lib/docker/containers/7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c/7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c-json.log"
+      }
+    },
+    "agent": {
+      "hostname": "d06ab0375ab7",
+      "id": "6a11d0a9-d837-46fc-bf64-43a0e3db06b3",
+      "type": "filebeat",
+      "version": "7.16.2",
+      "name": "d06ab0375ab7",
+      "ephemeral_id": "bec8503a-e548-40a0-9ed1-a3e832f6f971"
+    },
+    "host": {
+      "name": "d06ab0375ab7"
+    },
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "message": "ERROR:root:OH NO!!!!!!",
+    "@timestamp": "2022-04-20T04:28:40.215Z",
+    "input": {
+      "type": "container"
+    },
     "@version": "1",
-    "@timestamp": "2022-04-19T04:29:26.845Z",
-    "host": "filebeat.elk_elastic",
+    "container": {
+      "image": {
+        "name": "library/python:3.9-alpine"
+      },
+      "labels": {
+        "com_docker_compose_container-number": "1",
+        "com_docker_compose_depends_on": "",
+        "com_docker_compose_project_config_files": "/root/learning-monitoring/ELK/docker-compose.yml",
+        "com_docker_compose_project_working_dir": "/root/learning-monitoring/ELK",
+        "com_docker_compose_service": "some_application",
+        "com_docker_compose_oneoff": "False",
+        "com_docker_compose_project": "elk",
+        "com_docker_compose_version": "2.2.2",
+        "com_docker_compose_config-hash": "29129dac1567d42191497fbdaa4e14f37ab58c37fe176c4148a36f16d7a6ea4a",
+        "com_docker_compose_image": "sha256:c55bae5557c5c540d01302d5feb93a89035a224bb9d14346ec47ec2d5ebc3f3d"
+      },
+      "name": "some_app",
+      "id": "7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c"
+    },
+    "stream": "stderr",
     "tags": [
-      "_jsonparsefailure"
+      "_jsonparsefailure",
+      "beats_input_codec_json_applied"
     ]
   },
   "fields": {
-    "@timestamp": [
-      "2022-04-19T04:29:26.845Z"
+    "agent.version.keyword": [
+      "7.16.2"
     ],
-    "port": [
-      33088
+    "container.labels.com_docker_compose_project_working_dir.keyword": [
+      "/root/learning-monitoring/ELK"
+    ],
+    "container.labels.com_docker_compose_project_working_dir": [
+      "/root/learning-monitoring/ELK"
+    ],
+    "host.name.keyword": [
+      "d06ab0375ab7"
+    ],
+    "container.labels.com_docker_compose_service": [
+      "some_application"
+    ],
+    "container.id": [
+      "7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c"
+    ],
+    "agent.hostname.keyword": [
+      "d06ab0375ab7"
+    ],
+    "ecs.version.keyword": [
+      "1.12.0"
+    ],
+    "container.name": [
+      "some_app"
+    ],
+    "container.image.name": [
+      "library/python:3.9-alpine"
+    ],
+    "container.labels.com_docker_compose_image": [
+      "sha256:c55bae5557c5c540d01302d5feb93a89035a224bb9d14346ec47ec2d5ebc3f3d"
+    ],
+    "agent.name": [
+      "d06ab0375ab7"
+    ],
+    "host.name": [
+      "d06ab0375ab7"
+    ],
+    "container.name.keyword": [
+      "some_app"
+    ],
+    "agent.id.keyword": [
+      "6a11d0a9-d837-46fc-bf64-43a0e3db06b3"
+    ],
+    "input.type": [
+      "container"
+    ],
+    "log.offset": [
+      476
+    ],
+    "agent.hostname": [
+      "d06ab0375ab7"
+    ],
+    "tags": [
+      "_jsonparsefailure",
+      "beats_input_codec_json_applied"
+    ],
+    "container.labels.com_docker_compose_project": [
+      "elk"
+    ],
+    "container.labels.com_docker_compose_image.keyword": [
+      "sha256:c55bae5557c5c540d01302d5feb93a89035a224bb9d14346ec47ec2d5ebc3f3d"
+    ],
+    "agent.id": [
+      "6a11d0a9-d837-46fc-bf64-43a0e3db06b3"
+    ],
+    "ecs.version": [
+      "1.12.0"
+    ],
+    "container.labels.com_docker_compose_project_config_files.keyword": [
+      "/root/learning-monitoring/ELK/docker-compose.yml"
+    ],
+    "container.labels.com_docker_compose_version.keyword": [
+      "2.2.2"
+    ],
+    "agent.version": [
+      "7.16.2"
+    ],
+    "container.labels.com_docker_compose_depends_on": [
+      ""
+    ],
+    "container.labels.com_docker_compose_container-number.keyword": [
+      "1"
+    ],
+    "stream.keyword": [
+      "stderr"
+    ],
+    "container.labels.com_docker_compose_config-hash": [
+      "29129dac1567d42191497fbdaa4e14f37ab58c37fe176c4148a36f16d7a6ea4a"
+    ],
+    "input.type.keyword": [
+      "container"
     ],
     "tags.keyword": [
-      "_jsonparsefailure"
+      "_jsonparsefailure",
+      "beats_input_codec_json_applied"
+    ],
+    "container.labels.com_docker_compose_depends_on.keyword": [
+      ""
+    ],
+    "container.labels.com_docker_compose_service.keyword": [
+      "some_application"
+    ],
+    "agent.type": [
+      "filebeat"
+    ],
+    "stream": [
+      "stderr"
+    ],
+    "container.labels.com_docker_compose_oneoff.keyword": [
+      "False"
     ],
     "@version": [
       "1"
     ],
-    "host": [
-      "filebeat.elk_elastic"
+    "container.labels.com_docker_compose_config-hash.keyword": [
+      "29129dac1567d42191497fbdaa4e14f37ab58c37fe176c4148a36f16d7a6ea4a"
     ],
-    "host.keyword": [
-      "filebeat.elk_elastic"
+    "container.image.name.keyword": [
+      "library/python:3.9-alpine"
+    ],
+    "log.file.path.keyword": [
+      "/var/lib/docker/containers/7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c/7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c-json.log"
+    ],
+    "agent.type.keyword": [
+      "filebeat"
+    ],
+    "agent.ephemeral_id.keyword": [
+      "bec8503a-e548-40a0-9ed1-a3e832f6f971"
+    ],
+    "container.labels.com_docker_compose_project.keyword": [
+      "elk"
+    ],
+    "agent.name.keyword": [
+      "d06ab0375ab7"
     ],
     "message": [
-      "\\xDBl\\xE0\\xAC­嚇\\a\\xF0p3\\x8Fo3\\xB8oxj玩\\x9D\\x86'\\x90\\u0018\\x9E@\\xA2#\\x81\\xC4+\\xF3\\u0005\\xD6|\\b\\f?\\x85\\xC9\\xF0S\\x98\\f?\\x85\\xE9`Oa\\\"`z\\xD6\\xED\\u0003\\xD5.Xw\\b\\u0013X\\x87\\x8E\\xEB[\\xE5n\\u0004\\\"\\xE4\\u0019\\x87\\xD30H\\xCA\\u0014Ex\\x949~\\xF5\\xDC \\u0011\\xF2\\xB4V\\x8A|\\x9A\\xE4\\xBBD\\xC9\\xEB\\u000E\\xA6\\xA0V\\xA5@#(\\x9BnYj\\x91\\xEDsѾ\\xB8\\xD4\\xD4<\\xAB7/\\ew\\xF7\\xD1y\\xBE\\xDA\\xF9*\\rd\\u000F\\u0000\\xB85\\u0012\\xA0\\xFF\\u001C\\xE5m\\x8B+M\\xD8{ͽ\\xAFP\\xE1\\xEC\\x83\\v8\\xF3LY\\xCD\\u0005\\xD0p<\\xFD\\x9C\\xC0\\x99[\\xCAj*@\\u0004\\u0013,\\x81K=<\\xC1\\x99R\\xB2\\xAAE6\\xBE\\u000F\\u0004\\xC8\\u001A\\u0004j\\u0000\\xC0\\xB5&\\u0004\\xE8\\u001A\\\"*\\x84H\\xB1\\u0014ti\\xA2\\xC39\\u00040X\\x9D\\b\\xC9"
+      "ERROR:root:OH NO!!!!!!"
     ],
-    "tags": [
-      "_jsonparsefailure"
+    "container.labels.com_docker_compose_version": [
+      "2.2.2"
+    ],
+    "container.labels.com_docker_compose_oneoff": [
+      "False"
+    ],
+    "@timestamp": [
+      "2022-04-20T04:28:40.215Z"
+    ],
+    "log.file.path": [
+      "/var/lib/docker/containers/7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c/7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c-json.log"
+    ],
+    "agent.ephemeral_id": [
+      "bec8503a-e548-40a0-9ed1-a3e832f6f971"
+    ],
+    "container.labels.com_docker_compose_container-number": [
+      "1"
+    ],
+    "container.id.keyword": [
+      "7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c"
+    ],
+    "container.labels.com_docker_compose_project_config_files": [
+      "/root/learning-monitoring/ELK/docker-compose.yml"
     ]
   }
 }
