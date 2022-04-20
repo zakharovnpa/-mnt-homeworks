@@ -77,15 +77,12 @@ Filebeat следует сконфигурировать для отправки
 
 1. Созданы паттерны:
 ![screen-kibana-index-pattern-2](/10-monitoring-04-elk/Files/screen-kibana-index-pattern-2.png)
-2. Страница с логами контейнера **filebeat**:
 
-![screen-logs-filebeat-elk](/10-monitoring-04-elk/Files/screen-logs-filebeat-elk.png)
-
-3. Логи Filebeat:
+2. Логи Filebeat:
 ![screen-logs-filebeat-elk-3](/10-monitoring-04-elk/Files/screen-logs-filebeat-elk-3.png)
 ---
 
-4. Вот такой json файл приходит от Filebeat в Logstash при нормальной передачи логов.
+3. Вот такой json файл приходит от Filebeat в Logstash при передачи логов.
 ```json
 {
   "_index": "logstash-2022.04.20",
