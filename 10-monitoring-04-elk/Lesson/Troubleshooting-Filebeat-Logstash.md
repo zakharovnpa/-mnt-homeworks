@@ -23,7 +23,7 @@ logstash  | [2022-04-15T18:01:29,270][INFO ][logstash.inputs.tcp      ][main][2a
 ```
 
 ```
-* Вот такой файл приходит от Filebeat в Logstash при нормальной передачи логов.
+* Вот такой файл приходит от Filebeat в Logstash при нормальной передачи логов. Это необработанные данные. Бинарные. Т.к. стоит входной параматр tcp, а не beats
 ```json
 {
   "_index": "logstash-2022.04.19",
@@ -69,7 +69,233 @@ logstash  | [2022-04-15T18:01:29,270][INFO ][logstash.inputs.tcp      ][main][2a
   }
 }
 ```
-
+```
+{
+  "_index": "logstash-2022.04.20",
+  "_type": "_doc",
+  "_id": "rKw9RYABmp83w62qTgaY",
+  "_version": 1,
+  "_score": 1,
+  "_source": {
+    "log": {
+      "offset": 476,
+      "file": {
+        "path": "/var/lib/docker/containers/7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c/7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c-json.log"
+      }
+    },
+    "agent": {
+      "hostname": "d06ab0375ab7",
+      "id": "6a11d0a9-d837-46fc-bf64-43a0e3db06b3",
+      "type": "filebeat",
+      "version": "7.16.2",
+      "name": "d06ab0375ab7",
+      "ephemeral_id": "bec8503a-e548-40a0-9ed1-a3e832f6f971"
+    },
+    "host": {
+      "name": "d06ab0375ab7"
+    },
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "message": "ERROR:root:OH NO!!!!!!",
+    "@timestamp": "2022-04-20T04:28:40.215Z",
+    "input": {
+      "type": "container"
+    },
+    "@version": "1",
+    "container": {
+      "image": {
+        "name": "library/python:3.9-alpine"
+      },
+      "labels": {
+        "com_docker_compose_container-number": "1",
+        "com_docker_compose_depends_on": "",
+        "com_docker_compose_project_config_files": "/root/learning-monitoring/ELK/docker-compose.yml",
+        "com_docker_compose_project_working_dir": "/root/learning-monitoring/ELK",
+        "com_docker_compose_service": "some_application",
+        "com_docker_compose_oneoff": "False",
+        "com_docker_compose_project": "elk",
+        "com_docker_compose_version": "2.2.2",
+        "com_docker_compose_config-hash": "29129dac1567d42191497fbdaa4e14f37ab58c37fe176c4148a36f16d7a6ea4a",
+        "com_docker_compose_image": "sha256:c55bae5557c5c540d01302d5feb93a89035a224bb9d14346ec47ec2d5ebc3f3d"
+      },
+      "name": "some_app",
+      "id": "7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c"
+    },
+    "stream": "stderr",
+    "tags": [
+      "_jsonparsefailure",
+      "beats_input_codec_json_applied"
+    ]
+  },
+  "fields": {
+    "agent.version.keyword": [
+      "7.16.2"
+    ],
+    "container.labels.com_docker_compose_project_working_dir.keyword": [
+      "/root/learning-monitoring/ELK"
+    ],
+    "container.labels.com_docker_compose_project_working_dir": [
+      "/root/learning-monitoring/ELK"
+    ],
+    "host.name.keyword": [
+      "d06ab0375ab7"
+    ],
+    "container.labels.com_docker_compose_service": [
+      "some_application"
+    ],
+    "container.id": [
+      "7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c"
+    ],
+    "agent.hostname.keyword": [
+      "d06ab0375ab7"
+    ],
+    "ecs.version.keyword": [
+      "1.12.0"
+    ],
+    "container.name": [
+      "some_app"
+    ],
+    "container.image.name": [
+      "library/python:3.9-alpine"
+    ],
+    "container.labels.com_docker_compose_image": [
+      "sha256:c55bae5557c5c540d01302d5feb93a89035a224bb9d14346ec47ec2d5ebc3f3d"
+    ],
+    "agent.name": [
+      "d06ab0375ab7"
+    ],
+    "host.name": [
+      "d06ab0375ab7"
+    ],
+    "container.name.keyword": [
+      "some_app"
+    ],
+    "agent.id.keyword": [
+      "6a11d0a9-d837-46fc-bf64-43a0e3db06b3"
+    ],
+    "input.type": [
+      "container"
+    ],
+    "log.offset": [
+      476
+    ],
+    "agent.hostname": [
+      "d06ab0375ab7"
+    ],
+    "tags": [
+      "_jsonparsefailure",
+      "beats_input_codec_json_applied"
+    ],
+    "container.labels.com_docker_compose_project": [
+      "elk"
+    ],
+    "container.labels.com_docker_compose_image.keyword": [
+      "sha256:c55bae5557c5c540d01302d5feb93a89035a224bb9d14346ec47ec2d5ebc3f3d"
+    ],
+    "agent.id": [
+      "6a11d0a9-d837-46fc-bf64-43a0e3db06b3"
+    ],
+    "ecs.version": [
+      "1.12.0"
+    ],
+    "container.labels.com_docker_compose_project_config_files.keyword": [
+      "/root/learning-monitoring/ELK/docker-compose.yml"
+    ],
+    "container.labels.com_docker_compose_version.keyword": [
+      "2.2.2"
+    ],
+    "agent.version": [
+      "7.16.2"
+    ],
+    "container.labels.com_docker_compose_depends_on": [
+      ""
+    ],
+    "container.labels.com_docker_compose_container-number.keyword": [
+      "1"
+    ],
+    "stream.keyword": [
+      "stderr"
+    ],
+    "container.labels.com_docker_compose_config-hash": [
+      "29129dac1567d42191497fbdaa4e14f37ab58c37fe176c4148a36f16d7a6ea4a"
+    ],
+    "input.type.keyword": [
+      "container"
+    ],
+    "tags.keyword": [
+      "_jsonparsefailure",
+      "beats_input_codec_json_applied"
+    ],
+    "container.labels.com_docker_compose_depends_on.keyword": [
+      ""
+    ],
+    "container.labels.com_docker_compose_service.keyword": [
+      "some_application"
+    ],
+    "agent.type": [
+      "filebeat"
+    ],
+    "stream": [
+      "stderr"
+    ],
+    "container.labels.com_docker_compose_oneoff.keyword": [
+      "False"
+    ],
+    "@version": [
+      "1"
+    ],
+    "container.labels.com_docker_compose_config-hash.keyword": [
+      "29129dac1567d42191497fbdaa4e14f37ab58c37fe176c4148a36f16d7a6ea4a"
+    ],
+    "container.image.name.keyword": [
+      "library/python:3.9-alpine"
+    ],
+    "log.file.path.keyword": [
+      "/var/lib/docker/containers/7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c/7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c-json.log"
+    ],
+    "agent.type.keyword": [
+      "filebeat"
+    ],
+    "agent.ephemeral_id.keyword": [
+      "bec8503a-e548-40a0-9ed1-a3e832f6f971"
+    ],
+    "container.labels.com_docker_compose_project.keyword": [
+      "elk"
+    ],
+    "agent.name.keyword": [
+      "d06ab0375ab7"
+    ],
+    "message": [
+      "ERROR:root:OH NO!!!!!!"
+    ],
+    "container.labels.com_docker_compose_version": [
+      "2.2.2"
+    ],
+    "container.labels.com_docker_compose_oneoff": [
+      "False"
+    ],
+    "@timestamp": [
+      "2022-04-20T04:28:40.215Z"
+    ],
+    "log.file.path": [
+      "/var/lib/docker/containers/7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c/7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c-json.log"
+    ],
+    "agent.ephemeral_id": [
+      "bec8503a-e548-40a0-9ed1-a3e832f6f971"
+    ],
+    "container.labels.com_docker_compose_container-number": [
+      "1"
+    ],
+    "container.id.keyword": [
+      "7de09c2ef6b59478883fc6568c99d7699326e270bcd99cc471df3eb458b4c57c"
+    ],
+    "container.labels.com_docker_compose_project_config_files": [
+      "/root/learning-monitoring/ELK/docker-compose.yml"
+    ]
+  }
+}
+```
 
 3. Проверка нод стэка. [Источник информаци - Run with Docker Compose](https://www.elastic.co/guide/en/elastic-stack-get-started/7.16/get-started-docker.html)
 ```
