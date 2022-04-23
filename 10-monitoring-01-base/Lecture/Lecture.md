@@ -289,6 +289,14 @@ Tools for Elastic - ElastAlert. Она умеет читать Elastic и стр
 
 Демо из ДЗ: [Caching in Go: Redis](https://github.com/hamnsk/go_psql_redis_example)
 
+Все свои проекты Андрюнини подключает к [SonarQube](https://www.sonarqube.org/) для проверки качества кода и на уязвимость.
+
+Рекомендация книги 
+
+[BPF для мониторинга Linux](https://www.ozon.ru/product/bpf-dlya-monitoringa-linux-kalavera-devid-fontana-lorentso-184708611/?sh=5vavedyE1w)
+[BPF для мониторинга Linux](https://www.labirint.ru/books/758839/)
+
+- 02:23:20 - Mikrotik + SNMP. SNMP exporter. Пример мониторинга в Prometheus.
 
 
 
