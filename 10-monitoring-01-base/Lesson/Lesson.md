@@ -368,9 +368,107 @@ P.P.S.: по желанию можно себя не ограничивать т
 [ДЗ на Python](https://github.com/zakharovnpa/01-devops-admin-homeworks/tree/main/04-script-02-py)
 
 Создаем скрипт на Python
+
+* Разработка скрипта для сбора метрик из директории логов ОС Ubuntu 20.04
 ```py
 #!/usr/bin/env python3
 
+# Скрипт проверки измененных файлов в локальной директории
+
+# Импортируем модуль
+import os
+    
+bashCommand = ["cd ~/netology-project/virt-homeworks-1", "git status"]	# команды, выполняемые в целевой директории
+result_os = os.popen(' && '.join(bashCommand)).read()			# чтение
+
+for result in result_os.split('\n'):		# выполнить разделение
+    if result.find('изменено') != -1:		# условие, если результаты вывода команд соответствуют знчению поиска
+    
+#is_change = False	#удалили неработающую переменную
+
+        prepare_result = result.replace('\tизменено:   ', '')	# перезаписать с добавлением знаков
+        prepare_result = result.replace('\tизменено:', '/root/netology-project/virt-homeworks-1/')  #внесли путь до директории
+        prepare_result = prepare_result.replace(' ', '')	#удаляем лишние пробелы
+        print(prepare_result)					# вывести результат на экран
+	
+# break		#удалили останавливающую цикл команду
+
+# The END
+
+```
+
+
+
+```py
+#!/usr/bin/env python3
+
+# Ранее это был скрипт для фиксации момента изменения IP адреса сервиса. Из него будем делать
+# Скрипт для сбора метрик из директории логов ОС Ubuntu 20.04
+
+# Импортируем модули
+import socket 
+import time
+import datetime
+import json
+import yaml
+
+fpath = "/root/scripts/Lesson-4.3/test3/" # путь к файлам
+
+# Переменные с актуальными IP адресами сервисов на момент начала проверки
+f = socket.gethostbyname('google.com')
+g = socket.gethostbyname('drive.google.com')
+h = socket.gethostbyname('mail.google.com')
+
+# Массив для вывода результатов на экран
+#server = ['     - google.com - '+f, '     - mail.google.com - '+h, '     - drive.google.com - '+g]
+
+#Блок вывода результатов на экран
+print('---       Внимание! Работает скрипт, определяющий актуальные IP адреса сервисов')
+print('---       Результаты находятся здесь: /root/scripts/Lesson-4.3/test3/')
+print('---       Для остановки скрипта и выхода нажмите Ctrl+C')
+#print('---    Актуальные сейчас IP адреса сервисов:')
+#print(server[0])
+#print(server[1])
+#print(server[2])
+#print('Смены IP адресов:')
+#print('---       Внимание! Работает скрипт, определяющий актуальные IP адреса сервисов')
+#print('---       Результаты сохраняются в файлах')
+
+# Массив для работы в цикле проверок
+service = {'google.com':f, 'mail.google.com':h, 'drive.google.com':g}
+
+# Переменные для работы цикла
+i = 1              # Начальное значение переменной
+waiting = 2        # интервал запуска тестов в секундах
+init=0             # Значение для сброса счетчика итераций
+
+#Блок цикла
+while True:                    # бесконечное число проверок 
+  for host in service:          # условие для каждого элемента (host )в массиве (service) 
+    ip = socket.gethostbyname(host)     # получение ip адреса по имени хоста
+    if ip != service[host]:    # сравнение полученного на предыдущем шаге ip адреса с адресом на начало проверки 
+      if i==1 and init !=1:    # проверка условий для счетчиков
+
+        # Строка, формирующая таблицу значений результатов проверок
+        print(str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")) +' [ERROR] ' + str(host) +' IP mistmatch: '+service[host]+' '+ip)
+
+
+# Блоки сборки  результатов проверок в файлы
+# json
+    with open(fpath+host+'.json', 'w') as jsf:
+        json_data = json.dumps({host:ip})
+        jsf.write(json_data)
+
+# yaml
+    with open(fpath+host+".yaml",'w') as ymf:
+        yaml_data= yaml.dump([{host:ip}])
+        ymf.write(yaml_data)
+
+    service[host]=ip    # запись нового полученного ip адреса в массив
+
+  time.sleep(waiting)     # таймер паузы в проверках
+
+# The END
 
 
 
