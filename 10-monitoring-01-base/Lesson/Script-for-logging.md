@@ -48,6 +48,25 @@ P.P.S.: по желанию можно себя не ограничивать т
 
 [ДЗ на Python](https://github.com/zakharovnpa/01-devops-admin-homeworks/tree/main/04-script-02-py)
 
+### Основные метрики сервера
+
+1. Системная информация сервера лежит в директории `/proc`
+2. Состав метрик:
+
+|Директория|Файл|Метрика|Примечание|
+|-|-|-|-|
+|/proc|meminfo|MemFree|Размер свободной память|
+|/proc|meminfo|SwapFree|Размер свободного раздела Swap|
+|/proc|meminfo|MemAvailable|Размер доступной памяти|
+|/proc|stat|cpu||
+|/proc|stat|processes||
+|/proc|vmstat|nr_free_pages||
+|/proc|zoneinfo|||
+|/proc|uptime||Время работы системы|
+|/proc|loadavg||Средняя нагрузка на систему
+|/proc|diskstats|sda5|Статистика ввода и вывода HDD
+
+
 ### Создаем скрипт на Python
 
 * Разработка скрипта для сбора метрик из директории логов ОС Ubuntu 20.04
