@@ -184,18 +184,24 @@ import datetime
 # Директория для складывания логов
 flog = "/var/log/"
 
+# Команды для просмотра файлов с метриками
 bashCommand = ["cd /proc", "cat stat", "cat meminfo", "cat loadavg", "cat vmstat", "cat diskstats"]
+
+# Условия для фильтрации параметров метрик
 result_os = os.popen(' && '.join(bashCommand)).read()
 for result in result_os.split('\n'):
     if result.find('MemFree') != -1:
         prepare_result_1 = result.replace('', '')
-        print(prepare_result_1[18:-2])
     elif result.find('MemAvailable') != -1:
         prepare_result_2 = result.replace('', '')
     elif result.find('cpu ') != -1:
         prepare_result_3 = result.replace('', '')
+        
+ # Для загрузки ЦП менее 1.00
     elif result.find('0.') != -1:
         prepare_result_4 = result.replace('', '')
+        
+   # Для загрузки ЦП более или равное 1.00
     elif result.find('1.') != -1:
         prepare_result_4 = result.replace('', '')
     elif result.find('nr_free_p') != -1:
@@ -207,25 +213,31 @@ for result in result_os.split('\n'):
 with open(flog + str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M")) + '-awesome-monitoring.log', 'w') as jsf:
     json_data = json.dumps({'Date': str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M"))}, indent=2)
     jsf.write(json_data)
+    
 # Фиксируем метрику MemFree
 with open(flog + str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M")) + '-awesome-monitoring.log', 'a') as jsf:
     json_data = json.dumps({'MemFree, kB':prepare_result_1[18:-2]}, indent=2)
     jsf.write(json_data)
+    
 # Фиксируем метрику MemAvailable
 with open(flog + str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M")) + '-awesome-monitoring.log', 'a') as jsf:
     json_data = json.dumps({'MemAvailable, kB':prepare_result_2[17:-2]}, indent=2)
     jsf.write(json_data)
+    
 # Фиксируем метрику cpu
 with open(flog + str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M")) + '-awesome-monitoring.log', 'a') as jsf:
     json_data = json.dumps({'CPU, %':prepare_result_3[5:-41]}, indent=2)
     jsf.write(json_data)
+    
 # Фиксируем метрику avgCPU
 with open(flog + str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M")) + '-awesome-monitoring.log', 'a') as jsf:
     json_data = json.dumps({'avgCPU, %':prepare_result_4[:-12]}, indent=2)
     jsf.write(json_data)
+    
 with open(flog + str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M")) + '-awesome-monitoring.log', 'a') as jsf:
     json_data = json.dumps({'nr_free_p':prepare_result_6[14:]}, indent=2)
     jsf.write(json_data)
+    
 # Фиксируем метрику HDD sda5
 with open(flog + str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M")) + '-awesome-monitoring.log', 'a') as jsf:
     json_data = json.dumps({'HDD sda5':prepare_result_7[18:-80]}, indent=2)
