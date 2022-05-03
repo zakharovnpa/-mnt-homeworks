@@ -7,12 +7,17 @@
 3. Создайте ещё один инстанс(2CPU4RAM) на основе образа `jetbrains/teamcity-agent`. Пропишите к нему a окружения `SERVER_URL: "http://<teamcity_url>:8111"`
 4. Авторизуйте агент
 5. Сделайте fork [репозитория](https://github.com/aragastmatb/example-teamcity)
-6. Создать VM (2CPU4RAM) и запустить playook (./infrastructure)
+6. Создать VM для Nexus (2CPU4RAM) и запустить playook (./infrastructure)
 
 ## Основная часть
 
 1. Создайте новый проект в teamcity на основе fork
 - 01:10
+
+- Создан проект `netology-teamcity`
+- Проброшен ключ SSH с измененными правами для пользователя и группы
+- Выполнено подключение к репозиторию по этой ссылке: `https://github.com/zakharovnpa/example-teamcity`
+
 
 2. Сделайте autodetect конфигурации
 3. Сохраните необходимые шаги, запустите первую сборку master'a
