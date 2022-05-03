@@ -69,21 +69,178 @@ P.P.S.: по желанию можно себя не ограничивать т
 
 ### Создаем скрипт на Python
 
+
 ```py
 #!/usr/bin/env python3
+#  /home/maestro/PycharmProjects/learning-python/venv/bin/python /home/maestro/PycharmProjects/learning-python/my-script-2.py
 
-# Скрипт проверки измененных файлов в локальной директории
+# Скрипт чтения содержимого файлов в локальной директории /proc
 
 # Импортируем модуль
 import os
-    
-bashCommand = ["/proc", "cat stat"]	# переменной `bashCommand` присваиваем масив команд, выполняемые в целевой
-									# директории
+import datetime
+
+
+bashCommand = ["cd /proc", "cat stat", "cat meminfo", "cat loadavg", "cat vmstat", "cat diskstats"]  # переменной `bashCommand` присваиваем масив команд, выполняемые в целевой
+# директории
+
+result_os = os.popen(' && '.join(bashCommand)).read()			# переменной `result_os` присвоиваем результаты выполнения функции `os.popen`
+# print(result_os)
+
+for result in result_os.split('\n'):		# для каждого элемента из результата `result_os` применить метод split и выполнить разделение построчно
+
+    if result.find('MemFree') != -1:  # условие, если результаты вывода команд соответствуют значению поиска
+        prepare_result = result.replace('\tMemFree:   ', '')
+        print(prepare_result)  # вывести результат на экран
+    elif result.find('MemAvailable') != -1:  # условие, если результаты вывода команд соответствуют значению поиска
+        prepare_result = result.replace('\tMemAvailable:   ', '')
+        print(prepare_result)  # вывести результат на экран
+    elif result.find('cpu ') != -1:  # условие, если результаты вывода команд соответствуют значению поиска
+        prepare_result = result.replace('\tcpu :   ', '')
+        print(prepare_result)  # вывести результат на экран
+    elif result.find('0.') != -1:  # условие, если результаты вывода команд соответствуют значению поиска
+        prepare_result = result.replace('\t:0.', '')
+        print(prepare_result)  # вывести результат на экран
+    elif result.find('1.') != -1:  # условие, если результаты вывода команд соответствуют значению поиска
+        prepare_result = result.replace('\t:1.', '')
+        print(prepare_result)  # вывести результат на экран
+    elif result.find('nr_free_p') != -1:  # условие, если результаты вывода команд соответствуют значению поиска
+        prepare_result = result.replace('\t:nr_free_p', '')
+        print(prepare_result)  # вывести результат на экран
+    elif result.find('sda5') != -1:  # условие, если результаты вывода команд соответствуют значению поиска
+        prepare_result = result.replace('\t:sda5', '')
+        print(prepare_result)  # вывести результат на экран
+
+# Результат: идет сбор данных
+cpu  1394898 1062 313401 19509245 17768 0 69307 0 0 0
+MemFree:         4716636 kB
+MemAvailable:    8465480 kB
+0.44 0.36 0.36 2/1648 37568
+nr_free_pages 1179159
+   8       5 sda5 55096 18314 5219622 41736 499493 404351 110318330 983550 0 446736 1025287 0 0 0 0 0 0
+
+
+#  Продолжение следует. 
+# Необходимо создать вторую часть - для сбора данных в файл .json
+
+
+```
+### Необходимо создать вторую часть - для сбора данных в файл .json
+
+Json - это словарь. Состоит из даных формата Key: Value
+
+```py
 
 
 
 
+```
+```py
+# Блоки сборки  результатов проверок в файлы
 
+# Образец:
+# json
+#   with open(fpath+host+'.json', 'w') as jsf:
+#        json_data = json.dumps({host:ip})
+#        jsf.write(json_data)
+#	
+
+# Рабочий вариант:
+with open("logs.json", 'w') as jsf:
+# with open("logs.json", 'a') as jsf:
+    json_data= json.dumps(prepare_result_1, indent=0)
+    jsf.write(json_data)
+with open("logs.json", 'w') as jsf:
+# with open("logs.json", 'a') as jsf:
+    json_data= json.dumps(prepare_result_2, indent=0)
+    jsf.write(json_data)
+	
+	
+```
+### Готовый рабочий Script
+
+* Расписание запуска скрипта в crontab
+
+```
+root@PC-Ubuntu:~/PycharmProjects/python-lesson-10.1# vim start-cron-log-script.sh
+root@PC-Ubuntu:~/PycharmProjects/python-lesson-10.1# 
+root@PC-Ubuntu:~/PycharmProjects/python-lesson-10.1# 
+root@PC-Ubuntu:~/PycharmProjects/python-lesson-10.1# crontab -u root start-cron-log-script.sh 
+root@PC-Ubuntu:~/PycharmProjects/python-lesson-10.1# 
+root@PC-Ubuntu:~/PycharmProjects/python-lesson-10.1# crontab -l
+* * * * * /root/PycharmProjects/python-lesson-10.1/./my-log-script.py
+```
+
+```py
+#!/usr/bin/env python3
+
+# Скрипт сбора логов на основе метрик из локальной директории /proc
+
+# Импортируем модуль
+import os
+import json
+import datetime
+
+# Директория для складывания логов
+flog = "/var/log/"
+
+bashCommand = ["cd /proc", "cat stat", "cat meminfo", "cat loadavg", "cat vmstat", "cat diskstats"]
+result_os = os.popen(' && '.join(bashCommand)).read()
+for result in result_os.split('\n'):
+    if result.find('MemFree') != -1:
+        prepare_result_1 = result.replace('', '')
+        print(prepare_result_1[18:-2])
+    elif result.find('MemAvailable') != -1:
+        prepare_result_2 = result.replace('', '')
+        print(prepare_result_2[17:-2])  # вывести результат на экран
+    elif result.find('cpu ') != -1:
+        prepare_result_3 = result.replace('', '')
+        print(prepare_result_3[5:-41])  # вывести результат на экран
+    elif result.find('0.') != -1:
+        prepare_result_4 = result.replace('', '')
+        print(prepare_result_4[:-12])  # вывести результат на экран
+    elif result.find('1.') != -1:
+        prepare_result_4 = result.replace('', '')
+        print(prepare_result_4[:-12])  # вывести результат на экран
+    elif result.find('nr_free_p') != -1:
+        prepare_result_6 = result.replace('', '')
+        print(prepare_result_6[14:])  # вывести результат на экран
+    elif result.find('sda5') != -1:
+        prepare_result_7 = result.replace('', '')
+        print(prepare_result_7[18:-80])  # вывести результат на экран
+
+# Фиксируем время сбора логов:
+with open(flog + str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M")) + '-awesome-monitoring.log', 'w') as jsf:
+    json_data = json.dumps({'Date': str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M"))}, indent=2)
+    jsf.write(json_data)
+# Фиксируем метрику MemFree
+with open(flog + str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M")) + '-awesome-monitoring.log', 'a') as jsf:
+    json_data = json.dumps({'MemFree, kB':prepare_result_1[18:-2]}, indent=2)
+    jsf.write(json_data)
+# Фиксируем метрику MemAvailable
+with open(flog + str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M")) + '-awesome-monitoring.log', 'a') as jsf:
+    json_data = json.dumps({'MemAvailable, kB':prepare_result_2[17:-2]}, indent=2)
+    jsf.write(json_data)
+# Фиксируем метрику cpu
+with open(flog + str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M")) + '-awesome-monitoring.log', 'a') as jsf:
+    json_data = json.dumps({'CPU, %':prepare_result_3[5:-41]}, indent=2)
+    jsf.write(json_data)
+# Фиксируем метрику avgCPU
+with open(flog + str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M")) + '-awesome-monitoring.log', 'a') as jsf:
+    json_data = json.dumps({'avgCPU, %':prepare_result_4[:-12]}, indent=2)
+    jsf.write(json_data)
+# Фиксируем метрику avgCPU 0.99-1.99
+# with open(flog + str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M")) + '-awesome-monitoring.log', 'a') as jsf:
+#     json_data = json.dumps({'avgCPU, %':prepare_result_5[:-12]}, indent=2)
+#     jsf.write(json_data)
+# Фиксируем метрику nr_free_p
+with open(flog + str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M")) + '-awesome-monitoring.log', 'a') as jsf:
+    json_data = json.dumps({'nr_free_p':prepare_result_6[14:]}, indent=2)
+    jsf.write(json_data)
+# Фиксируем метрику HDD sda5
+with open(flog + str(datetime.datetime.now().strftime("%Y-%m-%d--%H:%M")) + '-awesome-monitoring.log', 'a') as jsf:
+    json_data = json.dumps({'HDD sda5':prepare_result_7[18:-80]}, indent=2)
+    jsf.write(json_data)
 
 ```
 
