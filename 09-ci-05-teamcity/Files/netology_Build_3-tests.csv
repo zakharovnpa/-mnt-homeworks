@@ -1,0 +1,5 @@
+Order#,Test Name,Status,Duration(ms)
+1,plaindoll.WelcomerTest.welcomerSaysFarewell,OK,6
+2,plaindoll.WelcomerTest.welcomerSaysHunter,OK,0
+3,plaindoll.WelcomerTest.welcomerSaysStatus,OK,0
+4,plaindoll.WelcomerTest.welcomerSaysWelcome,OK,0
