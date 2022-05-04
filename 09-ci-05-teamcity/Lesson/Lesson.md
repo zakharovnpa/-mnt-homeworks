@@ -138,6 +138,7 @@ nexus                      : ok=17   changed=15   unreachable=0    failed=0    s
 * Как выкладывать в артифакты:
 - 02:33:20 - пояснение
 - В меню сборки `Build` --> `General Setting` в пункте `Artifact paths` записать `+:target/*.jar` и тогда все `.jar` артифакта сборки непосредственно были бы под кнопкой `Artifacts` (крайняя справа в виде стопочки бумаг) в общем списке проведенных сборок в меню `Build`--> `History`
+![screen-teamcity-build-history](/09-ci-05-teamcity/Files/screen-teamcity-build-history.png)
 
 
 
