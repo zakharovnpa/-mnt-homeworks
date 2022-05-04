@@ -9,6 +9,92 @@
 5. Сделайте fork [репозитория](https://github.com/aragastmatb/example-teamcity)
 6. Создать VM для Nexus (2CPU4RAM) и запустить playook (./infrastructure)
 
+* Запускем `ansible-playbook ./infrastructure/site.yml -i ./infrastructure/inventory/cicd/hosts.yml`
+```
+root@PC-Ubuntu:~/ansible-learning/yandex-cloud/Lambda/ansible# ansible-playbook ./infrastructure/site.yml -i ./infrastructure/inventory/cicd/hosts.yml 
+[WARNING]: Found both group and host with same name: nexus
+
+PLAY [Get Nexus installed] ***********************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ***************************************************************************************************************************************************************************************
+The authenticity of host '51.250.88.80 (51.250.88.80)' can't be established.
+ECDSA key fingerprint is SHA256:snjHfBoLYlGdxMlGh34ex7BAski6uP63bJZKoKAd1kE.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+ok: [nexus]
+
+TASK [Create Nexus group] ************************************************************************************************************************************************************************************
+changed: [nexus]
+
+TASK [Create Nexus user] *************************************************************************************************************************************************************************************
+changed: [nexus]
+
+TASK [Install JDK] *******************************************************************************************************************************************************************************************
+changed: [nexus]
+
+TASK [Create Nexus directories] ******************************************************************************************************************************************************************************
+changed: [nexus] => (item=/home/nexus/log)
+changed: [nexus] => (item=/home/nexus/sonatype-work/nexus3)
+changed: [nexus] => (item=/home/nexus/sonatype-work/nexus3/etc)
+changed: [nexus] => (item=/home/nexus/pkg)
+changed: [nexus] => (item=/home/nexus/tmp)
+
+TASK [Download Nexus] ****************************************************************************************************************************************************************************************
+[WARNING]: Module remote_tmp /home/nexus/.ansible/tmp did not exist and was created with a mode of 0700, this may cause issues when running as another user. To avoid this, create the remote_tmp dir with
+the correct permissions manually
+changed: [nexus]
+
+TASK [Unpack Nexus] ******************************************************************************************************************************************************************************************
+changed: [nexus]
+
+TASK [Link to Nexus Directory] *******************************************************************************************************************************************************************************
+changed: [nexus]
+
+TASK [Add NEXUS_HOME for Nexus user] *************************************************************************************************************************************************************************
+changed: [nexus]
+
+TASK [Add run_as_user to Nexus.rc] ***************************************************************************************************************************************************************************
+changed: [nexus]
+
+TASK [Raise nofile limit for Nexus user] *********************************************************************************************************************************************************************
+changed: [nexus]
+
+TASK [Create Nexus service for SystemD] **********************************************************************************************************************************************************************
+changed: [nexus]
+
+TASK [Ensure Nexus service is enabled for SystemD] ***********************************************************************************************************************************************************
+changed: [nexus]
+
+TASK [Create Nexus vmoptions] ********************************************************************************************************************************************************************************
+changed: [nexus]
+
+TASK [Create Nexus properties] *******************************************************************************************************************************************************************************
+changed: [nexus]
+
+TASK [Lower Nexus disk space threshold] **********************************************************************************************************************************************************************
+skipping: [nexus]
+
+TASK [Start Nexus service if enabled] ************************************************************************************************************************************************************************
+changed: [nexus]
+
+TASK [Ensure Nexus service is restarted] *********************************************************************************************************************************************************************
+skipping: [nexus]
+
+TASK [Wait for Nexus port if started] ************************************************************************************************************************************************************************
+ok: [nexus]
+
+PLAY RECAP ***************************************************************************************************************************************************************************************************
+nexus                      : ok=17   changed=15   unreachable=0    failed=0    skipped=2    rescued=0    ignored=0   
+
+```
+* Вход на сервер Nexus `http://51.250.88.80:8081`
+
+
+
+
+
+
+
+
 ## Основная часть
 
 1. Создайте новый проект в teamcity на основе fork
@@ -24,20 +110,33 @@
 - 01:32 - Build Feature - здесь настраивается праметр, по которому начинается сборка при изменини в репозитории?????
 
 4. Поменяйте условия сборки: если сборка по ветке `master`, то должен происходит `mvn clean deploy`, иначе `mvn clean test`. Это все про Maven.
+- 02:22:00 - Делаем сборку по условию задачи. Пояснение: если в имя ветки не входит слово `master`, то мы делаем просто тесты, если входит, то делаем полную нормальную сборку.
 - 02:24:15 - пример
+
+В настройках `Build` в шаге `Execute step` выбираем `Always, even build stop ... ` добавляем параметр `teamcity.build.brunc`, Conditions: `does not contain`, Value `master` - указываем конкретную ветку
+- 02:23:18 - если слово master не входит в имя ветки, то мы делаем просто тесты, если входит, то делаем полную нормальную сборку.
+- 02:23:50 - настройка второго шага сборки. 
+  - Execute step: `Always, even if build stop command was issued`
+  - Add Conditions:
+    - Parameter Name: `teamcity.build.branch`, 
+    - Conditions: `contains`, 
+    - Value: `master`
+  - Goals: `clean deploy ` - будет создавать файлы `.jar` и подготоваливать их к деплою в Nexus
+- Поменять в файле `pom.xml` ip address servers Nexus
+- Зайти на сервер Nexus `http://51.250.88.80:8081` - 02:25:00
 
 5. Для deploy будет необходимо загрузить [settings.xml](./teamcity/settings.xml) в набор конфигураций maven у teamcity, предварительно записав туда креды для подключения к nexus
 - 02:30:20
 
 6. В pom.xml необходимо поменять ссылки на репозиторий и nexus
-- 02:14 - про Nexus. Как установить на новой ВМ
+- 02:14 - про Nexus. Как установить на новой ВМ и про сбор артифактов
 - 02:28:20 - Nexus
 
 7. Запустите сборку по master, убедитесь что всё прошло успешно, артефакт появился в nexus
 - 02:27:50 - про PullRequest и Merge в ветку master
 - 02:33:50 - проверка артифакта в Nexus
 - 02:37:40 - проверка артифакта в Nexus. Самый простой способ доставки артфактов из CI в CD
-- 
+- 02:22:00 - Делаем сборку
 
 8. Мигрируйте `build configuration` в репозиторий
 - 02:50:10 - пояснение 
@@ -45,9 +144,49 @@
 9. Создайте отдельную ветку `feature/add_reply` в репозитории
 - 02:08:10 - пример
 
+
+* Не удалось создать новую ветку по команде `git checkout -b feature/add_reply `
+```
+root@PC-Ubuntu:~/netology-project/example-teamcity# git checkout -b feature/add_reply
+fatal: cannot lock ref 'refs/heads/feature/add_reply': 'refs/heads/feature' exists; cannot create 'refs/heads/feature/add_reply'
+
+```
+* Создана новая ветка `git checkout -b feature`
+
+```
+root@PC-Ubuntu:~/netology-project/example-teamcity# git checkout -b feature
+Переключено на новую ветку «feature»
+root@PC-Ubuntu:~/netology-project/example-teamcity# 
+root@PC-Ubuntu:~/netology-project/example-teamcity# git log --graph --oneline
+* 2cfadd3 (HEAD -> feature, origin/main, origin/HEAD, main) Adding change in README.md
+* c2f6429 Create WelcomerTest.java
+* cde289c Create Welcomer.java
+* 2d283da Create HelloPlayer.java
+* aeb3180 Create pom.xml
+* d08e247 Create .project
+* fd1eba4 Create .gitignore
+* 79e6a2f Create .classpath
+* 0d8bb7c Create Welcomer.java
+* 06d6cc9 Create HelloPlayer.java
+* 2514cbe Create settings.kts
+* 1805795 Create pom.xml
+* 8a81fb2 Create netology
+* e8b255f Create org.eclipse.jdt.core.prefs
+* 04d499b Create org.eclipse.jdt.apt.core.prefs
+* bf577d1 Initial commit
+
+```
+
+
 10. Напишите новый метод для класса Welcomer: метод должен возвращать произвольную реплику, содержащую слово `hunter`
 - 01:07 - показан прмер
 - 02:08 - пример
+
+* Вносим изменения в файл `sec/main/java/plaindoll/Welcomer.java`
+
+```
+
+```
 
 11. Дополните тест для нового метода на поиск слова `hunter` в новой реплике
 - 02:09:20 - пример
@@ -58,9 +197,25 @@
 13. Убедитесь что сборка самостоятельно запустилась, тесты прошли успешно
 - 02:06:35 - показаны где смотреть результаты тестов
 
+[netology_Build_3-tests.csv](/09-ci-05-teamcity/Files/netology_Build_3-tests.csv)
+
+```
+Order#,Test Name,Status,Duration(ms)
+1,plaindoll.WelcomerTest.welcomerSaysFarewell,OK,6
+2,plaindoll.WelcomerTest.welcomerSaysHunter,OK,0
+3,plaindoll.WelcomerTest.welcomerSaysStatus,OK,0
+4,plaindoll.WelcomerTest.welcomerSaysWelcome,OK,0
+
+```
+
 14. Внесите изменения из произвольной ветки `feature/add_reply` в `master` через `Merge`
+- 02:08:00 - пример
+
+
+
 15. Убедитесь, что нет собранного артифакта в сборке по ветке `master`
 - 01:57:45
+- 02:14 - про Nexus. Как установить на новой ВМ и про сбор артифактов
 
 16. Настройте конфигурацию так, чтобы она собирала `.jar` в артефакты сборки
 - 02:33
