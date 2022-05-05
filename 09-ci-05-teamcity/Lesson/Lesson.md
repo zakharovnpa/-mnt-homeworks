@@ -116,7 +116,7 @@ nexus                      : ok=17   changed=15   unreachable=0    failed=0    s
 3. Сохраните необходимые шаги, запустите первую сборку master'a
 - Выполнить предварительнуб настройку TeamCity
 
-- 01:32:00 - Build Feature - здесь настраивается праметр, по которому начинается сборка при изменини в репозитории?????
+- 01:32:00 - Build Feature - здесь настраивается параметр, по которому начинается сборка при изменини в репозитории?????
 
 4. Поменяйте условия сборки: если сборка по ветке `master`, то должен происходит `mvn clean deploy`, иначе `mvn clean test`. Это все про Maven.
 - 02:22:00 - Делаем сборку по условию задачи. Пояснение: если в имя ветки не входит слово `master`, то мы делаем просто тесты, если входит, то делаем полную нормальную сборку.
@@ -132,13 +132,55 @@ nexus                      : ok=17   changed=15   unreachable=0    failed=0    s
     - Value: `master`
   - Goals: `clean deploy ` - будет создавать файлы `.jar` и подготоваливать их к деплою в Nexus
 - Поменять в файле `pom.xml` ip address servers Nexus
+
+```xml
+<distributionManagement>
+		<repository>
+				<id>nexus</id>
+				<url>http://51.250.79.202:8081/repository/maven-releases</url>
+		</repository>
+	</distributionManagement>
+```
+
 - Зайти на сервер Nexus `http://51.250.88.80:8081` - 02:25:00
 
-5. Для deploy (загрузки артифактов на сревер Nexus) будет необходимо загрузить [settings.xml](./teamcity/settings.xml) в набор конфигураций maven у teamcity, предварительно записав туда креды для подключения к nexus
+5. Для deploy (загрузки артифактов на сревер Nexus) будет необходимо загрузить [settings.xml](./09-ci-05-teamcity/teamcity/settings.xml) в набор конфигураций maven у teamcity, предварительно записав туда креды для подключения к nexus. Креды - это Credentionals - параметры авторизации на сервере - логин и пароль
 - 02:29:30 - про необходимость загрузки настройки Nexus через загрузку файла `settings.xml` с загрузкой кредов
 - 02:30:20 - показано содержимое файла `settings.xml` и секция с логином и паролем
 - 02:31:00 - показано где настройки для загрузки файла конфигурации `settings.xml`
- 
+
+```xml
+  <servers>
+    <!-- server
+     | Specifies the authentication information to use when connecting to a particular server, identified by
+     | a unique name within the system (referred to by the 'id' attribute below).
+     |
+     | NOTE: You should either specify username/password OR privateKey/passphrase, since these pairings are
+     |       used together.
+     |
+    <server>
+      <id>deploymentRepo</id>
+      <username>repouser</username>
+      <password>repopwd</password>
+    </server>
+    -->
+    <server>
+      <id>nexus</id>
+      <username>admin</username>
+      <password>admin123</password>
+    </server>
+    <!-- Another sample, using keys to authenticate.
+    <server>
+      <id>siteServer</id>
+      <privateKey>/path/to/private/key</privateKey>
+      <passphrase>optional; leave empty if not used.</passphrase>
+    </server>
+    -->
+  </servers>
+```
+
+
+
 * Порядок загрузки файла конфигураци:
 - В меню проекта, в пункт `Maven Settings` --> `Uplad Settings File`
 
