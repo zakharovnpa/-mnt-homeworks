@@ -1,4 +1,4 @@
-GitLab
+## Лекция по теме "GitLab"
 1
 Алексей
 Метляков
@@ -7,7 +7,8 @@ DevOps Engineer
 OpenWay
 Алексей Метляков
 2
-План занятия
+
+### План занятия
 1. GitLab
 2. Own Issues
 3. Own Wiki
@@ -17,29 +18,33 @@ OpenWay
 7. Итоги
 8. Домашнее задание
 3
-GitLab
+
+### GitLab
 4
-Что такое GitLab?
+
+### Что такое GitLab?
 GitLab – ППО для полного контроля над производственным циклом
 ПО. Активно использует Ruby и Redis, есть возможность
 использовать SaaS (Software as a Service), так и установить
 на своей инфраструктуре.
-● Существует в следующих исполнениях:
-○ Community Edition (CE) – бесплатная версия c
+- Существует в следующих исполнениях:
+  - Community Edition (CE) – бесплатная версия c
 функционалом, не требующим проприетарного кода;
-○ Enterprise Edition (EE) – полноценная версия GitLab
+  - Enterprise Edition (EE) – полноценная версия GitLab
 Полное описание различий CE и EE на сайте.
-● Использует YAML для описание пайплайнов.
+- Использует YAML для описание пайплайнов.
 5
-Что такое GitLab?
+
+### Что такое GitLab?
 Некоторые основные возможности системы:
-● хранение репозитория (git),
-● отслеживание задач (issue tracking),
-● хранение страниц описания продукта (wiki, static site),
-● хранение артефактов (repository, registry),
-● создание CI\CD конвейера.
+- хранение репозитория (git),
+- отслеживание задач (issue tracking),
+- хранение страниц описания продукта (wiki, static site),
+- хранение артефактов (repository, registry),
+- создание CI\CD конвейера.
 6
-Архитектура GitLab
+
+### Архитектура GitLab
 NGINX
 GitLab
 Pages
@@ -53,7 +58,8 @@ Redis
 PostgreSQL
 Sidekiq
 Puma
-22 TCP GitLab Shell
+
+### 22 TCP GitLab Shell
 Архитектура GitLab
 route
 request
@@ -77,6 +83,7 @@ Web
 Server
 git session
 handler git
+
 Полное описание архитектуры есть на [официальном сайте](https://docs.gitlab.com/ee/development/architecture.html)
 
 
