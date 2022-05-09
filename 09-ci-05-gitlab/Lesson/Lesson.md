@@ -78,22 +78,23 @@ stages:
   - build
   - deploy
   
-image: docker:20.10.5
-services:docker:20.10.5-dind
+image: docker:latest       # docker:20.10.5
+services: 
+    - docker:latest        # docker:20.10.5-dind
 
 builder:
   stage: build
   script:
-    - docker build -t some_docker_build: latest .
+    - docker build -t some_docker_build:latest .
   except:
     - main
     
 deployer:
   stage: deploy
   script:
-    - docker build -t $CI_REGISTRY/zakharovnpa/gitlablesson/python-api: latest
+    - docker build -t $CI_REGISTRY/zakharovnpa/gitlablesson/python-api:latest .
     - docker login -u $CI_REGISTY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker push $CI_REGISTRY/zakharovnpa/gitlablesson/python-api: latest
+    - docker push $CI_REGISTRY/zakharovnpa/gitlablesson/python-api:latest
   only:
     - main
     
@@ -106,6 +107,23 @@ deployer:
 
 5. После создания файлов делаем commit на ветку main
 6. Переходим к CI/CD. Т.к. был создан файл `.gitlab-ci.yml`, то после commit сборка сразу начинается, как только все эт опопало в ветку main. и мы это можем видеть
+7. Создан коммит на ветку main. Успешно
+8. После коммита автоматом запустилась сборка. Неуспешно. 
+  * Была синтаксическая ошибка
+  * Не настроены Runner - процессы CI/CDдля запуска пайплайн сборки. Необходима регистрация раннера
+  * Процесс регистрации раннера не проходит, т.к. требуется зарегистрировать банковскую карту. В настоящее время это не возможно.
+  * Альтернатива - зарегистрировать раннер локально по [инструкции](https://docs.gitlab.com/runner/register/)
+
+9. Процесс регитрации ранера:
+
+* [Инструкция](https://docs.gitlab.com/runner/register/)
+
+* Прежде чем зарегистрировать бегуна, вы должны сначала:
+    - [Установите](https://docs.gitlab.com/runner/install/index.html) его на сервере отдельно от того, на котором установлен GitLab.
+    - Получите токен:
+* Устанавливаем раннер в [Docker](https://docs.gitlab.com/runner/install/docker.html) контейнер
+
+10. 
 
 ### Product Owner
 
