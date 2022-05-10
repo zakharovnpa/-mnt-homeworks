@@ -122,8 +122,51 @@ deployer:
     - [Установите](https://docs.gitlab.com/runner/install/index.html) его на сервере отдельно от того, на котором установлен GitLab.
     - Получите токен:
 * Устанавливаем раннер в [Docker](https://docs.gitlab.com/runner/install/docker.html) контейнер
+* [Регистрация раннера](https://docs.gitlab.com/runner/register/index.html#docker)
+  * [Пример регистрации раннера](https://docs.gitlab.com/runner/examples/gitlab.html)
+* 
 
-10. 
+10. В итоге раннер запустился
+11. Сборка нового образа прошла успешно. Образ выложен в гитлаб реджистри и его можно скачать.
+12. Скачивание собранного образа. - 01:30:28  - 01:31:30. Ссылку на скачивание образа берем на странице `Container Registry`
+
+```
+root@PC-Ubuntu:~# docker pull registry.gitlab.com/zakharovnpa/gitlablesson/python-api:latest
+latest: Pulling from zakharovnpa/gitlablesson/python-api
+Digest: sha256:0281164e4d963499b7be3029e159e5f4ea6211858df5e3ca72bdbbab6da8cfdd
+Status: Image is up to date for registry.gitlab.com/zakharovnpa/gitlablesson/python-api:latest
+registry.gitlab.com/zakharovnpa/gitlablesson/python-api:latest
+
+```
+```
+root@PC-Ubuntu:~# docker image list
+REPOSITORY                                                          TAG               IMAGE ID       CREATED             SIZE
+registry.gitlab.com/zakharovnpa/gitlablesson/python-api             latest            e87a0e154f99   About an hour ago   427MB
+registry.gitlab.com/zakharovnpa/gitlablesson                        latest            e87a0e154f99   About an hour ago   427MB
+docker                                                              dind              c89d806adeb8   4 days ago          236MB
+docker                                                              latest            da88b5cbcdd8   4 days ago          219MB
+gitlab/gitlab-runner                                                latest            89944ac4ab2c   7 days ago          691MB
+registry.gitlab.com/gitlab-org/gitlab-runner/gitlab-runner-helper   x86_64-f761588f   257667c17e33   7 days ago          66.9MB
+centos                                                              7                 eeb6ee3f44bd   7 months ago        204MB
+docker                                                              20.10.5-dind      0a9822c8848d   13 months ago       258MB
+docker                                                              20.10.5           1588477122de   13 months ago       241MB
+
+```
+
+13. Запуск контейнера и проверка что все работает как положено.  - 01:33:50
+
+```
+docker run -d -p 5290:5290 registry.gitlab.com/zakharovnpa/gitlablesson/python-api 
+```
+14. Проверяем работу веб-приложения
+```
+root@PC-Ubuntu:~# curl http://localhost:5290/get_info
+{"version": 3, "method": "GET", "message": "Already started"}
+```
+* Все работает.
+
+
+
 
 ### Product Owner
 
