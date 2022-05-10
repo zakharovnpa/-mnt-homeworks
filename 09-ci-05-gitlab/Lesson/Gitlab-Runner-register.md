@@ -5,6 +5,7 @@
 
 ### Альтернатива
 * Альтернатива - зарегистрировать раннер локально по [инструкции](https://docs.gitlab.com/runner/register/)
+> Локальный раннер - это раннер, запущенный, например в докер-контейнере и работающий для обработки очередей сборки. Для настройки надо запустить контейнер с раннеро и привязать его к проекту на сайте GitLab.com
 
 ### Процесс регитрации ранера:
 
@@ -264,3 +265,246 @@ Runner registered successfully. Feel free to start it, but if it's running alrea
 
 ```
 * На странице в репозитрии с раннерами появилась информация о зарегитрированном раннере.
+* Содержимое файла - конфигурации
+
+```
+root@44e681f99687:/etc/gitlab-runner# cat config.toml 
+concurrent = 1
+check_interval = 0
+
+[session_server]
+  session_timeout = 1800
+
+[[runners]]
+  name = "gitlablesson-runner"
+  url = "https://gitlab.com/"
+  token = "YyZG39jkbdsUzum9WBiv"
+  executor = "docker"
+  [runners.custom_build_dir]
+  [runners.cache]
+    [runners.cache.s3]
+    [runners.cache.gcs]
+    [runners.cache.azure]
+  [runners.docker]
+    tls_verify = false
+    image = "docker:latest"
+    privileged = false
+    disable_entrypoint_overwrite = false
+    oom_kill_disable = false
+    disable_cache = false
+    volumes = ["/cache"]
+    shm_size = 0
+
+[[runners]]
+  name = "44e681f99687"
+  url = "https://gitlab.com"
+  token = "YyZG39jkbdsUzum9WBiv"
+  executor = "docker"
+  [runners.custom_build_dir]
+  [runners.cache]
+    [runners.cache.s3]
+    [runners.cache.gcs]
+    [runners.cache.azure]
+  [runners.docker]
+    tls_verify = false
+    image = "docker:latest"
+    privileged = false
+    disable_entrypoint_overwrite = false
+    oom_kill_disable = false
+    disable_cache = false
+    volumes = ["/cache"]
+    shm_size = 0
+
+```
+* Перезапуск контейнера
+```
+docker run -d --name gitlab-runner --restart always \
+-v /var/run/docker.sock:/var/run/docker.sock \
+-v gitlab-runner-config:/etc/gitlab-runner \
+gitlab/gitlab-runner:latest
+
+```
+* Перезапуск регисрации был неудачный
+
+### Локальная установка и регистрация раннера на ОС Ubuntu
+
+* Инсталляция раннера в ОС Ubuntu
+```
+root@PC-Ubuntu:~# sudo curl -L --output /usr/local/bin/gitlab-runner https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 47.4M  100 47.4M    0     0  5978k      0  0:00:08  0:00:08 --:--:-- 6893k
+root@PC-Ubuntu:~# 
+root@PC-Ubuntu:~# sudo chmod +x /usr/local/bin/gitlab-runner
+root@PC-Ubuntu:~# 
+root@PC-Ubuntu:~# sudo useradd --comment 'GitLab Runner' --create-home gitlab-runner --shell /bin/bash
+root@PC-Ubuntu:~# 
+root@PC-Ubuntu:~# users
+maestro
+root@PC-Ubuntu:~# 
+root@PC-Ubuntu:~# sudo gitlab-runner install --user=gitlab-runner --working-directory=/home/gitlab-runner
+Runtime platform                                    arch=amd64 os=linux pid=26078 revision=f761588f version=14.10.1
+root@PC-Ubuntu:~# 
+root@PC-Ubuntu:~# sudo gitlab-runner start
+Runtime platform                                    arch=amd64 os=linux pid=26147 revision=f761588f version=14.10.1
+root@PC-Ubuntu:~# 
+root@PC-Ubuntu:~# 
+root@PC-Ubuntu:~# echo $REGISTRATION_TOKEN
+
+root@PC-Ubuntu:~# 
+
+```
+* Регистрация раннера
+```
+root@PC-Ubuntu:~# sudo gitlab-runner register --url https://gitlab.com/ --registration-token GR1348941aDbJ5hLqEha-sGVV72uF
+Runtime platform                                    arch=amd64 os=linux pid=26326 revision=f761588f version=14.10.1
+Running in system-mode.                            
+                                                   
+Enter the GitLab instance URL (for example, https://gitlab.com/):
+[https://gitlab.com/]: 
+Enter the registration token:
+[GR1348941aDbJ5hLqEha-sGVV72uF]: 
+Enter a description for the runner:
+[PC-Ubuntu]: 
+Enter tags for the runner (comma-separated):
+1.0.1
+Enter optional maintenance note for the runner:
+1
+Registering runner... succeeded                     runner=GR1348941aDbJ5hLq
+Enter an executor: ssh, virtualbox, docker+machine, docker-ssh, parallels, shell, kubernetes, custom, docker, docker-ssh+machine:
+docker 
+Enter the default Docker image (for example, ruby:2.7):
+docker:latest
+Runner registered successfully. Feel free to start it, but if it's running already the config should be automatically reloaded! 
+root@PC-Ubuntu:~# 
+
+```
+* Результат: Runner работает
+
+### Устранение ошибки "error during connect: Post "http://docker:2375/v1.24"
+
+* Ошибка при сборке:
+```
+
+Skipping Git submodules setup
+Executing "step_script" stage of the job script
+Using docker image sha256:da88b5cbcdd82afd42d2aedfc14ae3ffbbde9b2b6632ab38f3e67f826eb613f5 for docker:latest with digest docker@sha256:462f7ada37612b16adf56972b362b60c488861670b906a42e7a84319f2d1ff23 ...
+$ docker build -t $CI_REGISTRY/zakharovnpa/gitlablesson/python-api:latest .
+error during connect: Post "http://docker:2375/v1.24/build?buildargs=%7B%7D&cachefrom=%5B%5D&cgroupparent=&cpuperiod=0&cpuquota=0&cpusetcpus=&cpusetmems=&cpushares=0&dockerfile=Dockerfile&labels=%7B%7D&memory=0&memswap=0&networkmode=default&rm=1&shmsize=0&t=registry.gitlab.com%2Fzakharovnpa%2Fgitlablesson%2Fpython-api%3Alatest&target=&ulimits=null&version=1": dial tcp: lookup docker on 192.168.1.1:53: no such host
+Cleaning up project directory and file based variables
+ERROR: Job failed: exit code 1
+```
+* Причина: docker не мог получить доступ. Эта ошибка возникает с gitlab runners на основе докеров, такими как тот, который мы настроили с помощью dockerexecutor. Сообщение об ошибке означает, что  внутренний док - контейнер не подключен к хост-  docker демону. 
+* Решение: Чтобы это исправить, установите следующие параметры в [runners.docker]gitlab  -runner config.toml :
+```
+тома = [ "/cache" , "/var/run/docker.sock:/var/run/docker.sock" ]
+```
+#### Выполнено:
+
+```
+root@PC-Ubuntu:~# cat /etc/gitlab-runner/config.toml
+concurrent = 1
+check_interval = 0
+
+[session_server]
+  session_timeout = 1800
+
+[[runners]]
+  name = "PC-Ubuntu"
+  url = "https://gitlab.com/"
+  token = "chxg1JAhi1pHa2eNznJA"
+  executor = "docker"
+  [runners.custom_build_dir]
+  [runners.cache]
+    [runners.cache.s3]
+    [runners.cache.gcs]
+    [runners.cache.azure]
+  [runners.docker]
+    tls_verify = false
+    image = "docker:latest"
+    privileged = false
+    disable_entrypoint_overwrite = false
+    oom_kill_disable = false
+    disable_cache = false
+    volumes = ["/cache"]        # Здесь отсутсвует запись о подключении к сокету докера
+    shm_size = 0
+root@PC-Ubuntu:~# 
+```
+
+* Вносим исправления:
+```
+
+root@PC-Ubuntu:~# vim /etc/gitlab-runner/config.toml
+root@PC-Ubuntu:~# 
+root@PC-Ubuntu:~# 
+```
+
+```
+root@PC-Ubuntu:~# gitlab-runner --help
+NAME:
+   gitlab-runner - a GitLab Runner
+
+USAGE:
+   gitlab-runner [global options] command [command options] [arguments...]
+
+VERSION:
+   14.10.1 (f761588f)
+
+AUTHOR:
+   GitLab Inc. <support@gitlab.com>
+
+COMMANDS:
+     exec                  execute a build locally
+     list                  List all configured runners
+     run                   run multi runner service
+     register              register a new runner
+     install               install service
+     uninstall             uninstall service
+     start                 start service
+     stop                  stop service
+     restart               restart service
+     status                get status of a service
+     run-single            start single runner
+     unregister            unregister specific runner
+     verify                verify all registered runners
+     artifacts-downloader  download and extract build artifacts (internal)
+     artifacts-uploader    create and upload build artifacts (internal)
+     cache-archiver        create and upload cache artifacts (internal)
+     cache-extractor       download and extract cache artifacts (internal)
+     cache-init            changed permissions for cache paths (internal)
+     health-check          check health for a specific address
+     read-logs             reads job logs from a file, used by kubernetes executor (internal)
+     help, h               Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --cpuprofile value           write cpu profile to file [$CPU_PROFILE]
+   --debug                      debug mode [$DEBUG]
+   --log-format value           Choose log format (options: runner, text, json) [$LOG_FORMAT]
+   --log-level value, -l value  Log level (options: debug, info, warn, error, fatal, panic) [$LOG_LEVEL]
+   --help, -h                   show help
+   --version, -v                print the version
+root@PC-Ubuntu:~# 
+
+```
+* Проверяем статус раннера на локальной ОС. Запущен.
+```
+root@PC-Ubuntu:~# gitlab-runner status
+Runtime platform                                    arch=amd64 os=linux pid=49997 revision=f761588f version=14.10.1
+gitlab-runner: Service is running
+root@PC-Ubuntu:~# 
+```
+* Делаем рестарт раннера
+```
+root@PC-Ubuntu:~# gitlab-runner restart
+Runtime platform                                    arch=amd64 os=linux pid=50021 revision=f761588f version=14.10.1
+root@PC-Ubuntu:~# 
+root@PC-Ubuntu:~# 
+```
+* Проверяем статус раннера на локальной ОС. Запущен.
+```
+root@PC-Ubuntu:~# gitlab-runner status
+Runtime platform                                    arch=amd64 os=linux pid=50042 revision=f761588f version=14.10.1
+gitlab-runner: Service is running
+root@PC-Ubuntu:~# 
+
+```
