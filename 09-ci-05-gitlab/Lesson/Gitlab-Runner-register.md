@@ -396,6 +396,8 @@ ERROR: Job failed: exit code 1
 ```
 * Причина: docker не мог получить доступ. Эта ошибка возникает с gitlab runners на основе докеров, такими как тот, который мы настроили с помощью dockerexecutor. Сообщение об ошибке означает, что  внутренний док - контейнер не подключен к хост-  docker демону. 
 * Решение: Чтобы это исправить, установите следующие параметры в [runners.docker]gitlab  -runner config.toml :
+
+[Помогла эта статья](https://techoverflow.net/2021/01/12/how-to-fix-gitlab-ci-error-during-connect-post-http-docker2375-v1-40-auth-dial-tcp-lookup-docker-on-no-such-host/)
 ```
 тома = [ "/cache" , "/var/run/docker.sock:/var/run/docker.sock" ]
 ```
