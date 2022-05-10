@@ -163,8 +163,15 @@ docker run -d -p 5290:5290 registry.gitlab.com/zakharovnpa/gitlablesson/python-a
 root@PC-Ubuntu:~# curl http://localhost:5290/get_info
 {"version": 3, "method": "GET", "message": "Already started"}
 ```
-* Все работает.
+* Все работает. С другим контейнером тоже работает.
+```
+root@PC-Ubuntu:~# docker run -d -p 5290:5290 registry.gitlab.com/zakharovnpa/gitlablesson/python-api
+e07106816190060def9144ed65da3b395c32e88f896ed1c1dfa19ff428ab075a
+root@PC-Ubuntu:~# 
+root@PC-Ubuntu:~# curl http://localhost:5290/get_info
+{"version": 3, "method": "GET", "message": "Already started"}
 
+```
 
 
 
@@ -174,6 +181,36 @@ root@PC-Ubuntu:~# curl http://localhost:5290/get_info
 1. Какой метод необходимо исправить
 2. Текст с `{ "message": "Already started" }` на `{ "message": "Running"}`
 3. Issue поставить label: feature
+
+**Ответ:**
+
+- 00:30:45 Issue Trackers - отдельная компонента GitLab, позволяющая создавать issue или incident для конкретного проекта.
+- 00:32:40 - create New Issue. Name: ... , Type: Issue, Description, Assignes - zakharovnpa
+- 00:33:32 - Milestone - analog Apics in Jira. Создаем новый Milestone. Называем его.
+- 00:35:20 - только что созданная Issue
+- 00:35:35 - кнопка для создани Merge Request. Здесь нужно указать делать сейчас Merge Request или просто сделать новую ветку.  Для этой задачи создатся отдельная ветка. Указать Brance name, от какой ветки создавать Source branche
+- 
+
+1. Создано письмо на почту `contact-project+zakharovnpa-gitlablesson-35980166-issue-@incoming.gitlab.com` с постановкой задачи.
+2. Письмо получено в Service Descks GitLab.
+
+* Текст письма:
+```
+Нашему проекту нужна бизнесовая доработка
+Задача: Необходимо поменять JSON ответа на вызов метода GET /rest/api/get_info
+
+Пояснение: Изменить текст с { "message": "Already started" } на { "message": "Running"}
+
+С уважением, Product Owner
+```
+
+3. Даем ответ на письмо
+4. Создаем новую Issue
+5. В новой Issue добавляем параметров 
+6. Создалась новая Issue
+7. По кнопке `Confidential Merge Request` ставим галочку Create branch и создаем новую задачу-Issue и новую ветку. Создаем имя для новой ветки `add_feature` и от какой ветки оветвляться (от main). 
+8. 
+
 
 ### Developer
 
