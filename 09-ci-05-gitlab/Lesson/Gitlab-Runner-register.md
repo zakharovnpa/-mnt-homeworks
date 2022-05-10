@@ -438,6 +438,35 @@ root@PC-Ubuntu:~# vim /etc/gitlab-runner/config.toml
 root@PC-Ubuntu:~# 
 root@PC-Ubuntu:~# 
 ```
+```
+root@PC-Ubuntu:~# cat /etc/gitlab-runner/config.toml
+concurrent = 1
+check_interval = 0
+
+[session_server]
+  session_timeout = 1800
+
+[[runners]]
+  name = "PC-Ubuntu"
+  url = "https://gitlab.com/"
+  token = "chxg1JAhi1pHa2eNznJA"
+  executor = "docker"
+  [runners.custom_build_dir]
+  [runners.cache]
+    [runners.cache.s3]
+    [runners.cache.gcs]
+    [runners.cache.azure]
+  [runners.docker]
+    tls_verify = false
+    image = "docker:latest"
+    privileged = false
+    disable_entrypoint_overwrite = false
+    oom_kill_disable = false
+    disable_cache = false
+    volumes = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]       # внесенные исправления
+    shm_size = 0
+
+```
 
 ```
 root@PC-Ubuntu:~# gitlab-runner --help
