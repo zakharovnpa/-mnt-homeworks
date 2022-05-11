@@ -218,43 +218,66 @@ Collections – способ распространения контента Ans
 #### 18Подготовка к запуску
 Для скачивания необходимо воспользоваться пакетными
 менеджерами:
-● yum install ansbile
-● apt install ansible
-● pip3 install ansible --user
+- yum install ansbile
+- apt install ansible
+- pip3 install ansible --user
 Инструкции по установке в разных версиях ОС
 Если уже установлен ansible, то перед установкой версии выше 2.10,
 нужно удалить старую.
 
-  #### 19Подготовка к запуску
+  #### 19Подготовка к запуску 
 В пакет входят:
-● ansible – определение и запуск playbook из одного task на
-наборе hosts;
-● ansible-playbook – запуск полноценного playbook;
-● ansible-vault – шифрование хранилища методом AES256;
-● ansible-galaxy – скачивание roles и collections;
-● ansible-lint – используется для проверки синтаксиса;
-● ansible-console – консоль для запуска tasks;
-● ansible-conﬁg – просмотр и управление конфигурацией ansible;
-● ansible-doc – просмотр документации plugins;
-● ansible-inventory – просмотр информации о hosts из inventory;
-● ansible-pull – скачивание playbook и запуск на localhost;
-● ansible-test – тестирование collections.
+- ansible – определение и запуск playbook из одного task на наборе hosts;
+- ansible-playbook – запуск полноценного playbook;
+- ansible-vault – шифрование хранилища методом AES256;
+- ansible-galaxy – скачивание roles и collections;
+- ansible-lint – используется для проверки синтаксиса;
+- ansible-console – консоль для запуска tasks;
+- ansible-conﬁg – просмотр и управление конфигурацией ansible;
+- ansible-doc – просмотр документации plugins;
+- ansible-inventory – просмотр информации о hosts из inventory;
+- ansible-pull – скачивание playbook и запуск на localhost;
+- ansible-test – тестирование collections.
 
-#### 20Запуск команд
+#### 20Запуск команд      - 01:39:20
   
 ```yml
 ansible -m ping localhost       #Сделаем ping на locahost
+```
+```
 ansible -m ping -i inventory.yml all      #Сделаем ping на всех хостах из inventory
+```
+```
 ansible -m ping -i inventory.yml <group_name>       #Сделаем ping на всех хостах группы <group_name>
+```
+```
 ansible-playbook site.yml -i inventory/test.yml       #Запуск site на хостах из test
+```
+```
 ansible-inventory -i inventory.yml --graph <group_name>       #Показать хосты группы
+```
+```
 ansible-inventory -i inventory.yml --list       #Показать все переменные всех хостов из inventory
+```
+```
 ansible-inventory -i inventory.yml --list <hostname>      #Показать все переменные хоста из inventory
+```
+```
 ansible-doc <plugin_name>       #Показать документацию по плагину
+```
+```
 ansible-vault create <filename>       #Создать новый зашифрованные файл
+```
+```
 ansible-vault edit <filename>       #Отредактировать зашифрованный файл
+```
+```
 ansible-vault view <filename>       #Просмотреть зашифрованный файл
+```
+```
 ansible-vault rekey <filename>      #Поменять пароль у файла
+```
+```
 ansible-vault decrypt <filename>      #Расшифровать файл
 ```
 
@@ -294,6 +317,70 @@ Slack.
 Алексей Метляков
 Алексей Метляков
 
-  ### Практическая часть
+  ### Практическая часть      - 01:43:00
   
-  01:56:45 - Запуск Docker контейнеров
+- 01:43:00 - Написание нового Playbook 
+  - В директории Project/ansible создаем файл `site.yml`
+```yml
+# site.yml
+---
+- name: First play
+  host: test
+  task:
+    - name: First task
+      debug:                      # Модуль, который позворляет вывести в лог все что угодно
+        msg: "Параметр с таким значением: {{ custom_var }}"            # Переменная msg, которую надо вывести модулем debug
+      ignore_errors: true         # Игнорировать ошибки
+      fialed_when: false          # 
+    - name: Second task
+      debug:                      # Модуль, который позворляет вывести в лог все что угодно
+        var: custom_var           # Переменная custom_var, которую надо вывести модулем debug
+
+
+```
+  - В директории Project/ansible/inventory создаем файл `hosts.yml`
+ ```yml
+ # hosts.yml
+ ---
+ prod:                                      # группа
+   host:                                    # хост
+     centos:7                               # имя хоста
+       ansible_connection: docker           # тип подключения
+ 
+ test:
+   host:
+     some:
+       localhost:
+         ansible_connection_type: local
+ 
+ 
+ 
+ 
+ ```
+  - В директории Project/ansible/group_vars создаем файл `all.yml`, `test.yml`
+ ```yml
+ # all.yml
+ ---
+ 
+ ```
+ 
+ ```yml
+  # test.yml
+  ---
+  
+ ```
+ 
+   - В директории Project/ansible/group_vars/prod создаем файл `custom.yml`
+ ```yml
+ # custom.yml
+ ---
+ custom_var: случайное значение
+ 
+ ```
+ 
+- 01:50:50 - первый запуск Плейбуки
+- 01:52:00 - пояснение по статусам завершенного плейбук
+- 01:56:45 - Запуск Docker контейнеров
+- 02:16:00 - как испоьзовать переменные, взятые из Gathering_facts
+
+- 03:36:10 - Домашнее задание
