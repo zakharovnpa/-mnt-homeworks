@@ -85,7 +85,7 @@ molecule 3.4.0 using python 3.8
 
 ```
 * Запуск `molecule test`
-```
+```make
 root@server1:~/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/elasticsearch_roles# molecule test
 INFO     default scenario test matrix: dependency, lint, cleanup, destroy, syntax, create, prepare, converge, idempotence, side_effect, verify, cleanup, destroy
 INFO     Performing prerun...
@@ -426,7 +426,7 @@ root@server1:~/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/kibana_
 * Для этого необходимо в файл `molecule.yml` или `create.yml` добавить информацию.
 
 * файл `molecule.yml`
-```
+```yml
 ---
 dependency:
   name: galaxy
@@ -450,7 +450,7 @@ verifier:
 
 * Ошибки при запуске тестов:
 
-```
+```make
 TASK [elasticsearch_roles : Install Elasticsearch] *****************************
 
 fatal: [ubuntu-instance]: 
