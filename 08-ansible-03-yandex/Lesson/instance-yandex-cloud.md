@@ -1,5 +1,10 @@
 ### Тестирование возможности установки своих ВМ 
 
+* Рабочая директория:
+```
+root@PC-Ubuntu:~/ansible-learning/yandex-cloud/Gamma#
+```
+
 * На соснове конфигурации Terraform из урока Docker-Swarm по созданию шести инстансов
 * План: изменить так конфигурацию Teraform, чтобы в результате могли создаваться 3 инстанса с именами `el-instance`, `k-instance`, `application-instance`
 
