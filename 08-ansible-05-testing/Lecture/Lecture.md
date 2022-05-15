@@ -568,34 +568,40 @@ platforms:
         # такое имя нужно для того, чтобы CI, когда эта штука запускается на TeamCity чтобы она могла работать в параллель. 
         # Т.е. создается уникальное и индивидуальное имя ВМ, где:
         # ${USER} - имя пользователя в ОС
-        # ${BUILD_NUMBER} - номер сборки в TeamCity. Если его нет, то пишется locaL
+        # ${BUILD_NUMBER:-local} - номер сборки в TeamCity. Если его нет, то пишется -locaL
         # Когда будет запускаться ВМ, то будет создаваться она с именем на основании шаблона
-
+  groups:         # группа для объединения создаваемых ВМ в одну группу ansible для прописывания group_vars
+    - vector_inner
 
   image: centos-7-x86_64
   flavor: 1.2.60
   network: external
   ssh_user: ${MOLECULE_OPENSTACK_SSH_USER:-cloud-user}
-          # ${MOLECULE_OPENSTACK_SSH_USER} - имя пользователя. Если его нет, то пишется -cloud-user
+  
+          # ${MOLECULE_OPENSTACK_SSH_USER:-cloud-user} - имя пользователя. Если его нет, то пишется -cloud-user
           # Когда будет запускаться ВМ, то будет запускаться она от имени на основании шаблона
   
-  groups:         # ansible группа переменных
-    - vector_inner
+
 - name: ${USER}--${BUILD_NUMBER:-locaL}-molecule-vector-role-centos7-incomer
   image: centos-7-x86_64
   flavor: 1.2.60    # 1 - кол-во CPU, 2 - размер оперативки 2Gb, 60 - HDD 60Gb
   network: external
   ssh_user: ${MOLECULE_OPENSTACK_SSH_USER:-cloud-user}
-  groups:
+  groups:             # группа для объединения создаваемых ВМ в одну группу ansible для прописывания group_vars
     - vector_outer
+    
     
   provisioner:
     name: ansible
     inventory:
       group_vars:
-      host_vars:
+   #  host_vars:    # можно наркутить переменных по хосту
+                    # Далее идут настройки для того, чтобы два сервера Вектор могли между собой общаться. Чтобы один другому отправлял какие-то данные
+                    # В целом это файлы yaml
+                    # !!! Алексей сказал, что они нам не очень сильно нужны.
+                   
         vector_inner:
-          vector config:
+          vector_config:
             sources:
               local:
                 type: socket
@@ -629,6 +635,28 @@ platforms:
                   when_full: block
         vector_outer:
           vector_config:
+            sources:
+              local_logs:
+                type: vector
+                address: 0.0.0.0:6767
+            sinks:
+              to_file:
+                type: file
+                inputs: ["local_logs"]
+                path: "{{ vector_config_dir }}/outer.log"
+                encoding:
+                  codec: ndjson
+
+     all:
+       vector_version: 0.18.1
+       vector_packages_url: https://packages.timber.io/vector/
+       force_reinsrall: false
+       vector_distr_is_local: false
+       need_create_service: true
+       vector_config_dir: "/home/cloud-user/vector-config"
+       
+verifier:
+  name: ansible
           
     - 00:52:45 показано продолжение файла
                   
@@ -638,16 +666,23 @@ platforms:
         # To be Continue
                   
     
-   verifier:
-     name: ansible
+
   
   
 ```
 
-- 00:52:50 - `create.yml` - не изменялся
+- 00:52:50 - `create.yml` - не изменялся, он абсолютно идентичен тому, что создала сама молекула
 
 - 00:52:56 - Описание файла `destroy.yml`
-- 00:53:29 - Описание файла `verify.yml`
+* Было добавлено для удаления key_pair на openstack сервере:
+```
+- name: Delete key pair
+  os_keypair:
+    name: "key-pair-{{ molecule_yml['platforms'][0]['name'] }}"
+    state: absent
+```
+
+- 00:53:29 - Описание файла `verify.yml` Тут есть дополнительные проверки того, что оба сервер могут между собой передавать сообщения
 ```yml
 # verify.yml`
 #Первый Play для локального вектора
@@ -673,7 +708,7 @@ platforms:
        set_fact:
          debug_msg: "{{ mounts['content'] | b64decode }}"
    - name: Ensure message in sent  # проверяется, что слова "debug message" появились в файле "debug_msg.message"
-     assert:
+     assert:    # !!! Пример asserta
        that: "debug message" in "debug_msg.message"
        
 # - 00:54:44
@@ -697,20 +732,28 @@ platforms:
 
 
 - 00:55:27 - !!! Важно! Запуск команды `molecule test` и пояснение что происходит
-  -  создание инстансов
+- 00:55:45 - показаны стадии тестировани
+``
+INFO    Default scenario test matrix: dependency, lint, cleanup, 
+``
+- 00:55:50 - установка ролей
+- 00:56:33 - запуск Destroy
+- 00:57:14 -  создание инстансов
   -  запуск и прохождение тестиования
   -  удаление инстансов
 - Мы один раз все настроили в `default/molecule.yml` 
 
-- 00:59:50 - теперь мы можем в файлах директории `role/tasks` все что угодно понаписать и пытаться все это дело прогнать.
+- 00:59:50 - !!! теперь мы можем в файлах директории `role/tasks` все что угодно понаписать и пытаться все это дело прогнать.
+* Пример файлов с тасками
 ```ps
-/role/tasks/
+#/role/tasks/
             config_vector.yml
             install_vector_apt.yml
             install_vector_dnf.yml
             install_vector_yum.yml
             main.yml
-            manage.yml
+            manage_vector.yml
+            precheck_vector.yml
             remove_vector_apt.yml
             remove_vector_dnf.yml
             remove_vector_yum.yml
@@ -730,12 +773,17 @@ platforms:
 
 
 - 01:00:25 - тест запуска при сломанном чем-то. Пояснение про то, как можно в Докер-контейнере прикрутить systemd с помощью Сигруп. Как альтернатива - использовать Podman.
-- 01:02:56 - Команда `molecule converge`. Как прогнать тест, но не уничтожить ВМ. 
+- 01:02:40 - показана ошибка `CRITICAL Ansible return code was 2, command was:`, а дпльше только стадии cleanup, destroy
+- 01:02:56 - !!! Команда `molecule converge`. Как прогнать тест, но не уничтожить ВМ. 
 - 01:05:20 - итог прогонки `molecule converge`
-- 01:05:30 - посмотреть что там на ВМ делается. Команда `molecule login --host <hostname> `. И дальше можно тестировать.
+- 01:05:30 - !!! посмотреть что там на ВМ делается. Команда `molecule login --host <hostname> `. Зашли под пользователем cloud-user, под которым работает инвентори. И дальше можно тестировать.
+- 01:06:05 - запуск команды внутри новой ВМ
+- 01:06:15 - делаем тесты
+- 01:07:10 - !!! пояснение как работать для CI на локальной ОС. После изменений конфигурации нужно запускать `molecule converge`. Он пытается прогнать роль. Она отваливается по каким-то причинам. Можно зайти на ВМ по `molecule login`, посмтореть что там ив каком состоянии, емли по логу молекулы не понятно что и где отвалилось (каких-то прав не хватило или еще что-нибудь)
+- 01:08:30 - делаем фиксы, converge, фиксы, converge, фиксы, converge. А потом когда все хорошо стало, делаем коммит, а там уже при появлении новой ревизии автоматом запускается в системе оркестратора конвейер сборки и тестирования, ну или молекульные тесты. Вытягивает из репозитория и запускает молекул тест
 - 01:08:35 - как сделать коммит.
 - 01:09:00 - об использовании `hint` в виде файла `pre-commt-config.yml`. Рекомендация сайта [pre-commit.com](https://pre-commit.com). Выполняется прекомит чек
-и есть уверенность на 90%, что мы линты пройдем. Останавливается коммит при наличии ошибок. А также ошибки могут автоматически исправляться.
+и есть уверенность на 90%, что мы линты пройдем. Останавливается коммит при наличии ошибок и даже не дасть сделать коммит с ошибкой. А также ошибки могут автоматически исправляться.
 ```yml
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -745,6 +793,12 @@ repos:
   -   id: end-of-file-fixer
   -   id: check_yaml
   -   id: check-added-lirge-files
+```
+- 01:10:25 - Файл `install_vector.yml`
+```
+---
+- name: Install Vector | Download RPM
+
 ```
 
 * Про TOX
