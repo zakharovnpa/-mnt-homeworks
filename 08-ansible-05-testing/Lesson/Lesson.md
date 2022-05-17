@@ -26,10 +26,15 @@ Successfully installed docker-5.0.3 molecule-docker-0.2.4 websocket-client-1.3.1
 docker --version
 Docker version 20.10.12, build e91ed57
 ```
+```
+root@server1:~/learning-ansible/Lesson-ansible-05# pip3 list | grep molecule-docker
+molecule-docker        0.2.4 
+```
 
 3. Соберите локальный образ на основе [Dockerfile](/08-ansible-05-testing/Lecture/Dockerfile). Это нужно для тестиования TOX на роли Elasticsearche
 ```ps
 FROM registry.redhat.io/rhel8/podman:latest
+
 ENV MOLECULE_NO_LOG false
 
 RUN yum reinstall glibc-common -y
@@ -46,6 +51,23 @@ RUN tar xf Python-3.9.2.tgz && cd Python-3.9.2/ && ./configure && make && make a
 RUN python3 -m pip install --upgrade pip && pip3 install tox selinux
 RUN rm -rf Python-*
 ```
+* Альтернативный Dockerfile
+```
+FROM rancher/dind:latest
+
+ENV MOLECULE_NO_LOG false
+
+RUN apt reinstall glibc-common -y
+RUN apt update -y && apt install tar gcc make python3-pip zlib-devel openssl-devel yum-utils libffi-devel -y
+
+ADD https://www.python.org/ftp/python/3.7.10/Python-3.7.10.tgz Python-3.7.10.tgz
+RUN tar xf Python-3.7.10.tgz && cd Python-3.7.10/ && ./configure && make && make altinstall
+ADD https://www.python.org/ftp/python/3.9.2/Python-3.9.2.tgz Python-3.9.2.tgz
+RUN tar xf Python-3.9.2.tgz && cd Python-3.9.2/ && ./configure && make && make altinstall
+RUN python3 -m pip install --upgrade pip && pip3 install tox selinux
+RUN rm -rf Python-*
+```
+
 Образ собран.
 ```ps
 root@server1:~/learning-ansible/Lesson-ansible-05# docker image list
@@ -84,6 +106,11 @@ molecule 3.4.0 using python 3.8
     docker:0.2.4 from molecule_docker
 
 ```
+```
+root@server1:~/learning-ansible/Lesson-ansible-05# pip3 list | grep molecule-docker
+molecule-docker        0.2.4 
+```
+
 * Запуск `molecule test`
 ```make
 root@server1:~/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/elasticsearch_roles# molecule test
