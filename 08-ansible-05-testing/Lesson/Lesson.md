@@ -92,7 +92,7 @@ registry.redhat.io/rhel8/podman   latest     f58db8adf7bb   5 weeks ago     399M
 
 ### Molecule
 
-1. Запустите  `molecule test` внутри корневой директории `elasticsearch-role`, посмотрите на вывод команды.
+#### 1. Запустите  `molecule test` внутри корневой директории `elasticsearch-role`, посмотрите на вывод команды.
 
 * Необходимо, чтобы было установлено: - `molecule`, `docker`, `molecule_docker` пакетик.
 ```
@@ -401,8 +401,8 @@ INFO     Pruning extra files from scenario ephemeral directory
 
 ```
 
-2. Перейдите в каталог с ролью `kibana-role` и создайте сценарий тестирования по умолчаню при помощи `molecule init scenario --driver-name docker`.
-Можно использовать любые драверы. (а какме есть?)
+#### 2. Перейдите в каталог с ролью `kibana-role` и создайте сценарий тестирования по умолчаню при помощи `molecule init scenario --driver-name docker`.
+Можно использовать любые драверы. (а какме есть? Delegate, )
 ```ps
 root@server1:~/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/kibana_roles# molecule init scenario --driver-name docker
 INFO     Initializing new scenario default...
@@ -448,7 +448,258 @@ root@server1:~/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/kibana_
 9 directories, 15 files
 ```
 
-3. Добавьте несколько разных дистрибутивов (centos:8, ubuntu:latest) для инстансов и протестируйте роль, исправьте найденные ошибки, если они есть.
+* Отключена задача "Конфигурирование Кибана". Была ошибка недоступности Elasticsearch
+* На Contos7 не проходит установка. Там не работает systemctl.
+* На Ubuntu Kibana установилась, тест молекулы прошел успешно:
+```ps
+root@server1:~/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/kibana_roles# molecule test
+INFO     default scenario test matrix: dependency, lint, cleanup, destroy, syntax, create, prepare, converge, idempotence, side_effect, verify, cleanup, destroy
+INFO     Performing prerun...
+INFO     Guessed /root/learning-ansible/Lesson-ansible-05/ansible/playbook as project root directory
+WARNING  Computed fully qualified role name of kibana_roles does not follow current galaxy requirements.
+Please edit meta/main.yml and assure we can correctly determine full role name:
+
+galaxy_info:
+role_name: my_name  # if absent directory name hosting role is used instead
+namespace: my_galaxy_namespace  # if absent, author is used instead
+
+Namespace: https://galaxy.ansible.com/docs/contributing/namespaces.html#galaxy-namespace-limitations
+Role: https://galaxy.ansible.com/docs/contributing/creating_role.html#role-names
+
+As an alternative, you can add 'role-name' to either skip_list or warn_list.
+
+INFO     Using /root/.cache/ansible-lint/ef1620/roles/kibana_roles symlink to current repository in order to enable Ansible to find the role using its expected full name.
+INFO     Added ANSIBLE_ROLES_PATH=~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:/root/.cache/ansible-lint/ef1620/roles
+INFO     Running default > dependency
+WARNING  Skipping, missing the requirements file.
+WARNING  Skipping, missing the requirements file.
+INFO     Running default > lint
+INFO     Lint is disabled.
+INFO     Running default > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running default > destroy
+INFO     Sanity checks: 'docker'
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item=instance)
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+FAILED - RETRYING: [localhost]: Wait for instance(s) deletion to complete (300 retries left).
+ok: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '719388041524.14278', 'results_file': '/root/.ansible_async/719388041524.14278', 'changed': True, 'item': {'image': 'docker.io/pycontribs/ubuntu', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+TASK [Delete docker network(s)] ************************************************
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+INFO     Running default > syntax
+
+playbook: /root/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/kibana_roles/molecule/default/converge.yml
+INFO     Running default > create
+
+PLAY [Create] ******************************************************************
+
+TASK [Log into a Docker registry] **********************************************
+skipping: [localhost] => (item={'image': 'docker.io/pycontribs/ubuntu', 'name': 'instance', 'pre_build_image': True}) 
+
+TASK [Check presence of custom Dockerfiles] ************************************
+ok: [localhost] => (item={'image': 'docker.io/pycontribs/ubuntu', 'name': 'instance', 'pre_build_image': True})
+
+TASK [Create Dockerfiles from image names] *************************************
+skipping: [localhost] => (item={'image': 'docker.io/pycontribs/ubuntu', 'name': 'instance', 'pre_build_image': True}) 
+
+TASK [Discover local Docker images] ********************************************
+ok: [localhost] => (item={'changed': False, 'skipped': True, 'skip_reason': 'Conditional result was False', 'item': {'image': 'docker.io/pycontribs/ubuntu', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item', 'i': 0, 'ansible_index_var': 'i'})
+
+TASK [Build an Ansible compatible image (new)] *********************************
+skipping: [localhost] => (item=molecule_local/docker.io/pycontribs/ubuntu) 
+
+TASK [Create docker network(s)] ************************************************
+
+TASK [Determine the CMD directives] ********************************************
+ok: [localhost] => (item={'image': 'docker.io/pycontribs/ubuntu', 'name': 'instance', 'pre_build_image': True})
+
+TASK [Create molecule instance(s)] *********************************************
+changed: [localhost] => (item=instance)
+
+TASK [Wait for instance(s) creation to complete] *******************************
+FAILED - RETRYING: [localhost]: Wait for instance(s) creation to complete (300 retries left).
+changed: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '322818549455.14474', 'results_file': '/root/.ansible_async/322818549455.14474', 'changed': True, 'item': {'image': 'docker.io/pycontribs/ubuntu', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=5    changed=2    unreachable=0    failed=0    skipped=4    rescued=0    ignored=0
+
+INFO     Running default > prepare
+WARNING  Skipping, prepare playbook not configured.
+INFO     Running default > converge
+
+PLAY [Converge] ****************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [instance]
+
+TASK [Include kibana_roles] ****************************************************
+
+TASK [kibana_roles : include_tasks] ********************************************
+included: /root/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/kibana_roles/tasks/download_kibana_deb.yml for instance
+
+TASK [kibana_roles : Download Kibana's deb] ************************************
+changed: [instance]
+
+TASK [kibana_roles : include_tasks] ********************************************
+included: /root/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/kibana_roles/tasks/install_kibana_deb.yml for instance
+
+TASK [kibana_roles : Install Kibana] *******************************************
+changed: [instance]
+
+RUNNING HANDLER [kibana_roles : restart kibana] ********************************
+changed: [instance]
+
+PLAY RECAP *********************************************************************
+instance                   : ok=6    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+INFO     Running default > idempotence
+
+PLAY [Converge] ****************************************************************
+
+TASK [Gathering Facts] *********************************************************
+ok: [instance]
+
+TASK [Include kibana_roles] ****************************************************
+
+TASK [kibana_roles : include_tasks] ********************************************
+included: /root/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/kibana_roles/tasks/download_kibana_deb.yml for instance
+
+TASK [kibana_roles : Download Kibana's deb] ************************************
+ok: [instance]
+
+TASK [kibana_roles : include_tasks] ********************************************
+included: /root/learning-ansible/Lesson-ansible-05/ansible/playbook/roles/kibana_roles/tasks/install_kibana_deb.yml for instance
+
+TASK [kibana_roles : Install Kibana] *******************************************
+ok: [instance]
+
+PLAY RECAP *********************************************************************
+instance                   : ok=5    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+INFO     Idempotence completed successfully.
+INFO     Running default > side_effect
+WARNING  Skipping, side effect playbook not configured.
+INFO     Running default > verify
+INFO     Running Ansible Verifier
+
+PLAY [Verify] ******************************************************************
+
+TASK [Example assertion] *******************************************************
+ok: [instance] => {
+    "changed": false,
+    "msg": "All assertions passed"
+}
+
+PLAY RECAP *********************************************************************
+instance                   : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+INFO     Verifier completed successfully.
+INFO     Running default > cleanup
+WARNING  Skipping, cleanup playbook not configured.
+INFO     Running default > destroy
+
+PLAY [Destroy] *****************************************************************
+
+TASK [Destroy molecule instance(s)] ********************************************
+changed: [localhost] => (item=instance)
+
+TASK [Wait for instance(s) deletion to complete] *******************************
+FAILED - RETRYING: [localhost]: Wait for instance(s) deletion to complete (300 retries left).
+changed: [localhost] => (item={'failed': 0, 'started': 1, 'finished': 0, 'ansible_job_id': '514117568756.16411', 'results_file': '/root/.ansible_async/514117568756.16411', 'changed': True, 'item': {'image': 'docker.io/pycontribs/ubuntu', 'name': 'instance', 'pre_build_image': True}, 'ansible_loop_var': 'item'})
+
+TASK [Delete docker network(s)] ************************************************
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=2    changed=2    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0
+
+INFO     Pruning extra files from scenario ephemeral directory
+
+
+```
+
+#### 3. Добавьте несколько разных дистрибутивов (centos:8, ubuntu:latest) для инстансов и протестируйте роль, исправьте найденные ошибки, если они есть.
+
+* Для успешного тестирования с помощью Молекулы ролей, используемых на разных дитсрибутивах, необходимо:
+  * В каждой роли обезличить название файлов для тасок. Например было `diwnload_kibana_rpm.yml` станет `download_rmp.yml`.
+  * Добавить в таски для каждой роли (/tasks) проверку фактов каждого инстанса на то, какой установлчный пакет там действует. 
+```
+- include_tasks: "download_{{ ansible_facts.pkg_mgr }}.yml"
+- include_tasks: "install_{{ ansible_facts.pkg_mgr }}.yml"
+
+```
+  * Сделать разные файлы для скачивания и установки пактов с дистрибутивами
+  * cat download_apt.yml 
+```
+
+---
+- name: "Download Elasticsearch's deb"
+  get_url:
+    url: "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{{ elasticsearch_version }}-amd64.deb"
+    dest: "files/elasticsearch-{{ elasticsearch_version }}-amd64.deb"
+    validate_certs: false
+  delegate_to: localhost
+  register: download_elastic
+  until: download_elastic is succeeded
+  when: elastic_install_type == 'remote'
+- name: Copy Elasticsearch to manage host
+  copy:
+    src: "files/elasticsearch-{{ elasticsearch_version }}-amd64.deb"
+    mode: 0755
+    dest: "/tmp/elasticsearch-{{ elasticsearch_version }}-amd64.deb"
+
+```
+  * cat download_yum.yml 
+```
+---
+- name: "Download Elasticsearch's rpm"
+  get_url:
+    url: "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{{ elasticsearch_version }}-x86_64.rpm"
+    dest: "files/elasticsearch-{{ elasticsearch_version }}-x86_64.rpm"
+    validate_certs: false
+  register: download_elastic
+  delegate_to: localhost
+  until: download_elastic is succeeded
+  when: elastic_install_type == 'remote'
+- name: Copy Elasticsearch to managed node
+  copy:
+    src: "files/elasticsearch-{{ elasticsearch_version }}-x86_64.rpm"
+    mode: 0755
+    dest: "/tmp/elasticsearch-{{ elasticsearch_version }}-x86_64.rpm"
+
+```
+  * cat install_apt.yml 
+```
+---
+- name: Install Elasticsearch
+  become: true
+  apt:
+    deb: "/tmp/elasticsearch-{{ elasticsearch_version }}-amd64.deb"
+    state: present
+  notify: restart Elasticsearch
+
+```
+  * cat install_yum.yml 
+```
+---
+- name: Install Elasticsearch
+  become: true
+  yum:
+    name: "/tmp/elasticsearch-{{ elasticsearch_version }}-x86_64.rpm"
+    state: present
+  notify: restart Elasticsearch
+
+```
+* План такой:
+  * В файле /molecule/default/molecule.yml указать какие инстансы будут собираться на каких дитсрибутивах
+
 
 * Для этого необходимо в файл `molecule.yml` или `create.yml` добавить информацию.
 
