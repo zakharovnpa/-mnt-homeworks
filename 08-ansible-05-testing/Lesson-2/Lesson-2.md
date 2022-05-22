@@ -257,6 +257,29 @@ RUN tar xf Python-3.9.2.tgz && cd Python-3.9.2/ && ./configure && make && make a
 RUN python3 -m pip install --upgrade pip && pip3 install tox selinux
 RUN rm -rf Python-*
 ```
+* Для разных дистрибуьтвов ОС использовать возможность определения типа ОС из Gathernig Facts - использовать переменну `ansible_facts.pkg_mgr`
+```
+  - import_tasks: "configure.yml"
+  - include_tasks: "download {{ ansible_facts.pkg_mgr }}.yml"     # пока это пример
+    tags: [always]
+                                                               
+  - include_tasks: "download_kibana_rpm.yml"    # пока это пример
+    # when:
+    #  - force_reinstall
+    # tags: [install]
+  - include_tasks: "install_kibana.yml"   # пока это пример
+    # when:
+    #  - skip_instal is undefinde
+    #  - ansible_distributon in support_system
+    tags: [install]
+    
+    tags: [config]
+    
+    
+    tags: [service]
+
+```
+
 
 ## Основная часть
 
